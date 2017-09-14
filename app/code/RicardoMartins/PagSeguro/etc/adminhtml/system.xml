@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2013-2017 Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="payment">
+            <group id="rm_pagseguro" translate="label comment" sortOrder="10000" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>PagSeguro - Ricardo Martins</label>
+                <comment><![CDATA[Need help? - <a href="//r-martins.github.io/PagSeguro-Magento-Transparente" target="_blank">Official site of the module</a> | <a href="//pagsegurotransparente.zendesk.com/hc/pt-br" target="_blank">Help Center</a>.<br/> Want to pay less fees? <a href="//r-martins.github.io/PagSeguro-Magento-Transparente/pro/app.html" target="_blank"><strong>Authorize your account</strong></a> in the application template and receive the PRO module for free in the informed e-mail, with ticket support and TEF.<br/>If you have lower rates yet, and wish to receive the PRO module with ticket support and tef without authorizing the application, <a href="//r-martins.github.io/PagSeguro-Magento-Transparente/pro/" target="_blank">please subscribe</a>.]]></comment>
+                <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>
