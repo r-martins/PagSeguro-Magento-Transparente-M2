@@ -1,0 +1,184 @@
+<!--
+/**
+ * Copyright © 2013-2017 Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+
+<fieldset data-bind="attr: {class: 'fieldset payment items ccard ' + getCode(), id: 'payment_form_' + getCode()}">
+    <!-- ko if: (isShowLegend())-->
+    <legend class="legend">
+        <span><!-- ko i18n: 'Credit Card Information'--><!-- /ko --></span>
+    </legend><br />
+    <!-- /ko -->
+     <div class="field type">
+        <div class="control">
+            <input type="hidden"
+                   name="payment[cc_type]"
+                   class="input-text"
+                   value=""
+                   data-bind="attr: {id: getCode() + '_cc_type', 'data-container': getCode() + '-cc-type'},
+                   value: creditCardType
+                   ">
+        </div>
+    </div>
+     <div class="field number required">
+        <label data-bind="attr: {for: getCode() + '_cc_owner'}" class="label">
+            <span><!-- ko i18n: 'Credit Card Owner Name'--><!-- /ko --></span>
+        </label>
+        <div class="control">
+            <input type="text" name="payment[ps_cc_owner]" class="input-text" value=""
+                   data-bind="attr: {
+                                    autocomplete: off,
+                                    id: getCode() + '_cc_owner',
+                                    title: $t('Credit Card Owner Name'),
+                                    'data-container': getCode() + '-cc-owner',
+                                    'data-validate': JSON.stringify({'required':true})}"
+                                    />
+        </div>
+    </div>
+    <div class="field number required">
+        <label data-bind="attr: {for: getCode() + '_cc_owner_birthday_day'}" class="label">
+            <span><!-- ko i18n: 'Date of Birth '--><!-- /ko --></span>
+        </label>
+        <div class="control">
+            <input type="text" name="payment[ps_cc_owner_birthday_day]" class="input-text ps_cc_birthdate" value=""
+                   data-bind="attr: {
+                                    autocomplete: off,
+                                    placeholder: 'DD',
+                                    id: getCode() + '_cc_owner_birthday_day',
+                                    title: $t('DD'),
+                                    'data-container': getCode() + '-cc-owner-birthday-day',
+                                    'data-validate': JSON.stringify({'required':true})}"
+                                    />
+             <input type="text" name="payment[ps_cc_owner_birthday_month]" class="input-text ps_cc_birthdate" value=""
+                   data-bind="attr: {
+                                    autocomplete: off,
+                                    placeholder: 'MM',
+                                    id: getCode() + '_cc_owner_birthday_month',
+                                    title: $t('MM'),
+                                    'data-container': getCode() + '-cc-owner-birthday-month',
+                                    'data-validate': JSON.stringify({'required':true})}"
+                                    />
+               <input type="text" name="payment[ps_cc_owner_birthday_year]" class="input-text ps_cc_birthdate" value=""
+                   data-bind="attr: {
+                                    autocomplete: off,
+                                    placeholder: 'YYYY',
+                                    id: getCode() + '_cc_owner_birthday_year',
+                                    title: $t('YYYY'),
+                                    'data-container': getCode() + '-cc-owner-birthday-year',
+                                    'data-validate': JSON.stringify({'required':true})}"
+                                    />
+        </div>
+    </div>
+    <div class="field number required">
+        <label data-bind="attr: {for: getCode() + '_cc_number'}" class="label">
+            <span><!-- ko i18n: 'Credit Card Number'--><!-- /ko --></span>
+        </label>
+        <div class="control">
+            <input type="number" name="payment[ps_cc_number]" class="input-text" value=""
+                   data-bind="attr: {
+                                    autocomplete: off,
+                                    id: getCode() + '_cc_number',
+                                    title: $t('Credit Card Number'),
+                                    'data-container': getCode() + '-cc-number',
+                                    'data-validate': JSON.stringify({'required-number':true, 'validate-card-type':getCcAvailableTypesValues(), 'validate-card-number':'#' + getCode() + '_cc_type', 'validate-cc-type':'#' + getCode() + '_cc_type'})},
+                              enable: isActive($parents),
+                              value: creditCardNumber,
+                              valueUpdate: 'keyup' "/>
+        </div>
+         <span id="card-brand"></span>
+          <span id="card-msg"></span>
+    </div>
+    <div class="field date required" data-bind="attr: {id: getCode() + '_cc_type_exp_div'}">
+        <label data-bind="attr: {for: getCode() + '_expiration'}" class="label">
+            <span><!-- ko i18n: 'Expiration Date'--><!-- /ko --></span>
+        </label>
+        <div class="control">
+            <div class="fields group group-2">
+                <div class="field no-label month">
+                    <div class="control">
+                        <select  name="payment[ps_cc_exp_month]"
+                                 class="select select-month"
+                                 data-bind="attr: {id: getCode() + '_expiration', 'data-container': getCode() + '-cc-month', 'data-validate': JSON.stringify({required:true, 'validate-cc-exp':'#' + getCode() + '_expiration_yr'})},
+                                            enable: isActive($parents),
+                                            options: getCcMonthsValues(),
+                                            optionsValue: 'value',
+                                            optionsText: 'month',
+                                            optionsCaption: $t('Month'),
+                                            value: creditCardExpMonth">
+                        </select>
+                    </div>
+                </div>
+                <div class="field no-label year">
+                    <div class="control">
+                        <select name="payment[ps_cc_exp_year]"
+                                class="select select-year"
+                                data-bind="attr: {id: getCode() + '_expiration_yr', 'data-container': getCode() + '-cc-year', 'data-validate': JSON.stringify({required:true})},
+                                           enable: isActive($parents),
+                                           options: getCcYearsValues(),
+                                           optionsValue: 'value',
+                                           optionsText: 'year',
+                                           optionsCaption: $t('Year'),
+                                           value: creditCardExpYear">
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ko if: (hasVerification())-->
+    <div class="field cvv required" data-bind="attr: {id: getCode() + '_cc_type_cvv_div'}">
+        <label data-bind="attr: {for: getCode() + '_cc_cid'}" class="label">
+            <span><!-- ko i18n: 'Card Verification Number'--><!-- /ko --></span>
+        </label>
+        <div class="control _with-tooltip">
+            <input type="number"
+                   autocomplete="off"
+                   class="input-text cvv"
+                   name="payment[ps_cc_cid]"
+                   value=""
+                   data-bind="attr: {id: getCode() + '_cc_cid',
+                        title: $t('Card Verification Number'),
+                        'data-container': getCode() + '-cc-cvv',
+                        'data-validate': JSON.stringify({'required-number':true, 'validate-card-cvv':'#' + getCode() + '_cc_type'})},
+                        enable: isActive($parents),
+                        value: creditCardVerificationNumber" />
+            <div class="field-tooltip toggle">
+                <span class="field-tooltip-action action-cvv"
+                      tabindex="0"
+                      data-toggle="dropdown"
+                      data-bind="attr: {title: $t('What is this?')}, mageInit: {'dropdown':{'activeClass': '_active'}}">
+                    <span><!-- ko i18n: 'What is this?'--><!-- /ko --></span>
+                </span>
+                <div class="field-tooltip-content"
+                     data-target="dropdown"
+                     data-bind="html: getCvvImageHtml()"></div>
+            </div>
+        </div>
+    </div>
+    <!-- /ko -->
+    <div class="field date required" data-bind="attr: {id: getCode() + '_cc_installments_div'}">
+        <label data-bind="attr: {for: getCode() + '_cc_installments'}" class="label">
+            <span><!-- ko i18n: 'Installments'--><!-- /ko --></span>
+        </label>
+        <div class="control">
+            <div class="fields group group-2">
+                <div class="field no-label installments">
+                    <div class="control">
+                        <select  name="payment[ps_cc_installments]"
+                                 class="select select-installments"
+                                 data-bind="attr: {id: getCode() + '_cc_installments', 'data-container': getCode() + '-cc-installments',},
+                                            enable: isActive($parents),
+                                            optionsValue: 'value',
+                                            optionsText: 'Installments',
+                                            optionsCaption: $t('Installments'),
+                                            value: 'Informe os dados do cartão para calcular'">
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</fieldset>
+<div data-bind="afterRender: preparePagSeguro()"></div>

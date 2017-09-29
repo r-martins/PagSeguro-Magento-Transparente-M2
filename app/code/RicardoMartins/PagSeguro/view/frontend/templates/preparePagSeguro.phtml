@@ -1,0 +1,35 @@
+<?php
+$helper = $this->helper('RicardoMartins\PagSeguro\Helper\Data');
+$viewJsPath = $block->getViewFileUrl('RicardoMartins_PagSeguro::js/pagseguro.js');
+$storeUrl = $helper->getStoreUrl();
+$grandTotal = $helper->getGrandTotal();
+$installments = $helper->getInstallmentQty();
+
+?>
+
+<script src="<?php echo $viewJsPath;?>"></script>
+<script type="text/javascript">
+     //<![CDATA[
+    var preparePagSeguro = function(){
+        
+        if(typeof RMPagSeguroObj != "undefined"){
+            <?php if ($helper->isDebugActive()): ?>
+            console.info('PagSeguro was already started.');
+            <?php endif; ?>
+            return;
+        }
+        <?php if ($helper->isDebugActive()): ?>
+        console.info('PagSeguro is initiating. Wait for ready message.');
+        <?php endif; ?>
+            var RMPagSeguroObj = new RMPagSeguro(<?php echo $helper->getConfigJs()?>);
+            console.info('PagSeguro ready');
+            RMPagSeguroObj.addCardFieldsObserver(RMPagSeguroObj);
+            RMPagSeguroObj.setStoreUrl("<?php echo $storeUrl ?>");
+            RMPagSeguroObj.updateBrand();
+            RMPagSeguroObj.setInstallmentsQty(<?php echo $installments;?>);
+            RMPagSeguroObj.getGrandTotal();
+    }
+    //preparePagSeguro();
+
+    //]]>
+</script>

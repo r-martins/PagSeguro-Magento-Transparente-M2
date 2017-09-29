@@ -27,28 +27,18 @@ class Internal extends \Magento\Framework\App\Helper\AbstractHelper
     protected $eavAttributeCollection;
 
     /**
-     * System Config Value
-     *
-     * @var \Magento\Framework\App\Config\ScopeConfigInterface
-     */
-    protected $scopeConfig;
-
-    /**
     * @param \Magento\Eav\Model\Config $eavConfigModel
     * @param \Magento\Eav\Model\ResourceModel\Entity\Attribute\Collection $eavAttributeCollection
-    * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
     */
 
 	public function __construct(
         \Magento\Eav\Model\Config $eavConfigModel,
         \Magento\Eav\Model\ResourceModel\Entity\Attribute\Collection $eavAttributeCollection,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Framework\App\Helper\Context $context
  
     ) {
         $this->eavConfigModel = $eavConfigModel;
         $this->eavAttributeCollection = $eavAttributeCollection;
-        $this->scopeConfig = $scopeConfig;
         parent::__construct($context);
     }
 

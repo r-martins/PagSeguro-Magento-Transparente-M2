@@ -19,12 +19,15 @@
                     <label>Token</label>
                      <comment>The token is fetched from your PagSeguro account panel. When you save this page, it will be encrypted, appearing to be a smaller size.</comment>
                 </field>
-                <field id="sandbox" translate="label comment" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="0">
+                <field id="key" translate="label comment" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Public Key</label>
+                </field>
+                <!-- <field id="sandbox" translate="label comment" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Test environment?</label>
                     <comment><![CDATA[In test mode, the data is sent to the sandbox of PagSeguro. Enable Sandbox access <a href="http://sandbox.pagseguro.uol.com.br/" target="_blank">here</a><br/>
                     Note: The Sandbox mode still does not work in the application template.]]></comment>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                </field>
+                </field> -->
                  <field id="debug" translate="label comment" type="select" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Debug</label>
                     <comment>See the log output in var / log / pagseguro.log. It is recommended that you enable logging for information about any issues.</comment>
