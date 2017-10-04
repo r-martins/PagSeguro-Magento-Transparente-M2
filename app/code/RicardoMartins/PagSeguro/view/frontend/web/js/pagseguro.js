@@ -13,8 +13,9 @@ function RMPagSeguro(config) {
 
         this.config = config;
         this.config.maxSenderHashAttempts = 30;
+        var methis = this;
         PagSeguroDirectPayment.setSessionId(config.PagSeguroSessionId);
-        var senderHashSuccess = updateSenderHash();
+        var senderHashSuccess = this.updateSenderHash();
         if(!senderHashSuccess){
             console.log('A new attempt to obtain sender_hash will be performed in 3 seconds.');
             var intervalSenderHash;
@@ -22,7 +23,7 @@ function RMPagSeguro(config) {
             intervalSenderHash = setInterval(function(){
                 senderHashAttempts++;
                 if(PagSeguroDirectPayment.ready){
-                    updateSenderHash();
+                    methis.updateSenderHash();
                     clearInterval(intervalSenderHash);
                     return true;
                 }
@@ -37,12 +38,13 @@ function RMPagSeguro(config) {
          parcelsDrop.append('<option value="">Enter the card details to calculate</option>');
 }
 
-function updateSenderHash() {
+
+RMPagSeguro.prototype.updateSenderHash = function(){
    var senderHash = PagSeguroDirectPayment.getSenderHash();
     if(typeof senderHash != "undefined" && senderHash != '')
     {
         this.senderHash = senderHash;
-        //self.updatePaymentHashes();
+        this.updatePaymentHashes();
         return true;
     }
     console.log('PagSeguro: Failed to get senderHash.');
@@ -168,7 +170,7 @@ RMPagSeguro.prototype.updateBrand = function(){
 RMPagSeguro.prototype.updatePaymentHashes = function(){
     var url = this.storeUrl + 'pseguro/ajax/updatePaymentHashes';
     var self = this;
-    var _paymentHashes = {
+    var paymentHashes = {
         "payment[sender_hash]": this.senderHash,
         "payment[credit_card_token]": this.creditCardToken,
         "payment[cc_type]": (this.brand)?this.brand.name:'',
@@ -176,12 +178,12 @@ RMPagSeguro.prototype.updatePaymentHashes = function(){
     };
     jQuery.ajax({
         url: url,
-        method: 'post',
-        parameters: _paymentHashes,
+        type: 'POST',
+        data: paymentHashes,
         success: function(response){
             if(self.config.debug){
                 console.debug('Hashes updated successfully.');
-                console.debug(_paymentHashes);
+                console.debug(paymentHashes);
             }
         },
         error: function(response){
@@ -227,7 +229,7 @@ RMPagSeguro.prototype.updateSessionId = function(){
     jQuery.ajax({
         url: url,
         onSuccess: function (response) {
-            var session_id = response.responseJSON.session_id;
+            var session_id = response.session_id;
             if(!session_id){
                 console.log('Não foi possível obter a session id do PagSeguro. Verifique suas configurações.');
             }
@@ -255,6 +257,7 @@ RMPagSeguro.prototype.getInstallments = function(grandTotal, selectedInstallment
         success: function(response) {
             var parcelsDrop = jQuery('#rm_pagseguro_cc_cc_installments');
             var b = response.installments[brandName];
+            parcelsDrop.empty();
 
             if(self.config.force_installments_selection){
                 parcelsDrop.append('<option value="">Select the amount of plots</option>');

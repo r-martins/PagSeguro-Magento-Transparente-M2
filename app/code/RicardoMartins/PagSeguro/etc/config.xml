@@ -10,7 +10,7 @@
         <payment>
             <rm_pagseguro_cc>
                 <active>0</active>
-                <payment_action>authorize</payment_action>
+                <payment_action>capture</payment_action>
                 <model>RicardoMartins\PagSeguro\Model\Payment</model>
                 <active>1</active>
                 <title>RicardoMartins PagSeguro CC Payment Gateway</title>
