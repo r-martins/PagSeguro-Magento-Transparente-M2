@@ -4,6 +4,7 @@ $viewJsPath = $block->getViewFileUrl('RicardoMartins_PagSeguro::js/pagseguro.js'
 $storeUrl = $helper->getStoreUrl();
 $grandTotal = $helper->getGrandTotal();
 $installments = $helper->getInstallmentQty();
+$visibleCpf = $helper->isCpfVisible();
 
 ?>
 
@@ -29,6 +30,7 @@ $installments = $helper->getInstallmentQty();
             RMPagSeguroObj.setInstallmentsQty(<?php echo $installments;?>);
             RMPagSeguroObj.getGrandTotal();
     }
+    window.visibleCpf = <?php echo $visibleCpf ?>;
     //preparePagSeguro();
 
     //]]>

@@ -8,7 +8,7 @@ namespace RicardoMartins\PagSeguro\Controller\Ajax;
 
 use Magento\Framework\Controller\ResultFactory;
 
-class UpdatePaymentHashes extends \Magento\Framework\App\Action\Action
+class UpdateInstallments extends \Magento\Framework\App\Action\Action
 {
    
  
@@ -42,13 +42,11 @@ class UpdatePaymentHashes extends \Magento\Framework\App\Action\Action
     {
         $resultJson = $this->resultFactory->create(ResultFactory::TYPE_JSON);     
         try{
-            $params = $this->getRequest()->getPost('payment');
-            $ownerdata = $this->getRequest()->getPost('ownerdata');
-             $this->checkoutSession->setData('PsPayment', serialize($params));
-              $this->checkoutSession->setData('PsOwnerdata', serialize($ownerdata));
+            $params = $this->getRequest()->getPost('installment');
+             $this->checkoutSession->setData('installment', serialize($params));
              $result = array(
                 'status'=> 'success',
-                'message' => __('Updated Payment Hashes')
+                'message' => __('Updated Installments.')
             );
          }catch (\Exception $e) {
             $result = array('status'=> 'error','message' => $e->getMessage());

@@ -71,6 +71,23 @@
                                     />
         </div>
     </div>
+     <!-- ko if: (window.visibleCpf)-->
+    <div class="field number required">
+        <label data-bind="attr: {for: getCode() + '_cpf'}" class="label">
+            <span><!-- ko i18n: 'CPF '--><!-- /ko --></span>
+        </label>
+        <div class="control">
+            <input type="text" name="payment[ps_cc_cpf]" class="input-text" value=""
+                   data-bind="attr: {
+                                    autocomplete: off,
+                                    id: getCode() + '_cpf',
+                                    title: $t('CPF'),
+                                    'data-container': getCode() + '-cpf',
+                                    'data-validate': JSON.stringify({'required':true})}"
+                                    />
+        </div>
+    </div>
+     <!-- /ko -->
     <div class="field number required">
         <label data-bind="attr: {for: getCode() + '_cc_number'}" class="label">
             <span><!-- ko i18n: 'Credit Card Number'--><!-- /ko --></span>

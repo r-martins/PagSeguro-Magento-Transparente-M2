@@ -44,7 +44,7 @@ RMPagSeguro.prototype.updateSenderHash = function(){
     if(typeof senderHash != "undefined" && senderHash != '')
     {
         this.senderHash = senderHash;
-        this.updatePaymentHashes();
+        //this.updatePaymentHashes();
         return true;
     }
     console.log('PagSeguro: Failed to get senderHash.');
@@ -168,13 +168,23 @@ RMPagSeguro.prototype.updateBrand = function(){
     }
 }
 RMPagSeguro.prototype.updatePaymentHashes = function(){
-    var url = this.storeUrl + 'pseguro/ajax/updatePaymentHashes';
     var self = this;
+    var url = self.storeUrl +'pseguro/ajax/updatePaymentHashes';
+    var ccOwner = jQuery('input[name="payment[ps_cc_owner]"]').val();
+    var ccOwnerBirthDay = jQuery('input[name="payment[ps_cc_owner_birthday_day]"]').val();
+    var ccOwnerBirthMonth = jQuery('input[name="payment[ps_cc_owner_birthday_month]"]').val();
+    var ccOwnerBirthYear = jQuery('input[name="payment[ps_cc_owner_birthday_year]"]').val();
+    var cpf = jQuery('input[name="payment[ps_cc_cpf]"]').val();
     var paymentHashes = {
         "payment[sender_hash]": this.senderHash,
         "payment[credit_card_token]": this.creditCardToken,
         "payment[cc_type]": (this.brand)?this.brand.name:'',
-        "payment[is_admin]": this.config.is_admin
+        "payment[is_admin]": this.config.is_admin,
+        "ownerdata[credit_card_owner]": ccOwner,
+        "ownerdata[credit_card_birthday]":ccOwnerBirthDay,
+        "ownerdata[credit_card_birthmonth]":ccOwnerBirthMonth,
+        "ownerdata[credit_card_birthyear]":ccOwnerBirthYear,
+        "ownerdata[credit_card_cpf]": cpf,
     };
     jQuery.ajax({
         url: url,
@@ -278,7 +288,8 @@ RMPagSeguro.prototype.getInstallments = function(grandTotal, selectedInstallment
                     parcelsDrop.append('<option value="'+optionVal+'">'+optionText+'</option>');
                 }
             }
-
+             // updating installment value in checkout session
+              self.updateInstallments();
         },
         error: function(response) {
             console.error('Error getting parcels:');
@@ -286,6 +297,33 @@ RMPagSeguro.prototype.getInstallments = function(grandTotal, selectedInstallment
         },
         complete: function(response) {
              console.log('inside getInstallments complete');
+        }
+    });
+}
+
+RMPagSeguro.prototype.updateInstallments = function(){
+    var url = this.storeUrl + 'pseguro/ajax/updateInstallments';
+    ccInstallment = jQuery('select[name="payment[ps_cc_installments]"] option:selected').val();
+    var self = this;
+    var installmentsData = {
+        "payment[cc_installment]": ccInstallment,
+    };
+    jQuery.ajax({
+        url: url,
+        type: 'POST',
+        data: installmentsData,
+        success: function(response){
+            if(self.config.debug){
+                console.debug('Installments Data updated successfully.');
+                console.debug(installmentsData);
+            }
+        },
+        error: function(response){
+            if(self.config.debug){
+                console.error('Failed to update Installments Data.');
+                console.error(response);
+            }
+            return false;
         }
     });
 }

@@ -22,7 +22,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     protected $_canRefund                   = true;
     protected $_canRefundInvoicePartial     = true;
 
-    protected $_stripeApi = false;
+
 
     protected $_countryFactory;
 
@@ -38,6 +38,14 @@ class Payment extends \Magento\Payment\Model\Method\Cc
      */ 
     protected $pagSeguroHelper;
 
+    /**
+     * PagSeguro Abstract Model
+     *
+     * @var RicardoMartins\PagSeguro\Model\Notifications
+     */ 
+    protected $pagSeguroAbModel;
+
+
     public function __construct(
         \Magento\Framework\Model\Context $context,
         \Magento\Framework\Registry $registry,
@@ -50,6 +58,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         \Magento\Framework\Stdlib\DateTime\TimezoneInterface $localeDate,
         \Magento\Directory\Model\CountryFactory $countryFactory,
         \RicardoMartins\PagSeguro\Helper\Data $pagSeguroHelper,
+        \RicardoMartins\PagSeguro\Model\Notifications $pagSeguroAbModel,
         array $data = array()
     ) {
         parent::__construct(
@@ -72,6 +81,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         // $this->_minAmount = 1;
         // $this->_maxAmount = 999999999;
         $this->pagSeguroHelper = $pagSeguroHelper;  
+        $this->pagSeguroAbModel = $pagSeguroAbModel;    
     }
 
      /**
@@ -84,9 +94,59 @@ class Payment extends \Magento\Payment\Model\Method\Cc
      */
     public function order(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
-         $order = $payment->getOrder();
-         $this->pagSeguroHelper->writeLog('Inside order...');
-         $this->pagSeguroHelper->writeLog(json_encode($order->getData()));
+          /*@var \Magento\Sales\Model\Order $order */
+          $this->pagSeguroHelper->writeLog('Inside Order');
+        $order = $payment->getOrder();
+        try {
+
+            //will grab data to be send via POST to API inside $params
+            $params = $this->pagSeguroHelper->getCreditCardApiCallParams($order, $payment);
+           
+            //call API
+            $returnXml = $this->pagSeguroHelper->callApi($params, $payment);
+            $this->pagSeguroHelper->writeLog($returnXml);
+
+            $this->pagSeguroAbModel->proccessNotificatonResult($returnXml);
+
+            if (isset($returnXml->errors)) {
+                $errMsg = array();
+                foreach ($returnXml->errors as $error) {
+                    $errMsg[] = $rmHelper->__((string)$error->message) . '(' . $error->code . ')';
+                }
+                throw new \Magento\Framework\Validator\Exception('Um ou mais erros ocorreram no seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg));
+            }
+            if (isset($returnXml->error)) {
+                $error = $returnXml->error;
+                $errMsg[] = $rmHelper->__((string)$error->message) . ' (' . $error->code . ')';
+                throw new \Magento\Framework\Validator\Exception('Um erro ocorreu em seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg));
+            }
+
+            $payment->setSkipOrderProcessing(true);
+
+            if (isset($returnXml->code)) {
+
+                $additional = array('transaction_id'=>(string)$returnXml->code);
+                if ($existing = $payment->getAdditionalInformation()) {
+                    if (is_array($existing)) {
+                        $additional = array_merge($additional, $existing);
+                    }
+                }
+                $payment->setAdditionalInformation($additional);
+
+            }
+  
+
+        } catch (\Exception $e) {
+            $this->debugData(['request' => $params, 'exception' => $e->getMessage()]);
+            $this->_logger->error(__('Payment capturing error.'));
+            throw new \Magento\Framework\Validator\Exception(__('Payment capturing error.'));
+        }
+        return $this;
+    }
+
+     public function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount)
+    {
+           $this->pagSeguroHelper->writeLog('Inside Auth');
     }
 
     /**
@@ -99,11 +159,53 @@ class Payment extends \Magento\Payment\Model\Method\Cc
      */
     public function capture(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
+        $this->pagSeguroHelper->writeLog('Inside capture');
         /*@var \Magento\Sales\Model\Order $order */
         $order = $payment->getOrder();
-         $this->pagSeguroHelper->writeLog('Inside capture...');
-        $this->pagSeguroHelper->writeLog(json_encode($order->getData()));
+        try {
 
+            //will grab data to be send via POST to API inside $params
+            $params = $this->pagSeguroHelper->getCreditCardApiCallParams($order, $payment);
+           
+            //call API
+            $returnXml = $this->pagSeguroHelper->callApi($params, $payment);
+            $this->pagSeguroHelper->writeLog($returnXml);
+
+            //$this->pagSeguroAbModel->proccessNotificatonResult($returnXml);
+
+            if (isset($returnXml->errors)) {
+                $errMsg = array();
+                foreach ($returnXml->errors as $error) {
+                    $errMsg[] = $rmHelper->__((string)$error->message) . '(' . $error->code . ')';
+                }
+                throw new \Magento\Framework\Validator\Exception('Um ou mais erros ocorreram no seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg));
+            }
+            if (isset($returnXml->error)) {
+                $error = $returnXml->error;
+                $errMsg[] = $rmHelper->__((string)$error->message) . ' (' . $error->code . ')';
+                throw new \Magento\Framework\Validator\Exception('Um erro ocorreu em seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg));
+            }
+
+            $payment->setSkipOrderProcessing(true);
+
+            if (isset($returnXml->code)) {
+
+                $additional = array('transaction_id'=>(string)$returnXml->code);
+                if ($existing = $payment->getAdditionalInformation()) {
+                    if (is_array($existing)) {
+                        $additional = array_merge($additional, $existing);
+                    }
+                }
+                $payment->setAdditionalInformation($additional);
+
+            }
+  
+
+        } catch (\Exception $e) {
+            $this->debugData(['request' => $params, 'exception' => $e->getMessage()]);
+            $this->_logger->error(__('Payment capturing error.'));
+            throw new \Magento\Framework\Validator\Exception(__('Payment capturing error.'));
+        }
         return $this;
     }
 
@@ -169,45 +271,43 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         $info = $this->getInfoInstance();
         $info->setAdditionalInformation('sender_hash', $this->pagSeguroHelper->getPaymentHash('sender_hash'))
             ->setAdditionalInformation('credit_card_token', $this->pagSeguroHelper->getPaymentHash('credit_card_token'))
-            ->setAdditionalInformation('credit_card_owner', $data->getPsCcOwner())
+            ->setAdditionalInformation('credit_card_owner', $this->pagSeguroHelper->getCCOwnerData('credit_card_owner'))
             ->setCcType($this->pagSeguroHelper->getPaymentHash('cc_type'))
-            ->setCcLast4(substr($data->getPsCcNumber(), -4))
+            ->setCcLast4(substr($data['additional_data']['cc_number'], -4))
             ->setCcExpYear($data['additional_data']['cc_exp_year'])
             ->setCcExpMonth($data['additional_data']['cc_exp_month']);
-         // $this->pagSeguroHelper->writeLog('manjutest'.json_encode($info->getData()));
-         //  $this->pagSeguroHelper->writeLog('manjuData'.json_encode($data->getData()));
 
-        //cpf
-        // if ($this->pagSeguroHelper->isCpfVisible()) {
-        //     $info->setAdditionalInformation($this->getCode() . '_cpf', $data->getData($this->getCode() . '_cpf'));
-        // }
+        // set cpf
+        if ($this->pagSeguroHelper->isCpfVisible()) {
+            $info->setAdditionalInformation($this->getCode() . '_cpf', $this->pagSeguroHelper->getCCOwnerData('credit_card_cpf'));
+        }
 
-        //DOB
-        // if ($this->pagSeguroHelper->isDobVisible()) {
-        //     $info->setAdditionalInformation(
-        //         'credit_card_owner_birthdate',
-        //         date(
-        //             'd/m/Y',
-        //             strtotime(
-        //                 $data->getPsCcOwnerBirthdayYear().
-        //                 '/'.
-        //                 $data->getPsCcOwnerBirthdayMonth().
-        //                 '/'.$data->getPsCcOwnerBirthdayDay()
-        //             )
-        //         )
-        //     );
-        // }
+        //DOB value
+        if ($this->pagSeguroHelper->isDobVisible()) {
+            $info->setAdditionalInformation(
+                'credit_card_owner_birthdate',
+                date(
+                    'd/m/Y',
+                    strtotime(
+                        $this->pagSeguroHelper->getCCOwnerData('credit_card_birthyear').
+                        '/'.
+                        $this->pagSeguroHelper->getCCOwnerData('credit_card_birthmonth').
+                        '/'.$this->pagSeguroHelper->getCCOwnerData('credit_card_birthday')
+                    )
+                )
+            );
+        }
 
-        //Installments
-        // if ($data->getPsCcInstallments()) {
-        //     $installments = explode('|', $data->getPsCcInstallments());
-        //     if (false !== $installments && count($installments)==2) {
-        //         $info->setAdditionalInformation('installment_quantity', (int)$installments[0]);
-        //         $info->setAdditionalInformation('installment_value', $installments[1]);
-        //     }
-        // }
-
+        //Installments value
+        if ($this->pagSeguroHelper->getInstallments('cc_installment')) {
+            $installments = explode('|', $this->pagSeguroHelper->getInstallments('cc_installment'));
+            if (false !== $installments && count($installments)==2) {
+                $info->setAdditionalInformation('installment_quantity', (int)$installments[0]);
+                $info->setAdditionalInformation('installment_value', $installments[1]);
+            }
+        }
         return $this;
+        
     }
 
 
@@ -265,7 +365,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
 
         $senderHash = $this->pagSeguroHelper->getPaymentHash('sender_hash');
         $creditCardToken = $this->pagSeguroHelper->getPaymentHash('credit_card_token');
-
+        
         if (!$creditCardToken || !$senderHash) {
             $missingInfo = sprintf('Token do cartão: %s', var_export($creditCardToken, true));
             $missingInfo .= sprintf('/ Sender_hash: %s', var_export($senderHash, true));
