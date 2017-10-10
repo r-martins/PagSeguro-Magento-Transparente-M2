@@ -42,7 +42,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
         \Magento\Framework\Stdlib\DateTime\TimezoneInterface $localeDate,
         \Magento\Directory\Model\CountryFactory $countryFactory,
         \RicardoMartins\PagSeguro\Helper\Data $pagSeguroHelper,
-        \Magento\Sales\Model\Order $orderModel,
+        \Magento\Sales\Api\Data\OrderInterface $orderModel,
         \Magento\Framework\DB\Transaction $transactionFactory,
         array $data = array()
     ) {
@@ -142,9 +142,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                 $order->addStatusHistoryComment($message);
             }
 
-            if ((int)$resultXML->status == 3) { //Quando o pedido foi dado como Pago
-                // cria fatura e envia email (se configurado)
-                // $payment->registerCaptureNotification(floatval($resultXML->grossAmount));
+            if ((int)$resultXML->status == 3) { 
                 if(!$order->hasInvoices()){
                     $invoice = $order->prepareInvoice();
                     $invoice->register()->pay();

@@ -45,6 +45,13 @@ class Payment extends \Magento\Payment\Model\Method\Cc
      */ 
     protected $pagSeguroAbModel;
 
+    /**
+     * Backend Auth Session
+     *
+     * @var Magento\Backend\Model\Auth\Session $adminSession
+     */ 
+    protected $adminSession;
+
 
     public function __construct(
         \Magento\Framework\Model\Context $context,
@@ -59,6 +66,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         \Magento\Directory\Model\CountryFactory $countryFactory,
         \RicardoMartins\PagSeguro\Helper\Data $pagSeguroHelper,
         \RicardoMartins\PagSeguro\Model\Notifications $pagSeguroAbModel,
+        \Magento\Backend\Model\Auth\Session $adminSession,
         array $data = array()
     ) {
         parent::__construct(
@@ -79,69 +87,16 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         $this->_countryFactory = $countryFactory;
 
         // $this->_minAmount = 1;
-        // $this->_maxAmount = 999999999;
+        // $this->_maxAmount = 999999999; 
         $this->pagSeguroHelper = $pagSeguroHelper;  
-        $this->pagSeguroAbModel = $pagSeguroAbModel;    
+        $this->pagSeguroAbModel = $pagSeguroAbModel; 
+        $this->adminSession = $adminSession;    
     }
 
-     /**
-     * Payment capturing
-     *
-     * @param \Magento\Payment\Model\InfoInterface $payment
-     * @param float $amount
-     * @return $this
-     * @throws \Magento\Framework\Validator\Exception
-     */
     public function order(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
           /*@var \Magento\Sales\Model\Order $order */
           $this->pagSeguroHelper->writeLog('Inside Order');
-        $order = $payment->getOrder();
-        try {
-
-            //will grab data to be send via POST to API inside $params
-            $params = $this->pagSeguroHelper->getCreditCardApiCallParams($order, $payment);
-           
-            //call API
-            $returnXml = $this->pagSeguroHelper->callApi($params, $payment);
-            $this->pagSeguroHelper->writeLog($returnXml);
-
-            $this->pagSeguroAbModel->proccessNotificatonResult($returnXml);
-
-            if (isset($returnXml->errors)) {
-                $errMsg = array();
-                foreach ($returnXml->errors as $error) {
-                    $errMsg[] = $rmHelper->__((string)$error->message) . '(' . $error->code . ')';
-                }
-                throw new \Magento\Framework\Validator\Exception('Um ou mais erros ocorreram no seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg));
-            }
-            if (isset($returnXml->error)) {
-                $error = $returnXml->error;
-                $errMsg[] = $rmHelper->__((string)$error->message) . ' (' . $error->code . ')';
-                throw new \Magento\Framework\Validator\Exception('Um erro ocorreu em seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg));
-            }
-
-            $payment->setSkipOrderProcessing(true);
-
-            if (isset($returnXml->code)) {
-
-                $additional = array('transaction_id'=>(string)$returnXml->code);
-                if ($existing = $payment->getAdditionalInformation()) {
-                    if (is_array($existing)) {
-                        $additional = array_merge($additional, $existing);
-                    }
-                }
-                $payment->setAdditionalInformation($additional);
-
-            }
-  
-
-        } catch (\Exception $e) {
-            $this->debugData(['request' => $params, 'exception' => $e->getMessage()]);
-            $this->_logger->error(__('Payment capturing error.'));
-            throw new \Magento\Framework\Validator\Exception(__('Payment capturing error.'));
-        }
-        return $this;
     }
 
      public function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount)
@@ -169,9 +124,6 @@ class Payment extends \Magento\Payment\Model\Method\Cc
            
             //call API
             $returnXml = $this->pagSeguroHelper->callApi($params, $payment);
-            $this->pagSeguroHelper->writeLog($returnXml);
-
-            //$this->pagSeguroAbModel->proccessNotificatonResult($returnXml);
 
             if (isset($returnXml->errors)) {
                 $errMsg = array();
@@ -184,6 +136,10 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                 $error = $returnXml->error;
                 $errMsg[] = $rmHelper->__((string)$error->message) . ' (' . $error->code . ')';
                 throw new \Magento\Framework\Validator\Exception('Um erro ocorreu em seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg));
+            }
+            /* process return result code status*/
+            if ((int)$returnXml->status == 6 || (int)$returnXml->status == 7) {
+                throw new \Magento\Framework\Validator\Exception('An error occurred in your payment.');
             }
 
             $payment->setSkipOrderProcessing(true);
@@ -199,8 +155,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                 $payment->setAdditionalInformation($additional);
 
             }
-  
-
+          //$this->pagSeguroAbModel->proccessNotificatonResult($returnXml);
         } catch (\Exception $e) {
             $this->debugData(['request' => $params, 'exception' => $e->getMessage()]);
             $this->_logger->error(__('Payment capturing error.'));
@@ -318,7 +273,10 @@ class Payment extends \Magento\Payment\Model\Method\Cc
      * @return bool
      */
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
-    {
+    {   
+        if($this->adminSession->getUser()){
+            return false;
+        }
         $isAvailable =  $this->getConfigData('active', $quote ? $quote->getStoreId() : null);
         if (empty($quote)) {
             return $isAvailable;

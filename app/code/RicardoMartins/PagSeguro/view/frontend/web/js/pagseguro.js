@@ -269,7 +269,7 @@ RMPagSeguro.prototype.getInstallments = function(grandTotal, selectedInstallment
             var b = response.installments[brandName];
             parcelsDrop.empty();
 
-            if(self.config.force_installments_selection){
+            if(self.config.force_installments_selection == 1){
                 parcelsDrop.append('<option value="">Select the amount of plots</option>');
             }
 
@@ -278,7 +278,7 @@ RMPagSeguro.prototype.getInstallments = function(grandTotal, selectedInstallment
                 var optionVal = '';
                 optionText = b[x].quantity + "x de R$" + b[x].installmentAmount.toFixed(2).toString().replace('.',',');
                 optionText += (b[x].interestFree)?" sem juros":" com juros";
-                if(self.config.show_total){
+                if(self.config.show_total == 1){
                     optionText += " (total R$" + (b[x].installmentAmount*b[x].quantity).toFixed(2).toString().replace('.', ',') + ")";
                 }
                 optionVal = b[x].quantity + "|" + b[x].installmentAmount;
