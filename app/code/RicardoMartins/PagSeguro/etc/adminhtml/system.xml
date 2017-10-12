@@ -43,7 +43,7 @@
                     <comment><![CDATA[If your store uses a custom attribute for the customer's CPF, select here. Otherwise choose "Request along with the other payment details".]]></comment>
                    <source_model>RicardoMartins\PagSeguro\Model\System\Config\Source\Cpf</source_model>
                 </field>
-                <field id="address_street_attribute" translate="label comment" type="select" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="0">
+               <field id="address_street_attribute" translate="label comment" type="select" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Attribute Delivery Street</label>
                     <comment><![CDATA[If your store uses a custom attribute for Delivery Street, select here.]]></comment>
                    <source_model>RicardoMartins\PagSeguro\Model\System\Config\Source\Attributes</source_model>

@@ -9,13 +9,24 @@
     <default>
         <payment>
             <rm_pagseguro_cc>
-                <active>0</active>
+                <active>1</active>
                 <payment_action>authorize_capture</payment_action>
                 <model>RicardoMartins\PagSeguro\Model\Payment</model>
-                <active>1</active>
                 <title>RicardoMartins PagSeguro CC Payment Gateway</title>
                 <order_status>pending_payment</order_status>
+                <flag>42x20</flag>
+                <send_neworder_email>0</send_neworder_email>
+                <group_restriction>0</group_restriction>
+                <info_brl>1</info_brl>
+                <show_total>0</show_total>
+                <force_installments_selection>0</force_installments_selection>
             </rm_pagseguro_cc>
+            <rm_pagseguro>
+                <model>RicardoMartins\PagSeguro\Model\Payment</model>
+                <address_street_attribute>street_1</address_street_attribute>
+                <address_number_attribute>street_1</address_number_attribute>
+                <address_neighborhood_attribute>street_1</address_neighborhood_attribute>
+            </rm_pagseguro>
         </payment>
     </default>
 </config>

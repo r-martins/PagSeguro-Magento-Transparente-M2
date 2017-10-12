@@ -816,7 +816,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $isStreetline = preg_match('/^street_(\d{1})$/', $attributeId, $matches);
 
         if ($isStreetline !== false && isset($matches[1])) { //uses streetlines
-            return $address->getStreet(intval($matches[1]));
+             $street = $address->getStreet();
+            return $street[$matches[1]];
         } else if ($attributeId == '') { //do not tell pagseguro
             return '';
         }
