@@ -823,7 +823,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         if ($isStreetline !== false && isset($matches[1])) { //uses streetlines
              $street = $address->getStreet();
-            return $street[$matches[1]];
+            return $street[$matches[1]-1];
         } else if ($attributeId == '') { //do not tell pagseguro
             return '';
         }
