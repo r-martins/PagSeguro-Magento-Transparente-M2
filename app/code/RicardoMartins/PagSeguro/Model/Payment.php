@@ -28,7 +28,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
 
     protected $_minAmount = null;
     protected $_maxAmount = null;
-    protected $_supportedCurrencyCodes = array('USD');
+    protected $_supportedCurrencyCodes = array('BRL');
 
     protected $_debugReplacePrivateDataKeys = ['number', 'exp_month', 'exp_year', 'cvc'];
     /**
@@ -128,13 +128,13 @@ class Payment extends \Magento\Payment\Model\Method\Cc
             if (isset($returnXml->errors)) {
                 $errMsg = array();
                 foreach ($returnXml->errors as $error) {
-                    $errMsg[] = $rmHelper->__((string)$error->message) . '(' . $error->code . ')';
+                    $errMsg[] = __((string)$error->message) . '(' . $error->code . ')';
                 }
                 throw new \Magento\Framework\Validator\Exception('Um ou mais erros ocorreram no seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg));
             }
             if (isset($returnXml->error)) {
                 $error = $returnXml->error;
-                $errMsg[] = $rmHelper->__((string)$error->message) . ' (' . $error->code . ')';
+                $errMsg[] = __((string)$error->message) . ' (' . $error->code . ')';
                 throw new \Magento\Framework\Validator\Exception('Um erro ocorreu em seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg));
             }
             /* process return result code status*/

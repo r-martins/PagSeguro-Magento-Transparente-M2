@@ -5,6 +5,12 @@ $storeUrl = $helper->getStoreUrl();
 $grandTotal = $helper->getGrandTotal();
 $installments = $helper->getInstallmentQty();
 $visibleCpf = $helper->isCpfVisible();
+if($helper->isDobVisible() == 1){
+  $visibleDob = $helper->isDobVisible();  
+}else{
+ $visibleDob = 0;
+}
+
 
 ?>
 
@@ -31,6 +37,7 @@ $visibleCpf = $helper->isCpfVisible();
             RMPagSeguroObj.getGrandTotal();
     }
     window.visibleCpf = <?php echo $visibleCpf ?>;
+    window.visibleDob = <?php echo $visibleDob ?>;
     //preparePagSeguro();
 
     //]]>

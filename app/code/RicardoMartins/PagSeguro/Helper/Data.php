@@ -304,7 +304,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function isDobVisible()
     {
-        $customerDobAttribute = $this->scopeConfig->getValue('payment/rm_pagseguro/owner_dob_attribute');
+        $customerDobAttribute = $this->scopeConfig->getValue('payment/rm_pagseguro_cc/owner_dob_attribute');
         return empty($customerDobAttribute);
     }
 
@@ -519,9 +519,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         $phone = $this->extractPhone($order->getBillingAddress()->getTelephone());
 
-        $senderName = $this->removeDuplicatedSpaces(
+        if($order->getCustomerIsGuest()){
+            $senderName = $this->removeDuplicatedSpaces(
+            sprintf('%s %s', $order->getBillingAddress()->getFirstname(), $order->getBillingAddress()->getLastname())
+            );
+        }else{
+             $senderName = $this->removeDuplicatedSpaces(
             sprintf('%s %s', $order->getCustomerFirstname(), $order->getCustomerLastname())
-        );
+            );
+        }
 
         $senderName = substr($senderName, 0, 50);
 

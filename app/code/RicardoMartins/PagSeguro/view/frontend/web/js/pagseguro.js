@@ -70,6 +70,9 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
         jQuery(ccCvvElm).keyup(function( event ) {
             obj.updateCreditCardToken();
         });
+        jQuery("#rm_pagseguro_cc_cc_installments").change(function( event ) {
+            obj.updateInstallments();
+        });
         
     }catch(e){
         console.error('Unable to add greeting to cards. ' + e.message);
@@ -306,7 +309,7 @@ RMPagSeguro.prototype.updateInstallments = function(){
     ccInstallment = jQuery('select[name="payment[ps_cc_installments]"] option:selected').val();
     var self = this;
     var installmentsData = {
-        "payment[cc_installment]": ccInstallment,
+        "installment[cc_installment]": ccInstallment,
     };
     jQuery.ajax({
         url: url,

@@ -24,8 +24,9 @@
             <rm_pagseguro>
                 <model>RicardoMartins\PagSeguro\Model\Payment</model>
                 <address_street_attribute>street_1</address_street_attribute>
-                <address_number_attribute>street_1</address_number_attribute>
-                <address_neighborhood_attribute>street_1</address_neighborhood_attribute>
+                <address_number_attribute>street_2</address_number_attribute>
+                <address_complement_attribute>street_3</address_complement_attribute>
+                <address_neighborhood_attribute>street_4</address_neighborhood_attribute>
             </rm_pagseguro>
         </payment>
     </default>

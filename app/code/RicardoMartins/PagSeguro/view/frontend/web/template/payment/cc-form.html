@@ -37,6 +37,7 @@
                                     />
         </div>
     </div>
+     <!-- ko if: (window.visibleDob)-->
     <div class="field number required">
         <label data-bind="attr: {for: getCode() + '_cc_owner_birthday_day'}" class="label">
             <span><!-- ko i18n: 'Date of Birth '--><!-- /ko --></span>
@@ -71,6 +72,7 @@
                                     />
         </div>
     </div>
+     <!-- /ko -->
      <!-- ko if: (window.visibleCpf)-->
     <div class="field number required">
         <label data-bind="attr: {for: getCode() + '_cpf'}" class="label">
