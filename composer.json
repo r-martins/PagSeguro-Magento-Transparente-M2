@@ -1,14 +1,20 @@
 {
-    "name": "r-martins/pagseguro-magento2",
+    "name": "ricardomartins/pagseguro-m2",
     "description": "PagSeguro Transparente para Magento 2",
     "type": "magento2-module",
-    "require": {
-        "magento/project-community-edition": ">=2.1 || >=2.2"
+    "version": "1.0.0",
+    "license": [
+        "OSL-3.0",
+        "AFL-3.0"
+    ],
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "RicardoMartins\\PagSeguro\\": ""
+        }
     },
-    "require-dev": {
-        "magento/project-community-edition": ">=2.1 || >=2.2"
-    },
-    "license": "MIT",
     "authors": [
         {
             "name": "Ricardo Martins",
