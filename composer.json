@@ -1,5 +1,5 @@
 {
-    "name": "ricardomartins/pagseguro-m2",
+    "name": "ricardomartins/pagseguro",
     "description": "PagSeguro Transparente para Magento 2",
     "type": "magento2-module",
     "version": "1.0.0",
