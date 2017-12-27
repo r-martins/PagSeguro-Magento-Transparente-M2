@@ -1,6 +1,6 @@
 {
     "name": "r-martins/pagseguro-magento2",
-    "description": "MPagSeguro Transparente para Magento 2",
+    "description": "PagSeguro Transparente para Magento 2",
     "type": "magento2-module",
     "require": {
         "magento/community-edition": ">=2.1"
