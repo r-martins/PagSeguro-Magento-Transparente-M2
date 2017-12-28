@@ -165,10 +165,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($this->isDebugActive()) {
             if (is_string($obj)) {
             	$this->_logger->debug($obj);
-                $this->messageManager->addSuccess( __('Thanks for your valuable feedback.') );
             } else {
                 $this->_logger->debug(json_encode($obj));
-                $this->messageManager->addSuccess( __('Thanks for your valuable feedback.') );
             }
         }
     }

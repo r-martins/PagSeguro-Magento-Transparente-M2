@@ -3,9 +3,9 @@
  * Copyright © 2013-2017 Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
-namespace RicardoMartins\PagSeguro\Model;
+namespace RicardoMartins\PagSeguro\Model\Method;
 
-class Payment extends \Magento\Payment\Model\Method\Cc
+class Cc extends \Magento\Payment\Model\Method\Cc
 {
     /**
      * @var string
@@ -52,6 +52,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc
      */ 
     protected $adminSession;
 
+    /** @var \Magento\Framework\Message\ManagerInterface */
+    protected $messageManager;
 
     public function __construct(
         \Magento\Framework\Model\Context $context,
@@ -67,6 +69,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         \RicardoMartins\PagSeguro\Helper\Data $pagSeguroHelper,
         \RicardoMartins\PagSeguro\Model\Notifications $pagSeguroAbModel,
         \Magento\Backend\Model\Auth\Session $adminSession,
+        \Magento\Framework\Message\ManagerInterface $messageManager,
         array $data = array()
     ) {
         parent::__construct(
@@ -90,7 +93,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         // $this->_maxAmount = 999999999; 
         $this->pagSeguroHelper = $pagSeguroHelper;  
         $this->pagSeguroAbModel = $pagSeguroAbModel; 
-        $this->adminSession = $adminSession;    
+        $this->adminSession = $adminSession;
+        $this->messageManager = $messageManager;
     }
 
     public function order(\Magento\Payment\Model\InfoInterface $payment, $amount)
@@ -157,9 +161,10 @@ class Payment extends \Magento\Payment\Model\Method\Cc
             }
           //$this->pagSeguroAbModel->proccessNotificatonResult($returnXml);
         } catch (\Exception $e) {
-            $this->debugData(['request' => $params, 'exception' => $e->getMessage()]);
+            $this->debugData(['exception' => $e->getMessage()]);
             $this->_logger->error(__('Payment capturing error.'));
-            throw new \Magento\Framework\Validator\Exception(__('Payment capturing error.'));
+            $this->messageManager->addError($e->getMessage());
+//            throw new \Magento\Framework\Exception\LocalizedException(__('Payment capturing error.'));
         }
         return $this;
     }
@@ -333,6 +338,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                     Se esta for uma atualização via Ajax, ignore esta mensagem até a finalização do pedido.
                     $missingInfo"
                 );
+            $this->messageManager
+                ->addError('Falha ao processar seu pagamento. Por favor, entre em contato com nossa equipe.');
             throw new \Magento\Framework\Validator\Exception(
                 'Falha ao processar seu pagamento. Por favor, entre em contato com nossa equipe.'
             );

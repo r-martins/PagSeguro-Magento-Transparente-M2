@@ -8,19 +8,20 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
         <section id="payment">
-            <group id="rm_pagseguro" translate="label comment" sortOrder="10000" showInDefault="1" showInWebsite="1" showInStore="0">
-                <label>PagSeguro - Ricardo Martins</label>
-                <comment><![CDATA[Need help? - <a href="//r-martins.github.io/PagSeguro-Magento-Transparente" target="_blank">Official site of the module</a> | <a href="//pagsegurotransparente.zendesk.com/hc/pt-br" target="_blank">Help Center</a>.<br/> Want to pay less fees? <a href="//r-martins.github.io/PagSeguro-Magento-Transparente/pro/app.html" target="_blank"><strong>Authorize your account</strong></a> in the application template and receive the PRO module for free in the informed e-mail, with ticket support and TEF.<br/>If you have lower rates yet, and wish to receive the PRO module with ticket support and tef without authorizing the application, <a href="//r-martins.github.io/PagSeguro-Magento-Transparente/pro/" target="_blank">please subscribe</a>.]]></comment>
+            <group id="rm_pagseguro" translate="label comment" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>PagSeguro - General Settings - Ricardo Martins</label>
+                <comment><![CDATA[Need help? - <a href="//r-martins.github.io/PagSeguro-Magento-Transparente" target="_blank">Official site of the module</a> | <a href="//pagsegurotransparente.zendesk.com/hc/pt-br" target="_blank">Help Center</a>.<br/> To use this module you need to get your free unlimited public key <a href="//r-martins.github.io/PagSeguro-Magento-Transparente/pro/app.html" target="_blank"><strong>authorizing your PagSeguro account</strong></a> in the application model or sign up for a key under the <a href="//r-martins.github.io/PagSeguro-Magento-Transparente/pro/" target="_blank">monthly subscription</a> model.]]></comment>
                 <field id="merchant_email" translate="label comment" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Email</label>
                     <comment>Store email (seller account)</comment>
                 </field>
                  <field id="token" translate="label comment" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Token</label>
-                     <comment>The token is fetched from your PagSeguro account panel. When you save this page, it will be encrypted, appearing to be a smaller size.</comment>
+                     <comment>The token is fetched from your PagSeguro account panel.</comment>
                 </field>
                 <field id="key" translate="label comment" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Public Key</label>
+                    <comment><![CDATA[Get your public key for free when <a href="//r-martins.github.io/PagSeguro-Magento-Transparente/pro/app.html" target="_blank">enabling your account</a>.]]></comment>
                 </field>
                 <!-- <field id="sandbox" translate="label comment" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Test environment?</label>
@@ -30,7 +31,7 @@
                 </field> -->
                  <field id="debug" translate="label comment" type="select" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Debug</label>
-                    <comment>See the log output in var / log / pagseguro.log. It is recommended that you enable logging for information about any issues.</comment>
+                    <comment><![CDATA[See the log output in var/log/pagseguro.log. It is recommended that you enable logging for information about any issues.]]></comment>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
                 <field id="send_invoice_email" translate="label comment" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="0">
@@ -40,7 +41,7 @@
                 </field>
                 <field id="customer_cpf_attribute" translate="label comment" type="select" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Customer CPF</label>
-                    <comment><![CDATA[If your store uses a custom attribute for the customer's CPF, select here. Otherwise choose "Request along with the other payment details".]]></comment>
+                    <comment><![CDATA[If your store uses a custom attribute for the customer's CPF, select here. Otherwise choose "Ask for it in the credit card form".]]></comment>
                    <source_model>RicardoMartins\PagSeguro\Model\System\Config\Source\Cpf</source_model>
                 </field>
                <field id="address_street_attribute" translate="label comment" type="select" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="0">
@@ -64,10 +65,10 @@
                    <source_model>RicardoMartins\PagSeguro\Model\System\Config\Source\Attributes</source_model>
                 </field>
             </group>
-            <group id="rm_pagseguro_cc" translate="label" sortOrder="10001" showInDefault="1" showInWebsite="1" showInStore="0">
-                <label>Credit Card - Ricardo Martins</label>
+            <group id="rm_pagseguro_cc" translate="label" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>PagSeguro - Credit Card - Ricardo Martins</label>
                 <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Enable</label>
+                    <label>Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
                  <field id="title" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="0">
@@ -78,7 +79,7 @@
                     <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
                 </field>
                  <field id="flag" translate="label comment" type="select" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Card Banner Size</label>
+                    <label>Card Brand Size</label>
                     <comment><![CDATA[Exemplos: <br/><img src="//stc.pagseguro.uol.com.br/public/img/payment-methods-flags/42x20/visa.png" title="42x20"/><img src="//stc.pagseguro.uol.com.br/public/img/payment-methods-flags/68x30/visa.png" title="68x30"/>]]></comment>
                     <source_model>RicardoMartins\PagSeguro\Model\System\Config\Source\Ccbrand</source_model>
                 </field>
@@ -94,7 +95,6 @@
                 </field>
                 <field id="sort_order" translate="label comment" type="text" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Sort Order</label>
-                    <comment><![CDATA[If your store uses a custom attribute for Delivery Street, select here.]]></comment>
                     <frontend_class>validate-number</frontend_class>
                 </field>
                 <field id="group_restriction" translate="label" type="select" sortOrder="8" showInDefault="1" showInWebsite="1" showInStore="0">
@@ -108,7 +108,7 @@
                    <depends><field id="group_restriction">1</field></depends>
                 </field>
                 <field id="show_total" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Display total value in the field selector</label>
+                    <label>Display total amount in the installment selector</label>
                     <comment><![CDATA[When enabled, the total order value is displayed along with the parceling information.]]></comment>
                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
@@ -116,6 +116,11 @@
                     <label>Force parcel selection</label>
                     <comment><![CDATA[When enabled, it will force the customer to select the installments amount instead of leaving payment to the pre-selected view.]]></comment>
                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="debug" translate="label comment" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Debug</label>
+                    <comment><![CDATA[Enables debug mode for log requests/responses.]]></comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
             </group>
         </section>

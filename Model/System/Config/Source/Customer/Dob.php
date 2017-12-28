@@ -31,7 +31,7 @@ class Dob implements \Magento\Framework\Option\ArrayInterface
     {
         $fields = $this->pagSeguroHelper->getFields('customer');
         $options = [];
-        $options[] = array('value'=>'','label'=> __('Request customer along with card details'));
+        $options[] = array('value'=>'','label'=> __('Ask for it in the credit card form'));
 
         foreach ($fields as $key => $value) {
             if (!is_null($value['frontend_label'])) {

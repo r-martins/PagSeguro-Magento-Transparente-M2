@@ -8,12 +8,27 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
     <default>
         <payment>
+            <rm_pagseguro>
+                <model>RicardoMartins\PagSeguro\Model\Method\Cc</model>
+                <address_street_attribute>street_1</address_street_attribute>
+                <address_number_attribute>street_2</address_number_attribute>
+                <address_complement_attribute>street_3</address_complement_attribute>
+                <address_neighborhood_attribute>street_4</address_neighborhood_attribute>
+            </rm_pagseguro>
             <rm_pagseguro_cc>
                 <active>1</active>
+                <can_authorize>1</can_authorize>
+                <debug>1</debug>
+                <can_capture>1</can_capture>
+                <can_void>1</can_void>
+                <can_use_checkout>1</can_use_checkout>
+                <can_use_internal>0</can_use_internal>
+                <currency>BRL</currency>
+                <sort_order>1</sort_order>
                 <payment_action>authorize_capture</payment_action>
-                <model>RicardoMartins\PagSeguro\Model\Payment</model>
-                <title>RicardoMartins PagSeguro CC Payment Gateway</title>
-                <order_status>pending_payment</order_status>
+                <model>RicardoMartins\PagSeguro\Model\Method\Cc</model>
+                <title>Cartão de Crédito via PagSeguro UOL</title>
+                <order_status>pending</order_status>
                 <flag>42x20</flag>
                 <send_neworder_email>0</send_neworder_email>
                 <group_restriction>0</group_restriction>
@@ -21,13 +36,6 @@
                 <show_total>0</show_total>
                 <force_installments_selection>0</force_installments_selection>
             </rm_pagseguro_cc>
-            <rm_pagseguro>
-                <model>RicardoMartins\PagSeguro\Model\Payment</model>
-                <address_street_attribute>street_1</address_street_attribute>
-                <address_number_attribute>street_2</address_number_attribute>
-                <address_complement_attribute>street_3</address_complement_attribute>
-                <address_neighborhood_attribute>street_4</address_neighborhood_attribute>
-            </rm_pagseguro>
         </payment>
     </default>
 </config>

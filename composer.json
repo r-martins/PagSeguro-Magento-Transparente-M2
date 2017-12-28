@@ -20,5 +20,10 @@
             "name": "Ricardo Martins",
             "email": "pagseguro-transparente@ricardomartins.net.br"
         }
-    ]
+    ],
+    "require": {
+        "magento/module-payment": "100.1.* 100.2.*",
+        "magento/module-checkout": "100.1.* 100.2.*",
+        "magento/module-sales": "100.1.* 100.2.*"
+    }
 }
