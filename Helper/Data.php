@@ -364,6 +364,22 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
      
         $xml = \SimpleXML_Load_String(trim($response));
+        
+        //$errArray = array();
+
+        if ($xml->error->code) {
+            $xmlError = json_decode(json_encode($xml), true);
+            $xmlError = $xmlError['error'];
+            foreach ($xmlError as $xmlErr) {
+                $errArray[] = $xmlErr['message'];
+            }
+
+            $errArray = implode(",", $errArray);
+
+            $this->setSessionVl($errArray);
+
+        }
+
 
         if (false === $xml) {
             switch($response){
@@ -427,7 +443,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         
         $params = array(
-        'email'                 => $this->getMerchantEmail(),
+            'email'             => $this->getMerchantEmail(),
             'token'             => $this->getToken(),
             'paymentMode'       => 'default',
             'paymentMethod'     =>  'creditCard',
@@ -443,7 +459,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $params = array_merge($params, $this->getAddressParams($order, 'shipping'));
         $params = array_merge($params, $this->getAddressParams($order, 'billing'));
         $params = array_merge($params, $this->getCreditCardHolderParams($order, $payment));
-         $params = array_merge($params, $this->getCreditCardInstallmentsParams($order, $payment));
+        $params = array_merge($params, $this->getCreditCardInstallmentsParams($order, $payment));
 
         return $params;
     }
@@ -632,7 +648,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $addressCity = $address->getCity();
         $addressState = $this->getStateCode($address->getRegion());
 
-
         $return = array(
             $type.'AddressStreet'     => substr($addressStreet, 0, 80),
             $type.'AddressNumber'     => substr($addressNumber, 0, 20),
@@ -654,6 +669,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                     $shippingCost -= 0.01;
                 }
                 $return['shippingCost'] = number_format($shippingCost, 2, '.', '');
+            }else {
+                $return['shippingCost'] = '0.00';
             }
         }
         return $return;
@@ -823,7 +840,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         if ($isStreetline !== false && isset($matches[1])) { //uses streetlines
              $street = $address->getStreet();
-            return $street[$matches[1]];
+            return $street[0];
         } else if ($attributeId == '') { //do not tell pagseguro
             return '';
         }
@@ -958,5 +975,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
    
-    
+    public function setSessionVl($value)
+    {
+        return $this->checkoutSession->setCustomparam($value);
+    }
+
+    public function getSessionVl()
+    {
+        return $this->checkoutSession->getCustomparam();
+    }
 }

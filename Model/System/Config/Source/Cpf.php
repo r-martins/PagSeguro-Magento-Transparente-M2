@@ -31,7 +31,7 @@ class Cpf implements \Magento\Framework\Option\ArrayInterface
     {
         $fields = $this->pagSeguroHelper->getFields('customer');
         $options = [];
-        $options[] = array('value'=>'','label'=> __('Ask for it in the payment form'));
+        $options[] = array('value'=>'','label'=> __('Request along with other payment details'));
 
         foreach ($fields as $key => $value) {
             if (!is_null($value['frontend_label'])) {

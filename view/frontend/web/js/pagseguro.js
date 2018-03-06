@@ -57,7 +57,7 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
         var ccExpMoElm = jQuery('select[name="payment[ps_cc_exp_month]"]');
         var ccExpYrElm = jQuery('select[name="payment[ps_cc_exp_year]"]');
         var ccCvvElm = jQuery('input[name="payment[ps_cc_cid]"]');
-        
+
         jQuery(ccNumElm).keyup(function( event ) {
             obj.updateCreditCardToken();
         });
@@ -110,6 +110,7 @@ RMPagSeguro.prototype.updateCreditCardToken = function(){
                 jQuery('#card-msg').html('');
             },
             error: function(psresponse){
+                //TODO: get real message instead of trying to catch all errors in the universe
                 if(undefined!=psresponse.errors["30400"]) {
                     jQuery('#card-msg').html('Dados do cartão inválidos.');
                 }else if(undefined!=psresponse.errors["10001"]){
@@ -120,6 +121,8 @@ RMPagSeguro.prototype.updateCreditCardToken = function(){
                     jQuery('#card-msg').html('Data de validade incorreta.');
                 }else if(undefined!=psresponse.errors["30403"]){
                     this.updateSessionId(); //Se sessao expirar, atualizamos a session
+                }else if(undefined!=psresponse.errors["11157"]){
+                    jQuery('#card-cpf-msg').html('CPF invalid value.');
                 }else{
                     jQuery('#card-msg').html('Check your typed card data.');
                 }

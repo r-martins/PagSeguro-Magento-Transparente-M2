@@ -41,7 +41,7 @@
                 </field>
                 <field id="customer_cpf_attribute" translate="label comment" type="select" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Customer CPF</label>
-                    <comment><![CDATA[If your store uses a custom attribute for the customer's CPF, select here. Otherwise choose "Ask for it in the credit card form".]]></comment>
+                    <comment><![CDATA[If your store uses a custom attribute for the customer's CPF, select here. Otherwise choose "Request along with the other payment details".]]></comment>
                    <source_model>RicardoMartins\PagSeguro\Model\System\Config\Source\Cpf</source_model>
                 </field>
                <field id="address_street_attribute" translate="label comment" type="select" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="0">
