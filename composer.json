@@ -1,6 +1,6 @@
 {
     "name": "ricardomartins/pagseguro",
-    "description": "PagSeguro Transparente para Magento 2",
+    "description": "Magento 2 Transparent Payment Module / PagSeguro Transparente para Magento 2",
     "type": "magento2-module",
     "version": "1.0.0",
     "license": [

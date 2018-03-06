@@ -1,12 +1,13 @@
 Módulo em desenvolvimento.
 
-###Instalação
+### Instalação
 
-composer require ricardomartins/pagseguro
+composer require ricardomartins/pagseguro:dev-master
 
 bin/magento cache:clean
+bin/magento setup:upgrade
 
 
-Recomendável alterar quantidade de linhas de endereço em Lojas->Configurações->Clientes->Configurações->Nome e opções de endereço->Número de linhas no endereço.
+Altere a quantidade de linhas de endereço em Lojas->Configurações->Clientes->Configurações->Nome e opções de endereço->Número de linhas no endereço.
 Altere para 4 linhas.
 
