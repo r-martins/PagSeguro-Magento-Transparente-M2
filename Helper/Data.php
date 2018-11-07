@@ -336,7 +336,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $params = $paramsObj->getParams();
         $paramsString = $this->convertToCURLString($params);
 
-       // $this->writeLog('Parameters being sent to API (/'.$type.'): '. var_export($params, true));
+        //$this->writeLog('Parameters being sent to API (/'.$type.'): '. var_export($params, true));
 
         //$this->writeLog('WSDL URL:'.$this->getWsUrl($type));
 
@@ -840,7 +840,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         if ($isStreetline !== false && isset($matches[1])) { //uses streetlines
              $street = $address->getStreet();
-            return $street[0];
+             $lineNum = (int)$matches[1] - 1;
+
+             return $street[$lineNum];
         } else if ($attributeId == '') { //do not tell pagseguro
             return '';
         }
