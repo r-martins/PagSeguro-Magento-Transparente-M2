@@ -65,12 +65,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Customer\Model\Customer $customer,
-        \Magento\Framework\App\Helper\Context $context
+        \Magento\Framework\App\Helper\Context $context,
+        \Psr\Log\LoggerInterface $customLogger
  
     ) {
         $this->storeManager = $storeManager;
         $this->checkoutSession = $checkoutSession;
         $this->customerRepo = $customer;
+        $this->_customLogger  = $customLogger;
+
         parent::__construct($context);
     }
 
@@ -82,7 +85,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getSessionId()
     {
-
         $url = $this->getWsUrl('sessions');
         $ch = curl_init($url);
         $params['email'] = $this->getMerchantEmail();
@@ -164,9 +166,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         if ($this->isDebugActive()) {
             if (is_string($obj)) {
-            	$this->_logger->debug($obj);
+            	$this->_customLogger->debug($obj);
             } else {
-                $this->_logger->debug(json_encode($obj));
+                $this->_customLogger->debug(json_encode($obj));
             }
         }
     }
@@ -238,7 +240,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $psPayment = $this->checkoutSession->getData('PsPayment');
        
         $psPayment = unserialize($psPayment);
-        // $this->writeLog('getPaymentHash'.json_encode($psPayment));
+//         $this->writeLog('getPaymentHash'.json_encode($psPayment));
         if (is_null($param)) {
             return $psPayment;
         }
@@ -336,9 +338,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $params = $paramsObj->getParams();
         $paramsString = $this->convertToCURLString($params);
 
-        //$this->writeLog('Parameters being sent to API (/'.$type.'): '. var_export($params, true));
+        $this->writeLog('Parameters being sent to API (/'.$type.'): '. var_export($params, true));
 
-        //$this->writeLog('WSDL URL:'.$this->getWsUrl($type));
+        $this->writeLog('WSDL URL:'.$this->getWsUrl($type));
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $this->getWsUrl($type));
@@ -360,7 +362,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         curl_close($ch);
 
-       // $this->writeLog('Retorno PagSeguro (/'.$type.'): ' . var_export($response, true));
+        $this->writeLog('Retorno PagSeguro (/'.$type.'): ' . var_export($response, true));
 
      
         $xml = \SimpleXML_Load_String(trim($response));
@@ -384,16 +386,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if (false === $xml) {
             switch($response){
                 case 'Unauthorized':
-                   // $this->writeLog(
-                      //  'Token / email not authorized by PagSeguro. Check your settings on the panel.'
-                   // );
+                    $this->writeLog(
+                        'Token / email not authorized by PagSeguro. Check your settings on the panel.'
+                    );
                     break;
                 case 'Forbidden':
-                    //$this->writeLog('Unauthorized access to Api Pagseguro. Make sure you have permission to  use this service. Return: ' . var_export($response, true)
-                   // );
+                    $this->writeLog('Unauthorized access to Api Pagseguro. Make sure you have permission to  use this service. Return: ' . var_export($response, true)
+                    );
                     break;
                 default:
-                   // $this->writeLog('Unexpected return of PagSeguro. Return: ' . $response);
+                    $this->writeLog('Unexpected return of PagSeguro. Return: ' . $response);
             }
             throw new \Magento\Framework\Validator\Exception(
                 'There was a problem processing your request / payment. Please contact us.'
