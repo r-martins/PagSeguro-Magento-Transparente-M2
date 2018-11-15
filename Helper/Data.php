@@ -55,6 +55,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     protected $customer;
 
+    protected $authResponse;
+
     /**
     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
     * @param \Magento\Checkout\Model\Session $checkoutSession
@@ -66,13 +68,17 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Customer\Model\Customer $customer,
         \Magento\Framework\App\Helper\Context $context,
-        \Psr\Log\LoggerInterface $customLogger
+        \Psr\Log\LoggerInterface $customLogger,
+        \Magento\Framework\App\ProductMetadataInterface $productMetadata,
+        \Magento\Framework\Module\ModuleListInterface $moduleList
  
     ) {
         $this->storeManager = $storeManager;
         $this->checkoutSession = $checkoutSession;
         $this->customerRepo = $customer;
         $this->_customLogger  = $customLogger;
+        $this->productMetadata = $productMetadata;
+        $this->moduleList = $moduleList;
 
         parent::__construct($context);
     }
@@ -111,7 +117,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             return $e->getMessage();
         }
 
+        $this->authResponse = $response;
         $xml = \SimpleXML_Load_String($response);
+
 
         if (false === $xml) {
             if (curl_errno($ch) > 0) {
@@ -126,6 +134,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         return (string)$xml->id;
+    }
+
+    public function getAuthResponse() {
+        return $this->authResponse;
     }
 
     /**
@@ -987,5 +999,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getSessionVl()
     {
         return $this->checkoutSession->getCustomparam();
+    }
+
+    public function getModuleInformation()
+    {
+        return $this->moduleList->getOne('RicardoMartins_PagSeguro');
+    }
+
+    public function getMagentoVersion() {
+        return $this->productMetadata->getVersion();
     }
 }
