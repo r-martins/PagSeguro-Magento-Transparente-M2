@@ -117,11 +117,7 @@
                     <comment><![CDATA[When enabled, it will force the customer to select the installments amount instead of leaving payment to the pre-selected view.]]></comment>
                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="debug" translate="label comment" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Debug</label>
-                    <comment><![CDATA[Enables debug mode for log requests/responses.]]></comment>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                </field>
+
             </group>
         </section>
     </system>
