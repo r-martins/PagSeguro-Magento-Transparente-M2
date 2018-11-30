@@ -365,11 +365,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         try{
             $response = curl_exec($ch);
-        }catch(Exception $e){
+        }catch(\Exception $e){
             throw new \Magento\Framework\Validator\Exception('Communication failure with Pagseguro (' . $e->getMessage() . ')');
         }
 
         if (curl_error($ch)) {
+            $this->writeLog('-----Curl error response----: ' . var_export(curl_error($ch), true));
             throw new \Magento\Framework\Validator\Exception(curl_error($ch));
         }
         curl_close($ch);
@@ -378,17 +379,22 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
      
         $xml = \SimpleXML_Load_String(trim($response));
-        
-        //$errArray = array();
+
 
         if ($xml->error->code) {
+
+            $errArray = array();
             $xmlError = json_decode(json_encode($xml), true);
             $xmlError = $xmlError['error'];
             foreach ($xmlError as $xmlErr) {
                 $errArray[] = $xmlErr['message'];
             }
 
+
             $errArray = implode(",", $errArray);
+            if($errArray) {
+                throw new \Magento\Framework\Validator\Exception(__($errArray));
+            }
 
             $this->setSessionVl($errArray);
 
