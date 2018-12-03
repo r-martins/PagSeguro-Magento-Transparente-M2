@@ -57,6 +57,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     protected $authResponse;
 
+    protected $_curl;
+
     /**
     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
     * @param \Magento\Checkout\Model\Session $checkoutSession
@@ -70,7 +72,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Framework\App\Helper\Context $context,
         \Psr\Log\LoggerInterface $customLogger,
         \Magento\Framework\App\ProductMetadataInterface $productMetadata,
-        \Magento\Framework\Module\ModuleListInterface $moduleList
+        \Magento\Framework\Module\ModuleListInterface $moduleList,
+        \Magento\Framework\HTTP\Client\Curl $curl
  
     ) {
         $this->storeManager = $storeManager;
@@ -79,6 +82,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->_customLogger  = $customLogger;
         $this->productMetadata = $productMetadata;
         $this->moduleList = $moduleList;
+        $this->_curl = $curl;
 
         parent::__construct($context);
     }
@@ -213,7 +217,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'flag' => $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_CC_FLAG),
             'debug' => $this->isDebugActive(),
             'PagSeguroSessionId' => $this->getSessionId(),
-            'is_admin' => 0,
             'show_total' => $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_CC_SHOW_TOTAL),
             'force_installments_selection' =>
                 $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_CC_FORCE_INSTALLMENTS)
@@ -1014,5 +1017,19 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getMagentoVersion() {
         return $this->productMetadata->getVersion();
+    }
+
+
+    /**
+     * Validate public key
+     */
+    public function validateKey() {
+
+
+        $url = 'http://ws.ricardomartins.net.br/pspro/v6/auth/' . $this->getPagSeguroPubKey();
+
+        $this->_curl->get($url);
+
+        return $this->_curl->getBody();
     }
 }

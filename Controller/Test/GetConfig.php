@@ -44,7 +44,7 @@ class GetConfig extends \Magento\Framework\App\Action\Action
                 'debug'     => (boolean)$this->_helper->isDebugActive()
             ),
             'configJs'      => json_decode($this->_helper->getConfigJs()),
-            'key_validate'  => $this->_helper->getAuthResponse(),
+            'key_validate'  => $this->_helper->validateKey(),
             'token_consistency' => (strlen($this->_helper->getToken()) == 32) ? "Good" : "Token does not consist 32 characters"
         );
 
