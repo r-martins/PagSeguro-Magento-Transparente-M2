@@ -118,14 +118,13 @@ class Cc extends \Magento\Payment\Model\Method\Cc
      */
     public function capture(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
-        $this->pagSeguroHelper->writeLog('Inside capture');
         /*@var \Magento\Sales\Model\Order $order */
         $order = $payment->getOrder();
         try {
 
             //will grab data to be send via POST to API inside $params
             $params = $this->pagSeguroHelper->getCreditCardApiCallParams($order, $payment);
-           
+
             //call API
             $returnXml = $this->pagSeguroHelper->callApi($params, $payment);
 
@@ -146,7 +145,7 @@ class Cc extends \Magento\Payment\Model\Method\Cc
                 throw new \Magento\Framework\Validator\Exception('An error occurred in your payment.');
             }
 
-            $payment->setSkipOrderProcessing(true);
+            //$payment->setSkipOrderProcessing(true);
 
             if (isset($returnXml->code)) {
 
@@ -161,10 +160,8 @@ class Cc extends \Magento\Payment\Model\Method\Cc
             }
           //$this->pagSeguroAbModel->proccessNotificatonResult($returnXml);
         } catch (\Exception $e) {
-            $this->debugData(['exception' => $e->getMessage()]);
-            $this->_logger->error(__('Payment capturing error.'));
-            $this->messageManager->addError($e->getMessage());
-//            throw new \Magento\Framework\Exception\LocalizedException(__('Payment capturing error.'));
+
+            throw new \Magento\Framework\Exception\LocalizedException(__($e->getMessage()));
         }
         return $this;
     }
@@ -322,9 +319,8 @@ class Cc extends \Magento\Payment\Model\Method\Cc
      */
     public function validate()
     {
-        //parent::validate();
-        $missingInfo = $this->getInfoInstance();
 
+        $this->pagSeguroHelper->writeLog(__('CC validate method'));
 
         $senderHash = $this->pagSeguroHelper->getPaymentHash('sender_hash');
         $creditCardToken = $this->pagSeguroHelper->getPaymentHash('credit_card_token');
@@ -338,11 +334,9 @@ class Cc extends \Magento\Payment\Model\Method\Cc
                     Se esta for uma atualização via Ajax, ignore esta mensagem até a finalização do pedido.
                     $missingInfo"
                 );
-            $this->messageManager
-                ->addError('Falha ao processar seu pagamento. Por favor, entre em contato com nossa equipe.');
-            throw new \Magento\Framework\Validator\Exception(
-                'Falha ao processar seu pagamento. Por favor, entre em contato com nossa equipe.'
-            );
+
+            $errorMsg = __('Falha ao processar seu pagamento. Por favor, entre em contato com nossa equipe.');
+            throw new \Magento\Framework\Exception\LocalizedException($errorMsg);
         }
         return $this;
     }

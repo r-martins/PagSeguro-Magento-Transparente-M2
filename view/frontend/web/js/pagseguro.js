@@ -57,6 +57,7 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
         var ccExpMoElm = jQuery('select[name="payment[ps_cc_exp_month]"]');
         var ccExpYrElm = jQuery('select[name="payment[ps_cc_exp_year]"]');
         var ccCvvElm = jQuery('input[name="payment[ps_cc_cid]"]');
+        var cpf = jQuery('input[name="payment[ps_cc_cpf]"]');
 
         jQuery(ccNumElm).keyup(function( event ) {
             obj.updateCreditCardToken();
@@ -68,6 +69,9 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
             obj.updateCreditCardToken();
         });
         jQuery(ccCvvElm).keyup(function( event ) {
+            obj.updateCreditCardToken();
+        });
+        jQuery(cpf).keyup(function( event ) {
             obj.updateCreditCardToken();
         });
         jQuery("#rm_pagseguro_cc_cc_installments").change(function( event ) {

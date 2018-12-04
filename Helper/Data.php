@@ -55,6 +55,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     protected $customer;
 
+    protected $authResponse;
+
+    protected $_curl;
+
     /**
     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
     * @param \Magento\Checkout\Model\Session $checkoutSession
@@ -66,13 +70,19 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Customer\Model\Customer $customer,
         \Magento\Framework\App\Helper\Context $context,
-        \Psr\Log\LoggerInterface $customLogger
+        \Psr\Log\LoggerInterface $customLogger,
+        \Magento\Framework\App\ProductMetadataInterface $productMetadata,
+        \Magento\Framework\Module\ModuleListInterface $moduleList,
+        \Magento\Framework\HTTP\Client\Curl $curl
  
     ) {
         $this->storeManager = $storeManager;
         $this->checkoutSession = $checkoutSession;
         $this->customerRepo = $customer;
         $this->_customLogger  = $customLogger;
+        $this->productMetadata = $productMetadata;
+        $this->moduleList = $moduleList;
+        $this->_curl = $curl;
 
         parent::__construct($context);
     }
@@ -111,7 +121,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             return $e->getMessage();
         }
 
+        $this->authResponse = $response;
         $xml = \SimpleXML_Load_String($response);
+
 
         if (false === $xml) {
             if (curl_errno($ch) > 0) {
@@ -126,6 +138,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         return (string)$xml->id;
+    }
+
+    public function getAuthResponse() {
+        return $this->authResponse;
     }
 
     /**
@@ -201,7 +217,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'flag' => $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_CC_FLAG),
             'debug' => $this->isDebugActive(),
             'PagSeguroSessionId' => $this->getSessionId(),
-            'is_admin' => 0,
             'show_total' => $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_CC_SHOW_TOTAL),
             'force_installments_selection' =>
                 $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_CC_FORCE_INSTALLMENTS)
@@ -353,11 +368,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         try{
             $response = curl_exec($ch);
-        }catch(Exception $e){
+        }catch(\Exception $e){
             throw new \Magento\Framework\Validator\Exception('Communication failure with Pagseguro (' . $e->getMessage() . ')');
         }
 
         if (curl_error($ch)) {
+            $this->writeLog('-----Curl error response----: ' . var_export(curl_error($ch), true));
             throw new \Magento\Framework\Validator\Exception(curl_error($ch));
         }
         curl_close($ch);
@@ -366,17 +382,22 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
      
         $xml = \SimpleXML_Load_String(trim($response));
-        
-        //$errArray = array();
+
 
         if ($xml->error->code) {
+
+            $errArray = array();
             $xmlError = json_decode(json_encode($xml), true);
             $xmlError = $xmlError['error'];
             foreach ($xmlError as $xmlErr) {
                 $errArray[] = $xmlErr['message'];
             }
 
+
             $errArray = implode(",", $errArray);
+            if($errArray) {
+                throw new \Magento\Framework\Validator\Exception(__($errArray));
+            }
 
             $this->setSessionVl($errArray);
 
@@ -987,5 +1008,28 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getSessionVl()
     {
         return $this->checkoutSession->getCustomparam();
+    }
+
+    public function getModuleInformation()
+    {
+        return $this->moduleList->getOne('RicardoMartins_PagSeguro');
+    }
+
+    public function getMagentoVersion() {
+        return $this->productMetadata->getVersion();
+    }
+
+
+    /**
+     * Validate public key
+     */
+    public function validateKey() {
+
+
+        $url = 'http://ws.ricardomartins.net.br/pspro/v6/auth/' . $this->getPagSeguroPubKey();
+
+        $this->_curl->get($url);
+
+        return $this->_curl->getBody();
     }
 }
