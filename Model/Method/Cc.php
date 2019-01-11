@@ -158,7 +158,7 @@ class Cc extends \Magento\Payment\Model\Method\Cc
                 $payment->setAdditionalInformation($additional);
 
             }
-          //$this->pagSeguroAbModel->proccessNotificatonResult($returnXml);
+          $this->pagSeguroAbModel->proccessNotificatonResult($returnXml);
         } catch (\Exception $e) {
 
             throw new \Magento\Framework\Exception\LocalizedException(__($e->getMessage()));

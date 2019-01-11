@@ -22,6 +22,8 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
      */ 
     protected $orderModel;
 
+    protected $orderRepository;
+
      /**
      * Magento transaction Factory
      *
@@ -60,7 +62,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
         );
 
         $this->pagSeguroHelper = $pagSeguroHelper;  
-        $this->orderModel = $orderModel;  
+        $this->orderModel = $orderModel;
         $this->transactionFactory = $transactionFactory;  
     }
 
@@ -71,6 +73,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
      */
     public function proccessNotificatonResult($resultXML)
     {
+
         if (isset($resultXML->error)) {
             $errMsg = __((string)$resultXML->error->message);
             throw new \Magento\Framework\Validator\Exception(
@@ -81,7 +84,9 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                 )
             );
         }
+
         if (isset($resultXML->reference)) {
+
             $orderNo = (string)$resultXML->reference;
             $order = $this->orderModel->loadByIncrementId($orderNo);
             if (!$order->getId()) {
@@ -124,7 +129,10 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                         $message .= 'The transaction was denied or canceled by the bank.';
                         break;
                 }
-                $order->cancel();
+
+                //$order->cancel();
+                $order->setState(\Magento\Sales\Model\Order::STATE_CANCELED);
+                $order->setStatus(\Magento\Sales\Model\Order::STATE_CANCELED);
             }
 
             if ($processedState->getStateChanged()) {
@@ -165,8 +173,13 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                 }
             }
 
-            $payment->save();
-            $order->save();
+            try {
+                $payment->save();
+                $order->save();
+            }catch(Exception $e) {
+                $this->pagSeguroHelper->writeLog($e->getMessage());
+            }
+
         } else {
             throw new \Magento\Framework\Validator\Exception(__('Invalid return. Order reference not found.'));
         }
@@ -179,10 +192,12 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
      */
     public function getNotificationStatus($notificationCode)
     {
-        $url = "https://ws.pagseguro.uol.com.br/v2/transactions/notifications/";
 
-        $params = array('token' => $this->pagSeguroHelper->getToken(), 'email' => $this->pagSeguroHelper->getMerchantEmail(),);
+        $url = "https://ws.pagseguro.uol.com.br/v2/transactions/notifications/" . $notificationCode;
+
+        $params = array('token' => $this->pagSeguroHelper->getToken(), 'email' => $this->pagSeguroHelper->getMerchantEmail());
         $url .= '?' . http_build_query($params);
+
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
