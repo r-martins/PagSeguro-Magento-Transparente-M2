@@ -475,7 +475,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'creditCardToken'   => $payment->getAdditionalInformation('credit_card_token'),
             'reference'         => $order->getIncrementId(),
             'extraAmount'       => $this->getExtraAmount($order),
-            'notificationURL'   => $this->getStoreUrl().'pseguro/notification',
+            'notificationURL'   => $this->getStoreUrl().'pseguro/notification/index',
         );
         $params = array_merge($params, $this->getItemsParams($order));
         $params = array_merge($params, $this->getSenderParams($order, $payment));

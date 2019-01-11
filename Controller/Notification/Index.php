@@ -49,15 +49,13 @@ class Index extends \Magento\Framework\App\Action\Action
     public function execute()
     {
         /** @var RicardoMartins_PagSeguro_Model_Abstract $model */
-       $this->pagSeguroHelper->writeLog(
-                'Notification received from the payment with the parameters:'
-                . var_export($this->getRequest()->getParams(), true)
-            );
+
         $response = $this->pagSeguroAbModel->getNotificationStatus($this->getRequest()->getPost('notificationCode'));
+
         if (false === $response) {
             throw new \Magento\Framework\Validator\Exception('Failed to process PagSeguro XML return.');
         }
-        //$xml = \SimpleXML_Load_String(trim($response));
-        $this->pagSeguroAbModel->proccessNotificatonResult($xml);
+
+        $this->pagSeguroAbModel->proccessNotificatonResult($response);
     }
 }
