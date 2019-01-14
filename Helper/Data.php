@@ -70,7 +70,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Customer\Model\Customer $customer,
         \Magento\Framework\App\Helper\Context $context,
-        \Psr\Log\LoggerInterface $customLogger,
+        \RicardoMartins\PagSeguro\Helper\Logger $loggerHelper,
         \Magento\Framework\App\ProductMetadataInterface $productMetadata,
         \Magento\Framework\Module\ModuleListInterface $moduleList,
         \Magento\Framework\HTTP\Client\Curl $curl
@@ -79,7 +79,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->storeManager = $storeManager;
         $this->checkoutSession = $checkoutSession;
         $this->customerRepo = $customer;
-        $this->_customLogger  = $customLogger;
+        $this->_logHelper  = $loggerHelper;
         $this->productMetadata = $productMetadata;
         $this->moduleList = $moduleList;
         $this->_curl = $curl;
@@ -95,6 +95,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getSessionId()
     {
+
         $url = $this->getWsUrl('sessions');
         $ch = curl_init($url);
         $params['email'] = $this->getMerchantEmail();
@@ -181,11 +182,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function writeLog($obj)
     {
         if ($this->isDebugActive()) {
-            if (is_string($obj)) {
-            	$this->_customLogger->debug($obj);
-            } else {
-                $this->_customLogger->debug(json_encode($obj));
-            }
+            $this->_logHelper->writeLog($obj);
         }
     }
 

@@ -15,10 +15,12 @@
         </arguments>
     </virtualType>
 
-    <type name="RicardoMartins\PagSeguro\Helper\Data">
+    <type name="RicardoMartins\PagSeguro\Helper\Logger">
         <arguments>
             <argument name="customLogger" xsi:type="object">PagSeguroLogger</argument>
         </arguments>
     </type>
+
+
 
 </config>
