@@ -280,7 +280,7 @@ RMPagSeguro.prototype.getInstallments = function(grandTotal, selectedInstallment
             parcelsDrop.empty();
 
             if(self.config.force_installments_selection == 1){
-                parcelsDrop.append('<option value="">Select the amount of plots</option>');
+                parcelsDrop.append('<option value="">Select the number of installments</option>');
             }
 
             for(var x=0; x < b.length; x++){

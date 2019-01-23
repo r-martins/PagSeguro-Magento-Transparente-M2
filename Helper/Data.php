@@ -859,9 +859,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $isStreetline = preg_match('/^street_(\d{1})$/', $attributeId, $matches);
 
         if ($isStreetline !== false && isset($matches[1])) { //uses streetlines
-             $street = $address->getStreet();
-             $lineNum = (int)$matches[1] - 1;
-
+             $street[1] = $address->getStreetLine(1); //street
+             $street[2] = $address->getStreetLine(2); //number
+             $street[3] = !$address->getStreetLine(4) ? '' : $address->getStreetLine(3); // complement
+             $street[4] = !$address->getStreetLine(4) ? $address->getStreetLine(3) : $address->getStreetLine(4); // neighborhood
+             $lineNum = (int)$matches[1];
              return $street[$lineNum];
         } else if ($attributeId == '') { //do not tell pagseguro
             return '';
