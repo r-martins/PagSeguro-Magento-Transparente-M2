@@ -46,6 +46,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
         \RicardoMartins\PagSeguro\Helper\Data $pagSeguroHelper,
         \Magento\Sales\Api\Data\OrderInterface $orderModel,
         \Magento\Framework\DB\Transaction $transactionFactory,
+        \Magento\Sales\Model\Order\Email\Sender\OrderCommentSender $commentSender,
         array $data = array()
     ) {
         parent::__construct(
@@ -63,7 +64,8 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
 
         $this->pagSeguroHelper = $pagSeguroHelper;  
         $this->orderModel = $orderModel;
-        $this->transactionFactory = $transactionFactory;  
+        $this->transactionFactory = $transactionFactory;
+        $this->_commentSender = $commentSender;
     }
 
   
@@ -103,6 +105,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
             $message = $processedState->getMessage();
 
             if ((int)$resultXML->status == 6) { //valor devolvido (gera credit memo e tenta cancelar o pedido)
+
                 if ($order->canUnhold()) {
                     $order->unhold();
                 }
@@ -111,12 +114,14 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                     $order->cancel();
                     $order->save();
                 } else {
+                    $this->pagSeguroHelper->writeLog("can't hold and can't cancel");
                     $payment->registerRefundNotification(floatval($resultXML->grossAmount));
                     $order->addStatusHistoryComment(
                         'Returned: Amount returned to buyer.'
                     )->save();
                 }
             }
+
 
             if ((int)$resultXML->status == 7 && isset($resultXML->cancellationSource)) {
                 //Especificamos a fonte do cancelamento do pedido
@@ -136,14 +141,16 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
             }
 
             if ($processedState->getStateChanged()) {
+
                 // somente para o status 6 que edita o status do pedido - Weber
                 if ((int)$resultXML->status != 6) {
-                    $order->setState(
-                        $processedState->getState(),
-                        true,
-                        $message,
-                        $processedState->getIsCustomerNotified()
-                    )->save();
+
+                    $order->setState($processedState->getState());
+
+                    $order->setStatus($processedState->getState());
+
+                    $order->addStatusHistoryComment($message);
+
                 }
 
             } else {
@@ -152,6 +159,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
 
             if ((int)$resultXML->status == 3) { 
                 if(!$order->hasInvoices()){
+
                     $invoice = $order->prepareInvoice();
                     $invoice->register()->pay();
                     $msg = sprintf('Captured payment. Transaction Identifier: %s', (string)$resultXML->code);
@@ -176,6 +184,10 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
             try {
                 $payment->save();
                 $order->save();
+
+                if($processedState->getIsCustomerNotified()) {
+                    $this->_commentSender->send($order, true, $message);
+                }
             }catch(Exception $e) {
                 $this->pagSeguroHelper->writeLog($e->getMessage());
             }
