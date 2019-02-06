@@ -48,12 +48,15 @@ class Index extends \Magento\Framework\App\Action\Action
     */
     public function execute()
     {
-        /** @var RicardoMartins_PagSeguro_Model_Abstract $model */
-
-        $response = $this->pagSeguroAbModel->getNotificationStatus($this->getRequest()->getPost('notificationCode'));
+        $notificationCode = $this->getRequest()->getPost('notificationCode', false);
+        if (false === $notificationCode) {
+            //@TODO Implement nice notification page with form and notificationCode
+            throw new \Magento\Framework\Validator\Exception(new \Magento\Framework\Phrase('Parâmetro notificationCode não recebido.'));
+        }
+        $response = $this->pagSeguroAbModel->getNotificationStatus($notificationCode);
 
         if (false === $response) {
-            throw new \Magento\Framework\Validator\Exception('Failed to process PagSeguro XML return.');
+            throw new \Magento\Framework\Validator\Exception(new \Magento\Framework\Phrase('Failed to process PagSeguro XML return.'));
         }
 
         $this->pagSeguroAbModel->proccessNotificatonResult($response);

@@ -128,10 +128,10 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                 switch((string)$resultXML->cancellationSource)
                 {
                     case 'INTERNAL':
-                        $message .= ' PagSeguro itself denied or canceled the transaction.';
+                        $message .= __('PagSeguro itself denied or canceled the transaction.');
                         break;
                     case 'EXTERNAL':
-                        $message .= 'The transaction was denied or canceled by the bank.';
+                        $message .= __('The transaction was denied or canceled by the bank.');
                         break;
                 }
 
@@ -205,11 +205,13 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
     public function getNotificationStatus($notificationCode)
     {
 
+        //@TODO Remove hard coded URL
         $url = "https://ws.pagseguro.uol.com.br/v2/transactions/notifications/" . $notificationCode;
 
         $params = array('token' => $this->pagSeguroHelper->getToken(), 'email' => $this->pagSeguroHelper->getMerchantEmail());
         $url .= '?' . http_build_query($params);
 
+        //@TODO Add ext-curl to composer
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -260,27 +262,27 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                     $return->setStateChanged(false);
                 }
                 $return->setMessage(
-                    'Awaiting payment: the buyer initiated the transaction, but so far PagSeguro has not received any payment information.'
+                    __('Awaiting payment: the buyer initiated the transaction, but so far PagSeguro has not received any payment information.')
                 );
                 break;
             case '2':
                 $return->setState(\Magento\Sales\Model\Order::STATE_PAYMENT_REVIEW);
                 $return->setIsCustomerNotified(true);
-                $return->setMessage('Under review: the buyer chose to pay with a credit card and
-                    PagSeguro is analyzing the risk of the transaction.'
+                $return->setMessage(
+                    __('Under review: the buyer chose to pay with a credit card and PagSeguro is analyzing the risk of the transaction.')
                 );
                 break;
             case '3':
                 $return->setState(\Magento\Sales\Model\Order::STATE_PROCESSING);
                 $return->setIsCustomerNotified(true);
-                $return->setMessage('Pay: the transaction was paid by the buyer and PagSeguro has already received a confirmation
-                    of the financial institution responsible for processing.'
+                $return->setMessage(
+                    __('Pay: the transaction was paid by the buyer and PagSeguro has already received a confirmation of the financial institution responsible for processing.')
                 );
                 $return->setIsTransactionPending(false);
                 break;
             case '4':
-                $return->setMessage('Available: The transaction has been paid and has reached the end of its
-                    has been returned and there is no open dispute'
+                $return->setMessage(
+                    __('Available: The transaction has been paid and has reached the end of its has been returned and there is no open dispute')
                 );
                 $return->setIsCustomerNotified(false);
                 $return->setStateChanged(false);
@@ -290,25 +292,25 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                 $return->setState(\Magento\Sales\Model\Order::STATE_PROCESSING);
                 $return->setIsCustomerNotified(false);
                 $return->setIsTransactionPending(false);
-                $return->setMessage('In dispute: the buyer, within the term of release of the transaction,
-                    opened a dispute.'
+                $return->setMessage(
+                    __('In dispute: the buyer, within the term of release of the transaction, opened a dispute.')
                 );
                 break;
             case '6':
                 $return->setData('state', \Magento\Sales\Model\Order::STATE_CLOSED);
                 $return->setIsCustomerNotified(false);
                 $return->setIsTransactionPending(false);
-                $return->setMessage('Returned: The transaction amount was returned to the buyer.');
+                $return->setMessage(__('Returned: The transaction amount was returned to the buyer.'));
                 break;
             case '7':
                 $return->setState(\Magento\Sales\Model\Order::STATE_CANCELED);
                 $return->setIsCustomerNotified(true);
-                $return->setMessage('Canceled: The transaction was canceled without being finalized.');
+                $return->setMessage(__('Canceled: The transaction was canceled without being finalized.'));
                 break;
             default:
                 $return->setIsCustomerNotified(false);
                 $return->setStateChanged(false);
-                $return->setMessage('Invalid status code returned by PagSeguro. (' . $statusCode . ')');
+                $return->setMessage(__('Invalid status code returned by PagSeguro. (%s)', $statusCode ));
         }
         return $return;
     }

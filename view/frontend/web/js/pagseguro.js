@@ -9,7 +9,7 @@ function RMPagSeguro(config) {
         if(config.PagSeguroSessionId == false){
             console.error('Unable to get PagSeguro SessionId. Check your token, key and settings.');
         }
-         console.log('RMPagSeguro constructure has been initialized.');
+         console.log('RMPagSeguro has been initialized.');
 
         this.config = config;
         this.config.maxSenderHashAttempts = 30;
@@ -35,7 +35,8 @@ function RMPagSeguro(config) {
         } 
 
          var parcelsDrop = jQuery('#rm_pagseguro_cc_cc_installments');
-         parcelsDrop.append('<option value="">Enter the card details to calculate</option>');
+        //                                    Please enter credit card data to calculate
+         parcelsDrop.append('<option value="">Informe os dados do cartão para calcular</option>');
 }
 
 
@@ -280,7 +281,7 @@ RMPagSeguro.prototype.getInstallments = function(grandTotal, selectedInstallment
             parcelsDrop.empty();
 
             if(self.config.force_installments_selection == 1){
-                parcelsDrop.append('<option value="">Select the number of installments</option>');
+                parcelsDrop.append('<option value="">Selecione a quantidade de parcelas</option>');
             }
 
             for(var x=0; x < b.length; x++){
