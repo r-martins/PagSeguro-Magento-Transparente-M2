@@ -120,6 +120,7 @@ class Cc extends \Magento\Payment\Model\Method\Cc
     {
         /*@var \Magento\Sales\Model\Order $order */
         $order = $payment->getOrder();
+
         try {
 
             //will grab data to be send via POST to API inside $params
@@ -145,7 +146,7 @@ class Cc extends \Magento\Payment\Model\Method\Cc
                 throw new \Magento\Framework\Validator\Exception('An error occurred in your payment.');
             }
 
-            //$payment->setSkipOrderProcessing(true);
+            $payment->setSkipOrderProcessing(true);
 
             if (isset($returnXml->code)) {
 
@@ -158,7 +159,8 @@ class Cc extends \Magento\Payment\Model\Method\Cc
                 $payment->setAdditionalInformation($additional);
 
             }
-          $this->pagSeguroAbModel->proccessNotificatonResult($returnXml);
+
+          $this->pagSeguroAbModel->proccessNotificatonResult($returnXml, $payment);
         } catch (\Exception $e) {
 
             throw new \Magento\Framework\Exception\LocalizedException(__($e->getMessage()));

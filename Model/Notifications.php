@@ -73,7 +73,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
      * Processes notification XML data. XML is sent right after order is sent to PagSeguro, and on order updates.
      * @param SimpleXMLElement $resultXML
      */
-    public function proccessNotificatonResult($resultXML)
+    public function proccessNotificatonResult($resultXML, $_payment = false)
     {
 
         if (isset($resultXML->error)) {
@@ -89,15 +89,22 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
 
         if (isset($resultXML->reference)) {
 
-            $orderNo = (string)$resultXML->reference;
-            $order = $this->orderModel->loadByIncrementId($orderNo);
-            if (!$order->getId()) {
-                $this->pagSeguroHelper->writeLog(
-                    sprintf('Request %s not found on system. Unable to process return.', $orderNo)
-                );
-                return $this;
+            if(is_object($_payment) && $_payment instanceof \Magento\Payment\Model\InfoInterface) {
+
+                $order = $_payment->getOrder();
+                $payment = $_payment;
+
+            }else {
+                $orderNo = (string)$resultXML->reference;
+                $order = $this->orderModel->loadByIncrementId($orderNo);
+                if (!$order->getId()) {
+                    $this->pagSeguroHelper->writeLog(
+                        sprintf('Request %s not found on system. Unable to process return.', $orderNo)
+                    );
+                    return $this;
+                }
+                $payment = $order->getPayment();
             }
-            $payment = $order->getPayment();
 
             $this->_code = $payment->getMethod();
             $processedState = $this->processStatus((int)$resultXML->status);
@@ -107,18 +114,19 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
             if ((int)$resultXML->status == 6) { //valor devolvido (gera credit memo e tenta cancelar o pedido)
 
                 if ($order->canUnhold()) {
-                    $order->unhold();
+                    $order->setState(\Magento\Sales\Model\Order::STATE_HOLDED);
+                    $order->setStatus(\Magento\Sales\Model\Order::STATE_HOLDED);
                 }
 
                 if ($order->canCancel()) {
-                    $order->cancel();
-                    $order->save();
+                    $order->setState(\Magento\Sales\Model\Order::STATE_CANCELED);
+                    $order->setStatus(\Magento\Sales\Model\Order::STATE_CANCELED);
                 } else {
                     $this->pagSeguroHelper->writeLog("can't hold and can't cancel");
                     $payment->registerRefundNotification(floatval($resultXML->grossAmount));
                     $order->addStatusHistoryComment(
                         'Returned: Amount returned to buyer.'
-                    )->save();
+                    );
                 }
             }
 
@@ -135,7 +143,6 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                         break;
                 }
 
-                //$order->cancel();
                 $order->setState(\Magento\Sales\Model\Order::STATE_CANCELED);
                 $order->setStatus(\Magento\Sales\Model\Order::STATE_CANCELED);
             }
@@ -145,11 +152,15 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                 // somente para o status 6 que edita o status do pedido - Weber
                 if ((int)$resultXML->status != 6) {
 
+                    $this->pagSeguroHelper->writeLog("State: ". $processedState->getState());
+
                     $order->setState($processedState->getState());
-
                     $order->setStatus($processedState->getState());
-
                     $order->addStatusHistoryComment($message);
+
+                    if((int)$resultXML->status == 1 && is_object($_payment)) {
+                        $_payment->setIsTransactionPending(true);
+                    }
 
                 }
 
@@ -181,16 +192,19 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                 }
             }
 
-            try {
-                $payment->save();
-                $order->save();
+            if(!is_object($_payment)) {
+                try {
+                    $payment->save();
+                    $order->save();
 
-                if($processedState->getIsCustomerNotified()) {
-                    $this->_commentSender->send($order, true, $message);
+                    if($processedState->getIsCustomerNotified()) {
+                        $this->_commentSender->send($order, true, $message);
+                    }
+                }catch(Exception $e) {
+                    $this->pagSeguroHelper->writeLog($e->getMessage());
                 }
-            }catch(Exception $e) {
-                $this->pagSeguroHelper->writeLog($e->getMessage());
             }
+
 
         } else {
             throw new \Magento\Framework\Validator\Exception(__('Invalid return. Order reference not found.'));
@@ -258,9 +272,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
             case '1':
                 $return->setState(\Magento\Sales\Model\Order::STATE_PENDING_PAYMENT);
                 $return->setIsCustomerNotified($this->getCode()!='pagseguro_cc');
-                if ($this->getCode()=='rm_pagseguro_cc') {
-                    $return->setStateChanged(false);
-                }
+
                 $return->setMessage(
                     __('Awaiting payment: the buyer initiated the transaction, but so far PagSeguro has not received any payment information.')
                 );
