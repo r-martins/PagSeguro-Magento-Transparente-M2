@@ -1,13 +1,15 @@
 <?php
-/**
- *
- * Copyright © 2013-2017 Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
- */
 namespace RicardoMartins\PagSeguro\Controller\Notification;
 
-use Magento\Framework\Controller\ResultFactory;
-
+/**
+ * Class Index
+ *
+ * @see       http://bit.ly/pagseguromagento Official Website
+ * @author    Ricardo Martins (and others) <pagseguro-transparente@ricardomartins.net.br>
+ * @copyright 2018-2019 Ricardo Martins
+ * @license   https://www.gnu.org/licenses/gpl-3.0.pt-br.html GNU GPL, version 3
+ * @package   RicardoMartins\PagSeguro\Controller\Notification
+ */
 class Index extends \Magento\Framework\App\Action\Action
 {    
      /**
@@ -24,7 +26,6 @@ class Index extends \Magento\Framework\App\Action\Action
      */ 
     protected $pagSeguroAbModel;
 
-
      /**
      * @param \RicardoMartins\PagSeguro\Helper\Data $pagSeguroHelper
      * @param \RicardoMartins\PagSeguro\Model\Notifications $pagSeguroAbModel
@@ -36,13 +37,11 @@ class Index extends \Magento\Framework\App\Action\Action
          \Magento\Framework\App\Action\Context $context
  
     ) {
-        
-        $this->pagSeguroHelper = $pagSeguroHelper;       
+        $this->pagSeguroHelper = $pagSeguroHelper;
         $this->pagSeguroAbModel = $pagSeguroAbModel;       
         parent::__construct($context);
     }
         
-
     /**
     * @return json
     */

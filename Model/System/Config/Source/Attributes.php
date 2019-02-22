@@ -1,12 +1,14 @@
 <?php
-/**
- * Copyright © 2013-2017 Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
- */
 namespace RicardoMartins\PagSeguro\Model\System\Config\Source;
 
 /**
- * Source model for available payment actions
+ * Class Attributes
+ *
+ * @see       http://bit.ly/pagseguromagento Official Website
+ * @author    Ricardo Martins (and others) <pagseguro-transparente@ricardomartins.net.br>
+ * @copyright 2018-2019 Ricardo Martins
+ * @license   https://www.gnu.org/licenses/gpl-3.0.pt-br.html GNU GPL, version 3
+ * @package   RicardoMartins\PagSeguro\Model\System\Config\Source
  */
 class Attributes implements \Magento\Framework\Option\ArrayInterface
 {

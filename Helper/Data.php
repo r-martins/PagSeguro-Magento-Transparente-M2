@@ -1,13 +1,14 @@
 <?php
-/**
- * Copyright © 2013-2017 Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
- */
 namespace RicardoMartins\PagSeguro\Helper;
 
-
 /**
- * PagSeguro Data helper
+ * Class Data Helper
+ *
+ * @see       http://bit.ly/pagseguromagento Official Website
+ * @author    Ricardo Martins (and others) <pagseguro-transparente@ricardomartins.net.br>
+ * @copyright 2018-2019 Ricardo Martins
+ * @license   https://www.gnu.org/licenses/gpl-3.0.pt-br.html GNU GPL, version 3
+ * @package   RicardoMartins\PagSeguro\Helper
  */
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
@@ -33,7 +34,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_PATH_PAYMENT_PAGSEGUROPRO_BOLETO_ACTIVE   = 'payment/pagseguropro_boleto/active';
     const XML_PATH_PAYMENT_PAGSEGURO_KEY                = 'payment/rm_pagseguro/key';
     const XML_PATH_PAYMENT_PAGSEGURO_CC_FORCE_INSTALLMENTS = 'payment/rm_pagseguro_cc/force_installments_selection';
-
 
      /**
      * Store Manager
@@ -88,7 +88,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         parent::__construct($context);
     }
 
-
     /**
      * Returns session ID from PagSeguro that will be used on JavaScript methods.
      * or FALSE on failure
@@ -96,13 +95,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getSessionId()
     {
-
         $url = $this->getWsUrl('sessions');
+        //@TODO Replace forbidden curl_*
         $ch = curl_init($url);
         $params['email'] = $this->getMerchantEmail();
         $params['token'] = $this->getToken();   
         $params['public_key'] = $this->getPagSeguroPubKey();    
 
+        //@TODO Replace curl
         curl_setopt_array(
             $ch,
             array(
@@ -126,8 +126,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->authResponse = $response;
         $xml = \SimpleXML_Load_String($response);
 
-
         if (false === $xml) {
+            //@TODO Remove curl
             if (curl_errno($ch) > 0) {
                 $this->writeLog('PagSeguro API communication failure: ' . curl_error($ch));
             } else {
@@ -155,7 +155,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_EMAIL);
     }
 
-
     /**
      * Check if debug mode is active
      * @return bool
@@ -165,7 +164,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_DEBUG);
     }
 
-
      /**
      * Get PagSeguro Public key (if exists)
      * @return string
@@ -174,7 +172,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_KEY);
     }
-
 
    /**
      * Write something to pagseguro.log
@@ -201,7 +198,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $token;
     }
 
-
 	/**
      * Return serialized (json) string with module configuration
      * return string
@@ -222,7 +218,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return json_encode($config);
     }
 
-
     /**
      * Return store base url
      * return string
@@ -232,7 +227,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->storeManager->getStore()->getBaseUrl();
     }
 
-
      /**
      * Return GrandTotal
      * return decimal
@@ -241,7 +235,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return  $this->checkoutSession->getQuote()->getGrandTotal();
     }
-
 
     /**
      * Get payment hashes (sender_hash & credit_card_token) from session
@@ -282,7 +275,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return false;
     }
 
-
     /**
      * Get cc installment from session
      * @param string 
@@ -291,7 +283,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getInstallments($param)
     {
         $ccinstallment = $this->checkoutSession->getData('installment');
-
         $ccinstallment = unserialize($ccinstallment);
 
         if (isset($ccinstallment[$param])) {
@@ -300,7 +291,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         return false;
     }
-
 
      /**
      * Check if CPF should be visible with other payment fields
@@ -312,7 +302,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return empty($customerCpfAttribute);
     }
 
-
      /**
      * Check if DOB should be visible with other payment fields
      * @return bool
@@ -323,7 +312,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return empty($customerDobAttribute);
     }
 
-
     /**
      * Return Installment Qty
      * return int
@@ -332,7 +320,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return  2;
     }
-
 
     /**
      * Call PagSeguro API to place an order (/transactions)
@@ -355,6 +342,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         $this->writeLog('WSDL URL:'.$this->getWsUrl($type));
 
+        //@TODO Remove curl
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $this->getWsUrl($type));
         curl_setopt($ch, CURLOPT_POST, count($params));
@@ -370,17 +358,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             throw new \Magento\Framework\Validator\Exception('Communication failure with Pagseguro (' . $e->getMessage() . ')');
         }
 
+        //@TODO Remove curl
         if (curl_error($ch)) {
+            //@TODO Remove curl
             $this->writeLog('-----Curl error response----: ' . var_export(curl_error($ch), true));
             throw new \Magento\Framework\Validator\Exception(curl_error($ch));
         }
+        //@TODO Remove curl
         curl_close($ch);
 
         $this->writeLog('Retorno PagSeguro (/'.$type.'): ' . var_export($response, true));
 
-     
         $xml = \SimpleXML_Load_String(trim($response));
-
 
         if ($xml->error->code) {
 
@@ -391,16 +380,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 $errArray[] = $xmlErr['message'];
             }
 
-
             $errArray = implode(",", $errArray);
             if($errArray) {
                 throw new \Magento\Framework\Validator\Exception(__($errArray));
             }
 
             $this->setSessionVl($errArray);
-
         }
-
 
         if (false === $xml) {
             switch($response){
@@ -424,7 +410,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $xml;
     }
 
-
     /**
      * Convert array values to utf-8
      * @param array $params
@@ -438,7 +423,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return $params;
     }
-
 
     /**
      * Convert API params (already ISO-8859-1) to url format (curl string)
@@ -455,14 +439,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return rtrim($fieldsString, '&');
     }
 
-
     /**
      * Returns associative array with required parameters to API, used on CC method calls
      * @return array
      */
     public function getCreditCardApiCallParams(\Magento\Sales\Model\Order $order, $payment)
     {
-        
         $params = array(
             'email'             => $this->getMerchantEmail(),
             'token'             => $this->getToken(),
@@ -484,7 +466,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         return $params;
     }
-
 
     /**
      * Calculates the "Exta" value that corresponds to Tax values minus Discount given
@@ -512,7 +493,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return number_format($extra, 2, '.', '');
     }
-
 
      /**
      * Return items information, to be send to API
@@ -593,7 +573,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getCreditCardHolderParams(\Magento\Sales\Model\Order $order, $payment)
     {
         $digits = new \Zend\Filter\Digits();
-
         $cpf = $this->getCustomerCpfValue($order, $payment);
 
         //data
@@ -639,7 +618,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return $return;
     }
-
 
     /**
      * Return an array with address (shipping/billing) information to be used on API
@@ -697,7 +675,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $return;
     }
 
-
     /**
      * Returns customer's CPF based on your module configuration
      * @param Mage_Sales_Model_Order $order
@@ -736,7 +713,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $cpfObj->getCpf();
     }
 
-
      /**
      * Extracts phone area code and returns phone number, with area code as key of the returned array
      * @author Ricardo Martins <ricardo@ricardomartins.net.br>
@@ -768,7 +744,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'number'=> (string)substr($originalPhone, 2, 9),
         );
     }
-
 
     /**
      * Remove duplicated spaces from string
@@ -802,7 +777,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return preg_replace('/[^0-9A-Za-zÃÁÀÂÇÉÊÍÕÓÔÚÜãáàâçéêíõóôúü.\-\/ ]/u', '', strtr($s, $replace));
     }
 
-
     /**
      * Should split shipping? If grand total is equal to discount total.
      * PagSeguro needs to receive product values > R$0,00, even if you need to invoice only shipping
@@ -826,7 +800,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return (abs($extraAmount) == $totalAmount);
     }
 
-
      /**
      * Return shipping code based on PagSeguro Documentation
      * 1 – PAC, 2 – SEDEX, 3 - Desconhecido
@@ -844,7 +817,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return '3';
     }
-
 
      /**
      * Gets the shipping attribute based on one of the id's from
@@ -871,7 +843,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return (string)$address->getData($attributeId);
     }
-
 
     /**
      * Returns customer's date of birthday, based on your module configuration or return a default date
@@ -906,7 +877,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         return date('d/m/Y', strtotime($dob));
     }
-
 
     /**
      * Get BR State code even if it was typed manually
@@ -962,7 +932,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $state;
     }
 
-
     /**
      * Replace accented characters
      * @param $string
@@ -973,7 +942,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return preg_replace('/[`^~\'"]/', null, iconv('UTF-8', 'ASCII//TRANSLIT', $string));
     }
-
 
     /**
      * Returns Webservice URL based on selected environment (prod or sandbox)
@@ -1019,13 +987,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->productMetadata->getVersion();
     }
 
-
     /**
      * Validate public key
      */
     public function validateKey() {
 
-
+        //@TODO Remove hardcoded url
         $url = 'http://ws.ricardomartins.net.br/pspro/v6/auth/' . $this->getPagSeguroPubKey();
 
         $this->_curl->get($url);

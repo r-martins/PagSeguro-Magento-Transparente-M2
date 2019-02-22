@@ -1,8 +1,8 @@
 /**
  * PagSeguro Transparente para Magento
- * @author Ricardo Martins <ricardo@ricardomartins.net.br>
- * @link https://github.com/r-martins/PagSeguro-Magento-Transparente
- * @version 3.2.3
+ * @author Ricardo Martins <pagseguro-transparente@ricardomartins.net.br>
+ * @link http://bit.ly/pagseguromagento
+ * @version 1.0.0
  */
 
 define([

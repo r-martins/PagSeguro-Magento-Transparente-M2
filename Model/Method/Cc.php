@@ -1,10 +1,15 @@
 <?php
-/**
- * Copyright © 2013-2017 Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
- */
 namespace RicardoMartins\PagSeguro\Model\Method;
 
+/**
+ * Class Cc
+ *
+ * @see       http://bit.ly/pagseguromagento Official Website
+ * @author    Ricardo Martins (and others) <pagseguro-transparente@ricardomartins.net.br>
+ * @copyright 2018-2019 Ricardo Martins
+ * @license   https://www.gnu.org/licenses/gpl-3.0.pt-br.html GNU GPL, version 3
+ * @package   RicardoMartins\PagSeguro\Model\Method
+ */
 class Cc extends \Magento\Payment\Model\Method\Cc
 {
     /**
@@ -15,17 +20,12 @@ class Cc extends \Magento\Payment\Model\Method\Cc
     const CODE = 'rm_pagseguro_cc';
 
     protected $_code = self::CODE;
-
     protected $_isGateway                   = true;
     protected $_canCapture                  = true;
     protected $_canCapturePartial           = true;
     protected $_canRefund                   = true;
     protected $_canRefundInvoicePartial     = true;
-
-
-
     protected $_countryFactory;
-
     protected $_minAmount = null;
     protected $_maxAmount = null;
     protected $_supportedCurrencyCodes = array('BRL');
@@ -89,6 +89,7 @@ class Cc extends \Magento\Payment\Model\Method\Cc
 
         $this->_countryFactory = $countryFactory;
 
+        //@TODO Remove
         // $this->_minAmount = 1;
         // $this->_maxAmount = 999999999; 
         $this->pagSeguroHelper = $pagSeguroHelper;  
@@ -99,13 +100,15 @@ class Cc extends \Magento\Payment\Model\Method\Cc
 
     public function order(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
+        //@TODO Review. Necessary?
           /*@var \Magento\Sales\Model\Order $order */
           $this->pagSeguroHelper->writeLog('Inside Order');
     }
 
      public function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
-           $this->pagSeguroHelper->writeLog('Inside Auth');
+        //@TODO Review. Necessary?
+        $this->pagSeguroHelper->writeLog('Inside Auth');
     }
 
     /**
@@ -213,7 +216,6 @@ class Cc extends \Magento\Payment\Model\Method\Cc
         return $this;
     }
 
-
     /**
      * Assign data to info model instance
      *
@@ -222,7 +224,6 @@ class Cc extends \Magento\Payment\Model\Method\Cc
      */
     public function assignData(\Magento\Framework\DataObject $data)
     {
-       
         if (!$data instanceof \Magento\Framework\DataObject) {
             $data = new \Magento\Framework\DataObject($data);
         }
@@ -266,9 +267,7 @@ class Cc extends \Magento\Payment\Model\Method\Cc
             }
         }
         return $this;
-        
     }
-
 
     /**
      * Determine method availability based on quote amount and config data
@@ -313,7 +312,6 @@ class Cc extends \Magento\Payment\Model\Method\Cc
         return true;
     }
 
-
     /**
      * Validate payment method information object
      *
@@ -321,7 +319,6 @@ class Cc extends \Magento\Payment\Model\Method\Cc
      */
     public function validate()
     {
-
         $this->pagSeguroHelper->writeLog(__('CC validate method'));
 
         $senderHash = $this->pagSeguroHelper->getPaymentHash('sender_hash');
@@ -342,5 +339,4 @@ class Cc extends \Magento\Payment\Model\Method\Cc
         }
         return $this;
     }
-
 }

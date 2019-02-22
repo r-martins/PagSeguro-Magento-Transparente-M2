@@ -1,24 +1,24 @@
 <?php
-/**
- *
- * Copyright © 2013-2017 Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
- */
 namespace RicardoMartins\PagSeguro\Controller\Ajax;
-
 use Magento\Framework\Controller\ResultFactory;
 
+/**
+ * Class UpdateInstallments
+ *
+ * @see       http://bit.ly/pagseguromagento Official Website
+ * @author    Ricardo Martins (and others) <pagseguro-transparente@ricardomartins.net.br>
+ * @copyright 2018-2019 Ricardo Martins
+ * @license   https://www.gnu.org/licenses/gpl-3.0.pt-br.html GNU GPL, version 3
+ * @package   RicardoMartins\PagSeguro\Controller\Ajax
+ */
 class UpdateInstallments extends \Magento\Framework\App\Action\Action
 {
-   
- 
      /**
      * Checkout Session
      *
      * @var \Magento\Checkout\Model\Session
      */ 
     protected $checkoutSession;
-
 
      /**
      * @param \Magento\Checkout\Model\Session $checkoutSession
@@ -29,11 +29,9 @@ class UpdateInstallments extends \Magento\Framework\App\Action\Action
          \Magento\Framework\App\Action\Context $context
  
     ) {
-        
-        $this->checkoutSession = $checkoutSession;       
+        $this->checkoutSession = $checkoutSession;
         parent::__construct($context);
     }
-        
 
     /**
     * @return json
@@ -51,10 +49,7 @@ class UpdateInstallments extends \Magento\Framework\App\Action\Action
          }catch (\Exception $e) {
             $result = array('status'=> 'error','message' => $e->getMessage());
         }
-
-        $resultJson->setData($result);         
+        $resultJson->setData($result);
         return $resultJson;
-        
-        
     }
 }

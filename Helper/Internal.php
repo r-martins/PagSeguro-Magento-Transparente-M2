@@ -1,17 +1,17 @@
 <?php
-/**
- * Copyright © 2013-2017 Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
- */
 namespace RicardoMartins\PagSeguro\Helper;
 
-
 /**
- * PagSeguro Data helper
+ * Class Internal Helper
+ *
+ * @see       http://bit.ly/pagseguromagento Official Website
+ * @author    Ricardo Martins (and others) <pagseguro-transparente@ricardomartins.net.br>
+ * @copyright 2018-2019 Ricardo Martins
+ * @license   https://www.gnu.org/licenses/gpl-3.0.pt-br.html GNU GPL, version 3
+ * @package   RicardoMartins\PagSeguro\Helper
  */
 class Internal extends \Magento\Framework\App\Helper\AbstractHelper
 {
-    
      protected $eavCustomerFields = [];
      protected $eavAddressFields = [];
     /**
@@ -53,7 +53,6 @@ class Internal extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function setCustomerAndAddressFields()
     {
-
         $addressEntityType = $this->eavConfigModel->getEntityType('customer_address');
         $customerEntityType = $this->eavConfigModel->getEntityType('customer');
         $entityTypeIds = [];
@@ -73,10 +72,8 @@ class Internal extends \Magento\Framework\App\Helper\AbstractHelper
         } 
         $this->eavAddressFields =  $eavAddressField;
         $this->eavCustomerFields =  $eavCustomerField;
-
-        
+        //@TODO check missing documented @return
     }
-
 
 	/**
      * Get EAV attributes collection filter by type param
@@ -86,13 +83,12 @@ class Internal extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getFields($type = 'customer_address')
     {
-
         if ($type == 'customer_address') {
             return $this->eavAddressFields; 
         } else {
              return $this->eavCustomerFields; 
         }
-        
+        //@TODO check missing documented @return
     }
 
     /**
@@ -105,5 +101,4 @@ class Internal extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->scopeConfig->getValue($valPath, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
     }
-    
 }

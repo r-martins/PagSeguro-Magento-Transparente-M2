@@ -1,10 +1,4 @@
 <?xml version="1.0"?>
-<!--
-/**
- * Copyright © 2013-2017 Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
- */
--->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceContainer name="page.messages">
@@ -17,7 +11,7 @@
                     <argument name="text" xsi:type="string"><![CDATA[<script type="text/javascript" src="https://stc.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.directpayment.js"></script>]]></argument>
                 </arguments>
             </block>
-            <block class="Magento\Framework\View\Element\Template" name="beforebody"  template="RicardoMartins_PagSeguro::preparePagSeguro.phtml"/>
+            <block class="Magento\Framework\View\Element\Template" name="beforebody" template="RicardoMartins_PagSeguro::preparePagSeguro.phtml"/>
         </referenceContainer>
         <referenceBlock name="checkout.root">
             <arguments>

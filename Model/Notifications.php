@@ -1,13 +1,17 @@
 <?php
-/**
- * Copyright © 2013-2017 Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
- */
 namespace RicardoMartins\PagSeguro\Model;
 
+/**
+ * Class Notifications
+ *
+ * @see       http://bit.ly/pagseguromagento Official Website
+ * @author    Ricardo Martins (and others) <pagseguro-transparente@ricardomartins.net.br>
+ * @copyright 2018-2019 Ricardo Martins
+ * @license   https://www.gnu.org/licenses/gpl-3.0.pt-br.html GNU GPL, version 3
+ * @package   RicardoMartins\PagSeguro\Model
+ */
 class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
 {
-    
     /**
      * PagSeguro Helper
      *
@@ -30,7 +34,6 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
      * @var \Magento\Framework\DB\Transaction
      */ 
     protected $transactionFactory;
-
 
     public function __construct(
         \Magento\Framework\Model\Context $context,
@@ -68,14 +71,12 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
         $this->_commentSender = $commentSender;
     }
 
-  
     /**
      * Processes notification XML data. XML is sent right after order is sent to PagSeguro, and on order updates.
      * @param SimpleXMLElement $resultXML
      */
     public function proccessNotificatonResult($resultXML, $_payment = false)
     {
-
         if (isset($resultXML->error)) {
             $errMsg = __((string)$resultXML->error->message);
             throw new \Magento\Framework\Validator\Exception(
@@ -88,12 +89,9 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
         }
 
         if (isset($resultXML->reference)) {
-
             if(is_object($_payment) && $_payment instanceof \Magento\Payment\Model\InfoInterface) {
-
                 $order = $_payment->getOrder();
                 $payment = $_payment;
-
             }else {
                 $orderNo = (string)$resultXML->reference;
                 $order = $this->orderModel->loadByIncrementId($orderNo);
@@ -129,7 +127,6 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                     );
                 }
             }
-
 
             if ((int)$resultXML->status == 7 && isset($resultXML->cancellationSource)) {
                 //Especificamos a fonte do cancelamento do pedido
@@ -205,12 +202,10 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                 }
             }
 
-
         } else {
             throw new \Magento\Framework\Validator\Exception(__('Invalid return. Order reference not found.'));
         }
     }
-
 
     /**
      * @param $notificationCode
@@ -218,7 +213,6 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
      */
     public function getNotificationStatus($notificationCode)
     {
-
         //@TODO Remove hard coded URL
         $url = "https://ws.pagseguro.uol.com.br/v2/transactions/notifications/" . $notificationCode;
 
@@ -254,7 +248,6 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
         curl_close($ch);
         return $xml;
     }
-
 
      /**
      * Processes order status and return information about order status
@@ -326,5 +319,4 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
         }
         return $return;
     }
-
 }

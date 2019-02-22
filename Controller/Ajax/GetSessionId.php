@@ -1,24 +1,24 @@
 <?php
-/**
- *
- * Copyright © 2013-2017 Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
- */
 namespace RicardoMartins\PagSeguro\Controller\Ajax;
-
 use Magento\Framework\Controller\ResultFactory;
 
+/**
+ * Class GetSessionId
+ *
+ * @see       http://bit.ly/pagseguromagento Official Website
+ * @author    Ricardo Martins (and others) <pagseguro-transparente@ricardomartins.net.br>
+ * @copyright 2018-2019 Ricardo Martins
+ * @license   https://www.gnu.org/licenses/gpl-3.0.pt-br.html GNU GPL, version 3
+ * @package   RicardoMartins\PagSeguro\Controller\Ajax
+ */
 class GetSessionId extends \Magento\Framework\App\Action\Action
 {
-   
- 
      /**
      * PagSeguro Helper
      *
      * @var RicardoMartins\PagSeguro\Helper\Data;
      */ 
     protected $pagSeguroHelper;
-
 
      /**
      * @param \RicardoMartins\PagSeguro\Helper\Data $pagSeguroHelper
@@ -29,11 +29,9 @@ class GetSessionId extends \Magento\Framework\App\Action\Action
          \Magento\Framework\App\Action\Context $context
  
     ) {
-        
-        $this->pagSeguroHelper = $pagSeguroHelper;       
+        $this->pagSeguroHelper = $pagSeguroHelper;
         parent::__construct($context);
     }
-        
 
     /**
     * @return json
@@ -53,7 +51,5 @@ class GetSessionId extends \Magento\Framework\App\Action\Action
 
         $resultJson->setData($result);         
         return $resultJson;
-        
-        
     }
 }

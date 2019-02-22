@@ -1,24 +1,24 @@
 <?php
-/**
- *
- * Copyright © 2013-2017 Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
- */
 namespace RicardoMartins\PagSeguro\Controller\Ajax;
-
 use Magento\Framework\Controller\ResultFactory;
 
+/**
+ * Class UpdatePaymentHashes
+ *
+ * @see       http://bit.ly/pagseguromagento Official Website
+ * @author    Ricardo Martins (and others) <pagseguro-transparente@ricardomartins.net.br>
+ * @copyright 2018-2019 Ricardo Martins
+ * @license   https://www.gnu.org/licenses/gpl-3.0.pt-br.html GNU GPL, version 3
+ * @package   RicardoMartins\PagSeguro\Controller\Ajax
+ */
 class UpdatePaymentHashes extends \Magento\Framework\App\Action\Action
 {
-   
- 
      /**
      * Checkout Session
      *
      * @var \Magento\Checkout\Model\Session
      */ 
     protected $checkoutSession;
-
 
      /**
      * @param \Magento\Checkout\Model\Session $checkoutSession
@@ -29,11 +29,9 @@ class UpdatePaymentHashes extends \Magento\Framework\App\Action\Action
          \Magento\Framework\App\Action\Context $context
  
     ) {
-        
-        $this->checkoutSession = $checkoutSession;       
+        $this->checkoutSession = $checkoutSession;
         parent::__construct($context);
     }
-        
 
     /**
     * @return json
@@ -43,9 +41,9 @@ class UpdatePaymentHashes extends \Magento\Framework\App\Action\Action
         $resultJson = $this->resultFactory->create(ResultFactory::TYPE_JSON);     
         try{
             $params = $this->getRequest()->getPost('payment');
-            $ownerdata = $this->getRequest()->getPost('ownerdata');
+            $ownerData = $this->getRequest()->getPost('ownerdata');
              $this->checkoutSession->setData('PsPayment', serialize($params));
-              $this->checkoutSession->setData('PsOwnerdata', serialize($ownerdata));
+              $this->checkoutSession->setData('PsOwnerdata', serialize($ownerData));
              $result = array(
                 'status'=> 'success',
                 'message' => __('Updated Payment Hashes')
@@ -56,7 +54,5 @@ class UpdatePaymentHashes extends \Magento\Framework\App\Action\Action
 
         $resultJson->setData($result);         
         return $resultJson;
-        
-        
     }
 }

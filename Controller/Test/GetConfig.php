@@ -1,10 +1,15 @@
 <?php
-
-
 namespace RicardoMartins\PagSeguro\Controller\Test;
 
-use Magento\Framework\Controller\ResultFactory;
-
+/**
+ * Class GetConfig
+ *
+ * @see       http://bit.ly/pagseguromagento Official Website
+ * @author    Ricardo Martins (and others) <pagseguro-transparente@ricardomartins.net.br>
+ * @copyright 2018-2019 Ricardo Martins
+ * @license   https://www.gnu.org/licenses/gpl-3.0.pt-br.html GNU GPL, version 3
+ * @package   RicardoMartins\PagSeguro\Controller\Test
+ */
 class GetConfig extends \Magento\Framework\App\Action\Action
 {
     /**
@@ -22,10 +27,12 @@ class GetConfig extends \Magento\Framework\App\Action\Action
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
-        \RicardoMartins\PagSeguro\Helper\Data $helper
+        \RicardoMartins\PagSeguro\Helper\Data $helper,
+        \Magento\Framework\Controller\Result\JsonFactory $jsonFactory
     )
     {
         $this->_helper = $helper;
+        $this->resultJsonFactory = $jsonFactory;
         return parent::__construct($context);
     }
 
@@ -35,7 +42,7 @@ class GetConfig extends \Magento\Framework\App\Action\Action
      */
     public function execute()
     {
-        $resultJson = $this->resultFactory->create(ResultFactory::TYPE_JSON);
+        $resultJson = $this->resultJsonFactory->create();
 
         $info = array(
             'Magento Version' => substr($this->_helper->getMagentoVersion(),0,1),
@@ -47,7 +54,6 @@ class GetConfig extends \Magento\Framework\App\Action\Action
             'key_validate'  => $this->_helper->validateKey(),
             'token_consistency' => (strlen($this->_helper->getToken()) == 32) ? "Good" : "Token does not consist 32 characters"
         );
-
 
         $resultJson->setData($info);
         return $resultJson;
