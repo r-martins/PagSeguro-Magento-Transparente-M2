@@ -123,6 +123,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             return $e->getMessage();
         }
 
+        libxml_use_internal_errors(true);
+
         $this->authResponse = $response;
         $xml = \SimpleXML_Load_String($response);
 
@@ -351,6 +353,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         curl_setopt($ch, CURLOPT_TIMEOUT, 45);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($ch, CURLOPT_USERAGENT, $this->getUserAgentDetails());
 
         try{
             $response = curl_exec($ch);
@@ -992,11 +995,30 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function validateKey() {
 
-        //@TODO Remove hardcoded url
-        $url = 'http://ws.ricardomartins.net.br/pspro/v6/auth/' . $this->getPagSeguroPubKey();
 
+        //@TODO Remove hardcoded url
+        $pubKey = $this->getPagSeguroPubKey();
+        if(empty($pubKey)){
+            return 'Public Key is empty.';
+        }
+
+        $url = 'http://ws.ricardomartins.net.br/pspro/v6/auth/' . $pubKey;
         $this->_curl->get($url);
 
         return $this->_curl->getBody();
+    }
+
+
+    /**
+     * Get environment details for usage statistics
+     * return string
+     */
+    public function getUserAgentDetails()
+    {
+        $ua = 'PagSeguro M2/';
+        $ua .= $this->moduleList->getOne('RicardoMartins_PagSeguro')['setup_version'];
+
+        $ua .= ' (Magento ' . $this->getMagentoVersion() . ')';
+        return $ua;
     }
 }
