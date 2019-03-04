@@ -1,4 +1,4 @@
-#Módulo PagSeguro Transparente para Magento 2
+# Módulo PagSeguro Transparente para Magento 2
 
 ### Instalação
 #### 1. Autorize sua loja 
