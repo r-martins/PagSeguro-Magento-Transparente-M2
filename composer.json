@@ -12,7 +12,12 @@
         }
     },
     "require": {
-        "ext-curl": "*"
+        "ext-curl": "*",
+        "ext-iconv": "*",
+        "ext-json": "*",
+        "ext-libxml": "*",
+        "ext-mbstring": "*",
+        "ext-simplexml": "*"
     },
     "authors": [
         {
