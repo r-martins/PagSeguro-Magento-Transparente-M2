@@ -755,7 +755,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function removeDuplicatedSpaces($string)
     {
-        $string = $this->normalizeChars($string);
+        $string = static::normalizeChars($string);
 
         return preg_replace('/\s+/', ' ', trim($string));
     }
@@ -895,7 +895,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         else if(strlen($state) > 2 && is_string($state))
         {
-            $state = $this->normalizeChars($state);
+            $state = static::normalizeChars($state);
             $state = trim($state);
             $state = $this->stripAccents($state);
             $state = mb_convert_case($state, MB_CASE_UPPER);
