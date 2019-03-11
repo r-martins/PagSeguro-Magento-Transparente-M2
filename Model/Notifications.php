@@ -240,7 +240,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
         $this->pagSeguroHelper->writeLog(sprintf('Return of the Pagseguro to notificationCode %s: %s', $notificationCode, $return));
 
         libxml_use_internal_errors(true);
-        $xml = \SimpleXML_Load_String(trim($return));
+        $xml = \simplexml_load_string(trim($return));
         if (false === $xml) {
             $this->pagSeguroHelper->writeLog('Return XML notification PagSeguro in unexpected format. Return: ' . $return);
         }

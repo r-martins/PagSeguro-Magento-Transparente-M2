@@ -126,7 +126,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         libxml_use_internal_errors(true);
 
         $this->authResponse = $response;
-        $xml = \SimpleXML_Load_String($response);
+        $xml = \simplexml_load_string($response);
 
         if (false === $xml) {
             //@TODO Remove curl
@@ -372,7 +372,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         $this->writeLog('Retorno PagSeguro (/'.$type.'): ' . var_export($response, true));
 
-        $xml = \SimpleXML_Load_String(trim($response));
+        $xml = \simplexml_load_string(trim($response));
 
         if ($xml->error->code) {
 
