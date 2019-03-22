@@ -2,8 +2,18 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
     <default>
         <payment>
+            <rm_pagseguro>
+                <title>PagSeguro UOL</title>
+                <model>RicardoMartins\PagSeguro\Model\Payment</model>
+                <debug>1</debug>
+                <address_street_attribute>street_1</address_street_attribute>
+                <address_number_attribute>street_2</address_number_attribute>
+                <address_complement_attribute>street_3</address_complement_attribute>
+                <address_neighborhood_attribute>street_4</address_neighborhood_attribute>
+                <sort_order>1</sort_order>
+            </rm_pagseguro>
             <rm_pagseguro_cc>
-                <active>1</active>
+                <active>0</active>
                 <payment_action>authorize_capture</payment_action>
                 <model>RicardoMartins\PagSeguro\Model\Method\Cc</model>
                 <title>Cartão de Crédito via PagSeguro UOL</title>
@@ -15,15 +25,14 @@
                 <show_total>0</show_total>
                 <force_installments_selection>0</force_installments_selection>
             </rm_pagseguro_cc>
-            <rm_pagseguro>
-                <title>PagSeguro UOL</title>
-                <model>RicardoMartins\PagSeguro\Model\Payment</model>
-                <debug>1</debug>
-                <address_street_attribute>street_1</address_street_attribute>
-                <address_number_attribute>street_2</address_number_attribute>
-                <address_complement_attribute>street_3</address_complement_attribute>
-                <address_neighborhood_attribute>street_4</address_neighborhood_attribute>
-            </rm_pagseguro>
+            <rm_pagseguro_boleto>
+                <active>0</active>
+                <title>Boleto - via PagSeguro UOL</title>
+                <order_status>holded</order_status>
+                <sort_order>2</sort_order>
+                <model>RicardoMartins\PagSeguro\Model\Method\Boleto</model>
+                <allowspecific>0</allowspecific>
+            </rm_pagseguro_boleto>
         </payment>
     </default>
 </config>
