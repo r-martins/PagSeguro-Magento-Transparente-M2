@@ -4,13 +4,8 @@ $viewJsPath = $block->getViewFileUrl('RicardoMartins_PagSeguro::js/pagseguro.js'
 $storeUrl = $helper->getStoreUrl();
 $grandTotal = $helper->getGrandTotal();
 $installments = $helper->getInstallmentQty();
-$visibleCpf = $helper->isCpfVisible();
-if($helper->isDobVisible() == 1){
-  $visibleDob = $helper->isDobVisible();  
-}else{
- $visibleDob = 0;
-}
-
+$visibleCpf = $helper->isCpfVisible() ? '1':'0';
+$visibleDob = $helper->isDobVisible() ? '1':'0';
 
 ?>
 
