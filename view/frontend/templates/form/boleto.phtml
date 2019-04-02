@@ -1,0 +1,18 @@
+<?php
+// @codingStandardsIgnoreFile
+/**
+ * @var \RicardoMartins\PagSeguro\Block\Form\Boleto $block
+ */
+$code = $block->escapeHtml($block->getMethodCode());
+?>
+<fieldset class="fieldset payment items ccard <?php /* @noEscape */ echo $code; ?>"
+          id="payment_form_<?php /* @noEscape */ echo $code; ?>" style="display: none;">
+    <div class="field type required">
+        <label for="<?php /* @noEscape */ echo $code; ?>_cc_type" class="label">
+            <span><?php echo $block->getMethod()->getTitle(); ?></span>
+        </label>
+        <div class="control">
+            <p><?php echo __('Você será redirecionado para o PagSeguro para gerar seu boleto.');?></p>
+        </div>
+    </div>
+</fieldset>
