@@ -9,9 +9,9 @@
                     <label>Email</label>
                     <comment>Store email (seller account)</comment>
                 </field>
-                <field id="token" translate="label comment" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="0">
+                 <field id="token" translate="label comment" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Token</label>
-                    <comment>The token is fetched from your PagSeguro account panel.</comment>
+                     <comment>The token is fetched from your PagSeguro account panel.</comment>
                 </field>
                 <field id="key" translate="label comment" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Public Key</label>
@@ -23,7 +23,7 @@
                     Note: The Sandbox mode still does not work in the application template.]]></comment>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field> -->
-                <field id="debug" translate="label comment" type="select" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="0">
+                 <field id="debug" translate="label comment" type="select" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Debug</label>
                     <comment><![CDATA[See the log output in var/log/pagseguro.log. It is recommended that you enable logging for information about any issues.]]></comment>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
@@ -36,27 +36,27 @@
                 <field id="customer_cpf_attribute" translate="label comment" type="select" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Customer CPF</label>
                     <comment><![CDATA[If your store uses a custom attribute for the customer's CPF, select here. Otherwise choose "Request along with the other payment details".]]></comment>
-                    <source_model>RicardoMartins\PagSeguro\Model\System\Config\Source\Cpf</source_model>
+                   <source_model>RicardoMartins\PagSeguro\Model\System\Config\Source\Cpf</source_model>
                 </field>
-                <field id="address_street_attribute" translate="label comment" type="select" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="0">
+               <field id="address_street_attribute" translate="label comment" type="select" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Attribute Delivery Street</label>
                     <comment><![CDATA[If your store uses a custom attribute for Delivery Street, select here.]]></comment>
-                    <source_model>RicardoMartins\PagSeguro\Model\System\Config\Source\Attributes</source_model>
+                   <source_model>RicardoMartins\PagSeguro\Model\System\Config\Source\Attributes</source_model>
                 </field>
                 <field id="address_number_attribute" translate="label comment" type="select" sortOrder="8" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Attribute Number</label>
                     <comment><![CDATA[If your store uses a custom attribute for the 'Number' field, select here.]]></comment>
-                    <source_model>RicardoMartins\PagSeguro\Model\System\Config\Source\Attributes</source_model>
+                   <source_model>RicardoMartins\PagSeguro\Model\System\Config\Source\Attributes</source_model>
                 </field>
                 <field id="address_complement_attribute" translate="label comment" type="select" sortOrder="9" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Attribute Complement</label>
                     <comment><![CDATA[If your store uses a custom attribute for the 'Complement' field of delivery, select here. You can omit this information from PagSeguro.]]></comment>
-                    <source_model>RicardoMartins\PagSeguro\Model\System\Config\Source\Attributes\Optional</source_model>
+                   <source_model>RicardoMartins\PagSeguro\Model\System\Config\Source\Attributes\Optional</source_model>
                 </field>
                 <field id="address_neighborhood_attribute" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Neighborhood Attribute</label>
                     <comment><![CDATA[If your store uses a custom attribute for the Delivery Neighborhood field, select here.]]></comment>
-                    <source_model>RicardoMartins\PagSeguro\Model\System\Config\Source\Attributes</source_model>
+                   <source_model>RicardoMartins\PagSeguro\Model\System\Config\Source\Attributes</source_model>
                 </field>
             </group>
             <group id="rm_pagseguro_cc" translate="label" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
@@ -65,14 +65,14 @@
                     <label>Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="title" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="0">
+                 <field id="title" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Title</label>
                 </field>
                 <field id="order_status" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>New Order Status</label>
                     <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
                 </field>
-                <field id="flag" translate="label comment" type="select" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="0">
+                 <field id="flag" translate="label comment" type="select" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Card Brand Size</label>
                     <comment><![CDATA[Exemplos: <br/><img src="//stc.pagseguro.uol.com.br/public/img/payment-methods-flags/42x20/visa.png" title="42x20"/><img src="//stc.pagseguro.uol.com.br/public/img/payment-methods-flags/68x30/visa.png" title="68x30"/>]]></comment>
                     <source_model>RicardoMartins\PagSeguro\Model\System\Config\Source\Ccbrand</source_model>
@@ -85,7 +85,7 @@
                 <field id="owner_dob_attribute" translate="label comment" type="select" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Date of birth</label>
                     <comment><![CDATA[Date of birth of the credit card owner is mandatory for PagSeguro.]]></comment>
-                    <source_model>RicardoMartins\PagSeguro\Model\System\Config\Source\Customer\Dob</source_model>
+                   <source_model>RicardoMartins\PagSeguro\Model\System\Config\Source\Customer\Dob</source_model>
                 </field>
                 <field id="sort_order" translate="label comment" type="text" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Sort Order</label>
@@ -93,29 +93,26 @@
                 </field>
                 <field id="group_restriction" translate="label" type="select" sortOrder="8" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Enable group restriction</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                   <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
                 <field id="customer_groups" translate="label comment" type="multiselect" sortOrder="9" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Customer Groups</label>
                     <comment><![CDATA[Client groups that can use this method.]]></comment>
-                    <source_model>Magento\Customer\Model\Config\Source\Group\Multiselect</source_model>
-                    <depends>
-                        <field id="group_restriction">1</field>
-                    </depends>
+                   <source_model>Magento\Customer\Model\Config\Source\Group\Multiselect</source_model>
+                   <depends><field id="group_restriction">1</field></depends>
                 </field>
                 <field id="show_total" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Display total amount in the installment selector</label>
                     <comment><![CDATA[When enabled, the total order value is displayed along with the parceling information.]]></comment>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                   <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
                 <field id="force_installments_selection" translate="label comment" type="select" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Force parcel selection</label>
                     <comment><![CDATA[When enabled, it will force the customer to select the installments amount instead of leaving payment to the pre-selected view.]]></comment>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                   <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
             </group>
-
-            <!--Boleto / Bank billet-->
+             <!--Boleto / Bank billet-->
             <group id="rm_pagseguro_boleto" translate="label" sortOrder="21" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>PagSeguro - Boleto - Ricardo Martins</label>
                 <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">

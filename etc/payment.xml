@@ -4,5 +4,8 @@
         <method name="rm_pagseguro_cc">
             <allow_multiple_address>0</allow_multiple_address>
         </method>
+        <method name="rm_pagseguro_boleto">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
     </methods>
 </payment>

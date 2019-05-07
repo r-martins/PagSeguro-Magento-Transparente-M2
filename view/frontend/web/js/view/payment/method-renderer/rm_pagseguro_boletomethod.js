@@ -12,21 +12,16 @@ define(
 
         return Component.extend({
             defaults: {
-                template: 'RicardoMartins_PagSeguro/payment/rm_pagseguro_cc'
+                template: 'RicardoMartins_PagSeguro/payment/rm_pagseguro_boleto'
             },
 
             getCode: function() {
-                return 'rm_pagseguro_cc';
+                return 'rm_pagseguro_boleto';
             },
 
             isActive: function() {
                 return true;
             },
-
-            validate: function() {
-                var $form = $('#' + this.getCode() + '-form');
-                return $form.validation() && $form.validation('isValid');
-            }
         });
     }
 );
