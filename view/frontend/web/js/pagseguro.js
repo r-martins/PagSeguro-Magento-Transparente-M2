@@ -191,8 +191,8 @@ RMPagSeguro.prototype.updatePaymentHashes = function(){
     var url = self.storeUrl +'pseguro/ajax/updatePaymentHashes';
     var boletocpf = jQuery('input[name="payment[pagseguro_boleto_cpf]"]').val();
     var cpf = jQuery('input[name="payment[ps_cc_cpf]"]').val();
-    alert(cpf+'==='+boletocpf)
-    if(boletocpf!='' && boletocpf != undefined){ alert('boletocpf');
+    
+    if(boletocpf!='' && boletocpf != undefined){
 		var boletocpf = jQuery('input[name="payment[pagseguro_boleto_cpf]"]').val();
 		var paymentHashes = {
 			"payment[sender_hash]": this.senderHash,
@@ -200,7 +200,7 @@ RMPagSeguro.prototype.updatePaymentHashes = function(){
 		};
 	}
 	
-	if(cpf !='' && cpf != undefined){		alert('cpf');
+	if(cpf !='' && cpf != undefined){
 		var ccOwner = jQuery('input[name="payment[ps_cc_owner]"]').val();
 		var ccOwnerBirthDay = jQuery('input[name="payment[ps_cc_owner_birthday_day]"]').val();
 		var ccOwnerBirthMonth = jQuery('input[name="payment[ps_cc_owner_birthday_month]"]').val();

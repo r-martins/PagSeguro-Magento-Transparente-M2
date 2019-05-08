@@ -1,7 +1,0 @@
-<fieldset data-bind="attr: {class: 'fieldset payment items ccard ' + getCode(), id: 'payment_form_' + getCode()}">
-    <!-- ko if: (isShowLegend())-->
-    <legend class="legend">
-        <span><!-- ko i18n: 'Credit Card Information'--><!-- /ko --></span>
-    </legend><br />
-</fieldset>
-<div data-bind="afterRender: preparePagSeguro()"></div>
