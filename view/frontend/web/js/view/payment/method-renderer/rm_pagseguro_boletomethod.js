@@ -1,11 +1,10 @@
 define(
     [
-        'Magento_Payment/js/view/payment/cc-form',
+        'Magento_Checkout/js/view/payment/default',
         'jquery',
         'Magento_Checkout/js/action/place-order',
         'Magento_Checkout/js/model/full-screen-loader',
-        'Magento_Checkout/js/model/payment/additional-validators',
-        'Magento_Payment/js/model/credit-card-validation/validator'
+        'Magento_Checkout/js/model/payment/additional-validators'
     ],
     function (Component, $) {
         'use strict';
@@ -21,7 +20,7 @@ define(
 
             isActive: function() {
                 return true;
-            },
+            }            
         });
     }
 );

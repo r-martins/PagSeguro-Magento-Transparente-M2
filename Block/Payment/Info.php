@@ -9,13 +9,14 @@ class Info extends \Magento\Framework\View\Element\Template
     protected $_scopeConfig;
 
     public function __construct(
+        \Magento\Framework\View\Element\Template\Context $context,
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Sales\Model\OrderFactory $orderFactory,
-        \Magento\Framework\View\Element\Context $context
+        array $data = []
     ) {
+		parent::__construct($context, $data);
         $this->_checkoutSession = $checkoutSession;
-        $this->_orderFactory = $orderFactory;
-        $this->_scopeConfig = $context->getScopeConfig();
+        $this->_orderFactory = $orderFactory;     
     }
 
 
@@ -35,15 +36,31 @@ class Info extends \Magento\Framework\View\Element\Template
         return false;
     }
 
-    public function getShippingInfo()
+    public function getPaymentInfo()
     {
         $order = $this->getOrder();
-        if($order) {
-            $address = $order->getShippingAddress();    
-
-            return $address;
-        }
+        if ($order) {
+			$payment = $this->_checkoutSession->getLastRealOrder()->getPayment();        
+			$paymentMethod = $payment->getMethod();
+			
+			switch($paymentMethod)
+			{
+				case 'rm_pagseguro_boleto':
+					return array(
+						'tipo' => 'Boleto',
+						'url' => $payment->getAdditionalInformation('boletoUrl'),
+						'texto' => 'Clique aqui para imprimir seu boleto',
+					);
+					break;
+				case 'pagseguropro_tef':
+					return array(
+						'tipo' => 'Débito Online (TEF)',
+						'url' => $payment->getAdditionalInformation('tefUrl'),
+						'texto' => 'Clique aqui para realizar o pagamento',
+					);
+				break;
+			}
+		}	
         return false;
-
     }
 }

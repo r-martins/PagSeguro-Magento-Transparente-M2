@@ -103,9 +103,13 @@ class Boleto extends \Magento\Payment\Model\Method\AbstractMethod
         $info = $this->getInfoInstance();
         $info->setAdditionalInformation('sender_hash', $this->pagSeguroHelper->getPaymentHash('sender_hash'));
         
+        //$this->pagSeguroHelper->writeLog('getData Order'. print_r($data->getData()));
         // set cpf
         if ($this->pagSeguroHelper->isCpfVisible()) {
-            $info->setAdditionalInformation($this->getCode() . '_cpf', $this->pagSeguroHelper->getCCOwnerData('credit_card_cpf'));
+			
+			$this->pagSeguroHelper->writeLog('boletocpf_cpf'. $this->pagSeguroHelper->getCCOwnerData('boleto_cpf'));
+			
+            $info->setAdditionalInformation($this->getCode() . '_cpf', $this->pagSeguroHelper->getCCOwnerData('boleto_cpf'));
         }
         
         return $this;
@@ -156,6 +160,10 @@ $this->pagSeguroHelper->writeLog($params);
 						}
 					}
 					$payment->setAdditionalInformation($additional);
+					
+					if (isset($returnXml->paymentMethod->type) && (int)$returnXml->paymentMethod->type == 2) {
+					   $payment->setAdditionalInformation('boletoUrl', (string)$returnXml->paymentLink);
+					}
 
 				}
 
