@@ -379,11 +379,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $errArray = array();
             $xmlError = json_decode(json_encode($xml), true);
             $xmlError = $xmlError['error'];
-            foreach ($xmlError as $xmlErr) {
-                $errArray[] = $xmlErr['message'];
-            }
-
-            $errArray = implode(",", $errArray);
+            
+			if(isset($xmlError['code'])) {
+				$errArray[] = $xmlError['message'];
+			} else {
+				foreach ($xmlError as $xmlErr) {					
+					$errArray[] = $xmlErr['message'];
+				}
+			}
+            
+			$errArray = implode(",", $errArray);
             if($errArray) {
                 throw new \Magento\Framework\Validator\Exception(__($errArray));
             }

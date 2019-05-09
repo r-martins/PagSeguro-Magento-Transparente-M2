@@ -60,6 +60,7 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
         var ccCvvElm = jQuery('input[name="payment[ps_cc_cid]"]');
         var cpf = jQuery('input[name="payment[ps_cc_cpf]"]');
         var boletocpf = jQuery('input[name="payment[pagseguro_boleto_cpf]"]');
+        
 
         jQuery(ccNumElm).keyup(function( event ) {
             obj.updateCreditCardToken();
@@ -73,12 +74,20 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
         jQuery(ccCvvElm).keyup(function( event ) {
             obj.updateCreditCardToken();
         });
-        jQuery(cpf).keyup(function( event ) {
+        /*jQuery(cpf).keyup(function( event ) {
             obj.updateCreditCardToken();
-        });
+        });*/
         
-        jQuery(boletocpf).on('input', function(event) {
-			obj.updatePaymentHashes();
+        jQuery( "#pagseguro_cc_method .actions-toolbar .checkout" ).on("click", function() { 
+			if(cpf.val()!=''){
+				obj.updateCreditCardToken();
+			}	
+		});
+		
+		jQuery( "#pagseguro_boleto_method .actions-toolbar .checkout" ).on("click", function() { 
+			if(boletocpf.val()!=''){
+				obj.updatePaymentHashes();
+			}	
 		});
         
         jQuery("#rm_pagseguro_cc_cc_installments").change(function( event ) {
