@@ -162,7 +162,10 @@ RMPagSeguro.prototype.updateCreditCardToken = function(){
 }
 
 RMPagSeguro.prototype.updateBrand = function(){
-    var ccNum = jQuery('input[name="payment[ps_cc_number]"]').val().replace(/^\s+|\s+$/g,'');
+    var ccNum ='';
+	if(jQuery('input[name="payment[ps_cc_number]"]').val()){
+		var ccNum = jQuery('input[name="payment[ps_cc_number]"]').val().replace(/^\s+|\s+$/g,'');
+	}
     var currentBin = ccNum.substring(0, 6);
     var flag = this.config.flag;
     var debug = this.config.debug;
