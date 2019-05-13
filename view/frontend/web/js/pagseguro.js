@@ -2,7 +2,7 @@
  * PagSeguro Transparente para Magento
  * @author Ricardo Martins <pagseguro-transparente@ricardomartins.net.br>
  * @link http://bit.ly/pagseguromagento
- * @version 1.0.0
+ * @version 2.1.0
  */
 
 function RMPagSeguro(config) {
@@ -93,8 +93,6 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
         jQuery("#rm_pagseguro_cc_cc_installments").change(function( event ) {
             obj.updateInstallments();
         });
-        
-        
         
     }catch(e){
         console.error('Unable to add greeting to cards. ' + e.message);

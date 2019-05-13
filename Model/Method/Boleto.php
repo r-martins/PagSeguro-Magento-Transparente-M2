@@ -80,9 +80,6 @@ class Boleto extends \Magento\Payment\Model\Method\AbstractMethod
             $data
         );
 
-        //@TODO Remove
-        // $this->_minAmount = 1;
-        // $this->_maxAmount = 999999999; 
         $this->pagSeguroHelper = $pagSeguroHelper;  
         $this->pagSeguroAbModel = $pagSeguroAbModel; 
         $this->adminSession = $adminSession;
@@ -128,7 +125,8 @@ class Boleto extends \Magento\Payment\Model\Method\AbstractMethod
 
 				//will grab data to be send via POST to API inside $params
 				$params = $this->pagSeguroHelper->getBoletoApiCallParams($order, $payment);
-$this->pagSeguroHelper->writeLog($params);
+                $this->pagSeguroHelper->writeLog($params);
+
 				//call API
 				$returnXml = $this->pagSeguroHelper->callApi($params, $payment);
 
@@ -182,11 +180,11 @@ $this->pagSeguroHelper->writeLog($params);
      * @return bool
      */
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
-    {   
-        if($this->adminSession->getUser()){
+    {
+        if ($this->adminSession->getUser()) {
             return false;
         }
-        $isAvailable =  $this->getConfigData('active', $quote ? $quote->getStoreId() : null);
+        $isAvailable = $this->getConfigData('active', $quote ? $quote->getStoreId() : null);
         if (empty($quote)) {
             return $isAvailable;
         }
@@ -203,6 +201,4 @@ $this->pagSeguroHelper->writeLog($params);
 
         return false;
     }
-
-    
 }
