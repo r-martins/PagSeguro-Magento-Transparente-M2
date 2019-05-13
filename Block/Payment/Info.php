@@ -35,7 +35,13 @@ class Info extends \Magento\Framework\View\Element\Template
         }
         return false;
     }
-
+	
+	public function getPaymentMethod()
+    {
+		$payment = $this->_checkoutSession->getLastRealOrder()->getPayment();        
+		return $payment->getMethod();
+	}
+	
     public function getPaymentInfo()
     {
         $order = $this->getOrder();
