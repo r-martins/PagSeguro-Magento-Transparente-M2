@@ -1,2 +1,6 @@
-<?php $boletoUrl =  $block->getPaymentInfo(); ?>
-<input type="button" onclick="window.open('<?php echo $boletoUrl['url'] ?>');" value="<?php echo $boletoUrl['texto'] ?>"/>
+<?php 
+if($block->getPaymentInfo()){
+	$boletoUrl =  $block->getPaymentInfo(); ?>
+	<input type="button" onclick="window.open('<?php echo $boletoUrl['url'] ?>');" value="<?php echo $boletoUrl['texto'] ?>"/>
+	
+<?php } ?>	
