@@ -2,7 +2,7 @@
  * PagSeguro Transparente para Magento
  * @author Ricardo Martins <pagseguro-transparente@ricardomartins.net.br>
  * @link http://bit.ly/pagseguromagento
- * @version 1.0.0
+ * @version 2.1.0
  */
 
 function RMPagSeguro(config) {
@@ -59,6 +59,8 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
         var ccExpYrElm = jQuery('select[name="payment[ps_cc_exp_year]"]');
         var ccCvvElm = jQuery('input[name="payment[ps_cc_cid]"]');
         var cpf = jQuery('input[name="payment[ps_cc_cpf]"]');
+        var boletocpf = jQuery('input[name="payment[pagseguro_boleto_cpf]"]');
+        
 
         jQuery(ccNumElm).keyup(function( event ) {
             obj.updateCreditCardToken();
@@ -72,9 +74,22 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
         jQuery(ccCvvElm).keyup(function( event ) {
             obj.updateCreditCardToken();
         });
-        jQuery(cpf).keyup(function( event ) {
+        /*jQuery(cpf).keyup(function( event ) {
             obj.updateCreditCardToken();
-        });
+        });*/
+        
+        jQuery( "#pagseguro_cc_method .actions-toolbar .checkout" ).on("click", function() { 
+			if(cpf.val()!=''){
+				obj.updateCreditCardToken();
+			}	
+		});
+		
+		jQuery( "#pagseguro_boleto_method .actions-toolbar .checkout" ).on("click", function() { 
+			if(boletocpf.val()!=''){
+				obj.updatePaymentHashes();
+			}	
+		});
+        
         jQuery("#rm_pagseguro_cc_cc_installments").change(function( event ) {
             obj.updateInstallments();
         });
@@ -145,7 +160,10 @@ RMPagSeguro.prototype.updateCreditCardToken = function(){
 }
 
 RMPagSeguro.prototype.updateBrand = function(){
-    var ccNum = jQuery('input[name="payment[ps_cc_number]"]').val().replace(/^\s+|\s+$/g,'');
+    var ccNum ='';
+	if(jQuery('input[name="payment[ps_cc_number]"]').val()){
+		var ccNum = jQuery('input[name="payment[ps_cc_number]"]').val().replace(/^\s+|\s+$/g,'');
+	}
     var currentBin = ccNum.substring(0, 6);
     var flag = this.config.flag;
     var debug = this.config.debug;
@@ -181,22 +199,36 @@ RMPagSeguro.prototype.updateBrand = function(){
 RMPagSeguro.prototype.updatePaymentHashes = function(){
     var self = this;
     var url = self.storeUrl +'pseguro/ajax/updatePaymentHashes';
-    var ccOwner = jQuery('input[name="payment[ps_cc_owner]"]').val();
-    var ccOwnerBirthDay = jQuery('input[name="payment[ps_cc_owner_birthday_day]"]').val();
-    var ccOwnerBirthMonth = jQuery('input[name="payment[ps_cc_owner_birthday_month]"]').val();
-    var ccOwnerBirthYear = jQuery('input[name="payment[ps_cc_owner_birthday_year]"]').val();
+    var boletocpf = jQuery('input[name="payment[pagseguro_boleto_cpf]"]').val();
     var cpf = jQuery('input[name="payment[ps_cc_cpf]"]').val();
-    var paymentHashes = {
-        "payment[sender_hash]": this.senderHash,
-        "payment[credit_card_token]": this.creditCardToken,
-        "payment[cc_type]": (this.brand)?this.brand.name:'',
-        "payment[is_admin]": this.config.is_admin,
-        "ownerdata[credit_card_owner]": ccOwner,
-        "ownerdata[credit_card_birthday]":ccOwnerBirthDay,
-        "ownerdata[credit_card_birthmonth]":ccOwnerBirthMonth,
-        "ownerdata[credit_card_birthyear]":ccOwnerBirthYear,
-        "ownerdata[credit_card_cpf]": cpf,
-    };
+    
+    if(boletocpf!='' && boletocpf != undefined){
+		var boletocpf = jQuery('input[name="payment[pagseguro_boleto_cpf]"]').val();
+		var paymentHashes = {
+			"payment[sender_hash]": this.senderHash,
+			"ownerdata[boleto_cpf]": boletocpf,
+		};
+	}
+	
+	if(cpf !='' && cpf != undefined){
+		var ccOwner = jQuery('input[name="payment[ps_cc_owner]"]').val();
+		var ccOwnerBirthDay = jQuery('input[name="payment[ps_cc_owner_birthday_day]"]').val();
+		var ccOwnerBirthMonth = jQuery('input[name="payment[ps_cc_owner_birthday_month]"]').val();
+		var ccOwnerBirthYear = jQuery('input[name="payment[ps_cc_owner_birthday_year]"]').val();
+		var cpf = jQuery('input[name="payment[ps_cc_cpf]"]').val();
+		var paymentHashes = {
+			"payment[sender_hash]": this.senderHash,
+			"payment[credit_card_token]": this.creditCardToken,
+			"payment[cc_type]": (this.brand)?this.brand.name:'',
+			"payment[is_admin]": this.config.is_admin,
+			"ownerdata[credit_card_owner]": ccOwner,
+			"ownerdata[credit_card_birthday]":ccOwnerBirthDay,
+			"ownerdata[credit_card_birthmonth]":ccOwnerBirthMonth,
+			"ownerdata[credit_card_birthyear]":ccOwnerBirthYear,
+			"ownerdata[credit_card_cpf]": cpf,
+		};	
+	}
+    
     jQuery.ajax({
         url: url,
         type: 'POST',

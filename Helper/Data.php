@@ -379,11 +379,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $errArray = array();
             $xmlError = json_decode(json_encode($xml), true);
             $xmlError = $xmlError['error'];
-            foreach ($xmlError as $xmlErr) {
-                $errArray[] = $xmlErr['message'];
-            }
-
-            $errArray = implode(",", $errArray);
+            
+			if(isset($xmlError['code'])) {
+				$errArray[] = $xmlError['message'];
+			} else {
+				foreach ($xmlError as $xmlErr) {					
+					$errArray[] = $xmlErr['message'];
+				}
+			}
+            
+			$errArray = implode(",", $errArray);
             if($errArray) {
                 throw new \Magento\Framework\Validator\Exception(__($errArray));
             }
@@ -1020,5 +1025,29 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         $ua .= ' (Magento ' . $this->getMagentoVersion() . ')';
         return $ua;
+    }
+    
+    
+    public function getBoletoApiCallParams($order, $payment)
+    {
+        $params = array(
+            'email' => $this->getMerchantEmail(),
+            'token' => $this->getToken(),
+            'paymentMode'   => 'default',
+            'paymentMethod' =>  'boleto',
+            'receiverEmail' =>  $this->getMerchantEmail(),
+            'currency'  => 'BRL',
+            'reference'     => $order->getIncrementId(),
+            'extraAmount'=> $this->getExtraAmount($order),
+            'notificationURL' => $this->getStoreUrl().'pseguro/notification/index',
+        );
+        
+        $params = array_merge($params, $this->getItemsParams($order));
+        $params = array_merge($params, $this->getSenderParams($order, $payment));
+        $params = array_merge($params, $this->getAddressParams($order, 'shipping'));
+        $params = array_merge($params, $this->getAddressParams($order, 'billing'));
+        
+        return $params;
+
     }
 }
