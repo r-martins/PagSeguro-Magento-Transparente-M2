@@ -347,6 +347,8 @@ RMPagSeguro.prototype.getInstallments = function(grandTotal, selectedInstallment
 RMPagSeguro.prototype.updateInstallments = function(){
     var url = this.storeUrl + 'pseguro/ajax/updateInstallments';
     ccInstallment = jQuery('select[name="payment[ps_cc_installments]"] option:selected').val();
+    var arr = ccInstallment.split("|");
+    this.setInstallmentsQty(arr[0]);
     var self = this;
     var installmentsData = {
         "installment[cc_installment]": ccInstallment,
