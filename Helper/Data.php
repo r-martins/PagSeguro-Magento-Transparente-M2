@@ -119,7 +119,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         try{
             $response = curl_exec($ch);
-        }catch(Exception $e){
+        }catch(\Exception $e){
             return $e->getMessage();
         }
 

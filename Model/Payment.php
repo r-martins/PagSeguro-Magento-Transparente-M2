@@ -165,11 +165,11 @@ class Payment extends \Magento\Payment\Model\Method\Cc
             return $this;
           //$this->pagSeguroAbModel->proccessNotificatonResult($returnXml);
         } catch (\Exception $e) {
-            /*
+
             $this->_logger->error(__('Payment capturing error.'));
             throw new \Magento\Framework\Validator\Exception(__('Payment capturing error.'));
-             return;*/
-             echo $this->pagSeguroHelper->getSessionVl();
+            return;
+//             echo $this->pagSeguroHelper->getSessionVl();
   
             //return;
         }
