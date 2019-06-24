@@ -60,6 +60,7 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
         var ccCvvElm = jQuery('input[name="payment[ps_cc_cid]"]');
         var cpf = jQuery('input[name="payment[ps_cc_cpf]"]');
         var boletocpf = jQuery('input[name="payment[pagseguro_boleto_cpf]"]');
+        var tefcpf = jQuery('input[name="payment[pagseguro_tef_cpf]"]');
         
 
         jQuery(ccNumElm).keyup(function( event ) {
@@ -89,9 +90,19 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
 				obj.updatePaymentHashes();
 			}	
 		});
+		
+		jQuery( "#pagseguro_tef_method .actions-toolbar .checkout" ).on("click", function() { 
+			if(tefcpf.val()!=''){
+				obj.updatePaymentHashes();
+			}	
+		});
         
         jQuery("#rm_pagseguro_cc_cc_installments").change(function( event ) {
             obj.updateInstallments();
+        });
+        
+        jQuery("#pagseguropro_tef_bank").change(function( event ) {
+            jQuery(".tefbank").val(jQuery(this).val());
         });
         
         
@@ -202,13 +213,24 @@ RMPagSeguro.prototype.updatePaymentHashes = function(){
     var self = this;
     var url = self.storeUrl +'pseguro/ajax/updatePaymentHashes';
     var boletocpf = jQuery('input[name="payment[pagseguro_boleto_cpf]"]').val();
+    var tefcpf = jQuery('input[name="payment[pagseguro_tef_cpf]"]').val();
+    var tefbank = jQuery('input[name="payment[pagseguropro_tef_bank]"]').val();
     var cpf = jQuery('input[name="payment[ps_cc_cpf]"]').val();
     
     if(boletocpf!='' && boletocpf != undefined){
 		var boletocpf = jQuery('input[name="payment[pagseguro_boleto_cpf]"]').val();
 		var paymentHashes = {
 			"payment[sender_hash]": this.senderHash,
-			"ownerdata[boleto_cpf]": boletocpf,
+			"ownerdata[boleto_cpf]": boletocpf,			
+		};
+	}
+	
+	if(tefcpf!='' && tefcpf != undefined){
+		var tefcpf = jQuery('input[name="payment[pagseguro_tef_cpf]"]').val();
+		var paymentHashes = {
+			"payment[sender_hash]": this.senderHash,
+			"ownerdata[tef_cpf]": tefcpf,
+			"ownerdata[tef_bank]": tefbank,
 		};
 	}
 	

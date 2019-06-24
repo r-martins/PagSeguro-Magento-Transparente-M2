@@ -33,6 +33,15 @@
                 <model>RicardoMartins\PagSeguro\Model\Method\Boleto</model>
                 <allowspecific>0</allowspecific>
             </rm_pagseguro_boleto>
+            <rm_pagseguro_tef>
+                <active>1</active>
+                <payment_action>order</payment_action>
+                <title>PagSeguro - TEF - Ricardo Martins</title>
+                <order_status>holded</order_status>
+                <sort_order>2</sort_order>
+                <model>RicardoMartins\PagSeguro\Model\Method\Tef</model>
+                <allowspecific>0</allowspecific>
+            </rm_pagseguro_tef>
         </payment>
     </default>
 </config>
