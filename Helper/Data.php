@@ -30,8 +30,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_PATH_PAYMENT_PAGSEGURO_CC_FLAG            = 'payment/rm_pagseguro_cc/flag';
     const XML_PATH_PAYMENT_PAGSEGURO_CC_INFO_BRL        = 'payment/rm_pagseguro_cc/info_brl';
     const XML_PATH_PAYMENT_PAGSEGURO_CC_SHOW_TOTAL      = 'payment/rm_pagseguro_cc/show_total';
-    const XML_PATH_PAYMENT_PAGSEGUROPRO_TEF_ACTIVE      = 'payment/pagseguropro_tef/active';
-    const XML_PATH_PAYMENT_PAGSEGUROPRO_BOLETO_ACTIVE   = 'payment/pagseguropro_boleto/active';
+    const XML_PATH_PAYMENT_PAGSEGURO_TEF_ACTIVE         = 'payment/rm_pagseguro_tef/active';
+    const XML_PATH_PAYMENT_PAGSEGURO_BOLETO_ACTIVE      = 'payment/rm_pagseguro_boleto/active';
     const XML_PATH_PAYMENT_PAGSEGURO_KEY                = 'payment/rm_pagseguro/key';
     const XML_PATH_PAYMENT_PAGSEGURO_CC_FORCE_INSTALLMENTS = 'payment/rm_pagseguro_cc/force_installments_selection';
 
@@ -119,7 +119,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         try{
             $response = curl_exec($ch);
-        }catch(Exception $e){
+        }catch(\Exception $e){
             return $e->getMessage();
         }
 
@@ -208,7 +208,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $config = array(
             'active_methods' => array(
-                'cc' => $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_CC_ACTIVE)
+                'cc' => $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_CC_ACTIVE),
+                'boleto' => $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_BOLETO_ACTIVE)
             ),
             'flag' => $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_CC_FLAG),
             'debug' => $this->isDebugActive(),
@@ -379,11 +380,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $errArray = array();
             $xmlError = json_decode(json_encode($xml), true);
             $xmlError = $xmlError['error'];
-            foreach ($xmlError as $xmlErr) {
-                $errArray[] = $xmlErr['message'];
-            }
-
-            $errArray = implode(",", $errArray);
+            
+			if(isset($xmlError['code'])) {
+				$errArray[] = $xmlError['message'];
+			} else {
+				foreach ($xmlError as $xmlErr) {					
+					$errArray[] = $xmlErr['message'];
+				}
+			}
+            
+			$errArray = implode(",", $errArray);
             if($errArray) {
                 throw new \Magento\Framework\Validator\Exception(__($errArray));
             }
@@ -1020,5 +1026,29 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         $ua .= ' (Magento ' . $this->getMagentoVersion() . ')';
         return $ua;
+    }
+    
+    
+    public function getBoletoApiCallParams($order, $payment)
+    {
+        $params = array(
+            'email' => $this->getMerchantEmail(),
+            'token' => $this->getToken(),
+            'paymentMode'   => 'default',
+            'paymentMethod' =>  'boleto',
+            'receiverEmail' =>  $this->getMerchantEmail(),
+            'currency'  => 'BRL',
+            'reference'     => $order->getIncrementId(),
+            'extraAmount'=> $this->getExtraAmount($order),
+            'notificationURL' => $this->getStoreUrl().'pseguro/notification/index',
+        );
+        
+        $params = array_merge($params, $this->getItemsParams($order));
+        $params = array_merge($params, $this->getSenderParams($order, $payment));
+        $params = array_merge($params, $this->getAddressParams($order, 'shipping'));
+        $params = array_merge($params, $this->getAddressParams($order, 'billing'));
+        
+        return $params;
+
     }
 }

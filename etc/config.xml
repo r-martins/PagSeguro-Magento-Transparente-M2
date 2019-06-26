@@ -24,6 +24,15 @@
                 <address_complement_attribute>street_3</address_complement_attribute>
                 <address_neighborhood_attribute>street_4</address_neighborhood_attribute>
             </rm_pagseguro>
+            <rm_pagseguro_boleto>
+                <active>1</active>
+                <payment_action>order</payment_action>
+                <title>Boleto - via PagSeguro UOL</title>
+                <order_status>holded</order_status>
+                <sort_order>2</sort_order>
+                <model>RicardoMartins\PagSeguro\Model\Method\Boleto</model>
+                <allowspecific>0</allowspecific>
+            </rm_pagseguro_boleto>
             <rm_pagseguro_tef>
                 <active>1</active>
                 <payment_action>order</payment_action>

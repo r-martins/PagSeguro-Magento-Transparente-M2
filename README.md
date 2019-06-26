@@ -6,10 +6,9 @@ Acesse http://r-martins.github.io/PagSeguro-Magento-Transparente/magento2/wizard
 
 #### 2. Instale o módulo via composer
  
-composer require ricardomartins/pagseguro:dev-master
-
-bin/magento cache:clean
-bin/magento setup:upgrade
+    composer require ricardomartins/pagseguro:dev-master
+    bin/magento cache:clean
+    bin/magento setup:upgrade
 
 #### 3. Configure o Magento
 
@@ -19,6 +18,11 @@ Altere para 4 linhas.
 * Em Formas de Pagamento, configure o e-mail da conta PagSeguro, Token PagSeguro e Public Key obtida no passo 1.
 
 * Limpe o cache, e pronto!
+
+
+Se preferir, assista o passo a passo de instalação:
+
+[![ASSISTA O PASSO A PASSO DE INSTALAÇÃO](https://img.youtube.com/vi/DQJ3W9Qfn58/0.jpg)](https://www.youtube.com/watch?v=DQJ3W9Qfn58)
 
 ### Site Oficial
 http://r-martins.github.io/PagSeguro-Magento-Transparente/

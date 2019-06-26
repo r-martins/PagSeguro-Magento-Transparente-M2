@@ -197,7 +197,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                     if($processedState->getIsCustomerNotified()) {
                         $this->_commentSender->send($order, true, $message);
                     }
-                }catch(Exception $e) {
+                }catch(\Exception $e) {
                     $this->pagSeguroHelper->writeLog($e->getMessage());
                 }
             }
@@ -229,7 +229,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
 
         try {
             $return = curl_exec($ch);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->pagSeguroHelper->writeLog(
                 sprintf('Failed to catch return for notificationCode %s: %s(%d)', $notificationCode, curl_error($ch),
                     curl_errno($ch)
