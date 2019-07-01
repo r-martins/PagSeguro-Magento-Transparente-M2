@@ -48,7 +48,6 @@ class Info extends \Magento\Framework\View\Element\Template
         if ($order) {
 			$payment = $this->_checkoutSession->getLastRealOrder()->getPayment();        
 			$paymentMethod = $payment->getMethod();
-			
 			switch($paymentMethod)
 			{
 				case 'rm_pagseguro_boleto':
@@ -58,7 +57,7 @@ class Info extends \Magento\Framework\View\Element\Template
 						'texto' => 'Clique aqui para imprimir seu boleto',
 					);
 					break;
-				case 'pagseguropro_tef':
+				case 'rm_pagseguro_tef':
 					return array(
 						'tipo' => 'Débito Online (TEF)',
 						'url' => $payment->getAdditionalInformation('tefUrl'),

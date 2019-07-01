@@ -2,7 +2,7 @@
  * PagSeguro Transparente para Magento
  * @author Ricardo Martins <pagseguro-transparente@ricardomartins.net.br>
  * @link http://bit.ly/pagseguromagento
- * @version 2.1.0
+ * @version 1.0.0
  */
 
 function RMPagSeguro(config) {
@@ -52,7 +52,7 @@ RMPagSeguro.prototype.updateSenderHash = function(){
     return false;
 }
 
-RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
+RMPagSeguro.prototype.addCardFieldsObserver = function(obj){ 
     try {
         var ccNumElm = jQuery('input[name="payment[ps_cc_number]"]');
         var ccExpMoElm = jQuery('select[name="payment[ps_cc_exp_month]"]');
@@ -90,13 +90,13 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
 				obj.updatePaymentHashes();
 			}	
 		});
-        
-        jQuery( "#pagseguro_tef_method .actions-toolbar .checkout" ).on("click", function() { 
+		
+		jQuery( "#pagseguro_tef_method .actions-toolbar .checkout" ).on("click", function() { 
 			if(tefcpf.val()!=''){
 				obj.updatePaymentHashes();
 			}	
 		});
-		
+        
         jQuery("#rm_pagseguro_cc_cc_installments").change(function( event ) {
             obj.updateInstallments();
         });
@@ -105,6 +105,12 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
             jQuery(".tefbank").val(jQuery(this).val());
         });
         
+        jQuery('#rm_pagseguro_tef').change(function() {
+			if(this.checked) {
+			   obj.removeUnavailableBanks();
+			}
+		});
+		
     }catch(e){
         console.error('Unable to add greeting to cards. ' + e.message);
     }
@@ -219,7 +225,7 @@ RMPagSeguro.prototype.updatePaymentHashes = function(){
 		var boletocpf = jQuery('input[name="payment[pagseguro_boleto_cpf]"]').val();
 		var paymentHashes = {
 			"payment[sender_hash]": this.senderHash,
-			"ownerdata[boleto_cpf]": boletocpf,
+			"ownerdata[boleto_cpf]": boletocpf,			
 		};
 	}
 	
@@ -393,4 +399,41 @@ RMPagSeguro.prototype.updateInstallments = function(){
             return false;
         }
     });
+}
+
+RMPagSeguro.prototype.removeUnavailableBanks = function() {
+	var self = this;
+	var parcelsDrop = jQuery('#pagseguropro_tef_bank');
+	parcelsDrop.empty();
+	var tefnodeName = jQuery('#pagseguropro_tef_bank').prop("nodeName");
+	if(tefnodeName != "SELECT"){
+		//se houve customizações no elemento dropdown de bancos, não selecionaremos aqui
+		return;
+	}
+	PagSeguroDirectPayment.getPaymentMethods({  
+		amount: this.grandTotal,
+		success: function (response) {
+			if (response.error == true && this.config.debug) {
+				console.log('Não foi possível obter os meios de pagamento que estão funcionando no momento.');
+				return;
+			}
+			try {
+				parcelsDrop.empty();
+				parcelsDrop.append('<option value="">Selecione o banco</option>');
+				for (y in response.paymentMethods.ONLINE_DEBIT.options) {
+					if (response.paymentMethods.ONLINE_DEBIT.options[y].status != 'UNAVAILABLE') {
+						var optName = response.paymentMethods.ONLINE_DEBIT.options[y].displayName.toString();
+						var optValue = response.paymentMethods.ONLINE_DEBIT.options[y].name.toString();
+						parcelsDrop.append('<option value="'+optValue+'">'+optName+'</option>');
+					}
+				}
+
+				if(this.config.debug){
+					console.info('Bancos TEF atualizados com sucesso.');
+				}
+			} catch (err) {
+				console.log(err.message);
+			}
+		}
+	})
 }

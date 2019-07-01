@@ -2,7 +2,7 @@
 namespace RicardoMartins\PagSeguro\Model\Method;
 
 /**
- * Class Cc
+ * Class Tef
  *
  * @see       http://bit.ly/pagseguromagento Official Website
  * @author    Ricardo Martins (and others) <pagseguro-transparente@ricardomartins.net.br>
@@ -129,7 +129,7 @@ class Tef extends \Magento\Payment\Model\Method\AbstractMethod
 
 				//will grab data to be send via POST to API inside $params
 				$params = $this->pagSeguroHelper->getTefApiCallParams($order, $payment);
-$this->pagSeguroHelper->writeLog($params);
+
 				//call API
 				$returnXml = $this->pagSeguroHelper->callApi($params, $payment);
 
@@ -162,7 +162,7 @@ $this->pagSeguroHelper->writeLog($params);
 					}
 					$payment->setAdditionalInformation($additional);
 					
-					if (isset($returnXml->paymentMethod->type) && (int)$returnXml->paymentMethod->type == 2) {
+					if (isset($returnXml->paymentMethod->type) && (int)$returnXml->paymentMethod->type == 3) {
 					   $payment->setAdditionalInformation('tefUrl', (string)$returnXml->paymentLink);
 					}
 

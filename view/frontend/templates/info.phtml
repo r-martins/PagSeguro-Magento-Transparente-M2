@@ -1,5 +1,5 @@
 <?php
-if ($block->getPaymentMethod() == 'rm_pagseguro_boleto' || $block->getPaymentMethod() == 'rm_pagseguropro_tef'):
+if ($block->getPaymentMethod() == 'rm_pagseguro_boleto' || $block->getPaymentMethod() == 'rm_pagseguro_tef'):
 	$boletoUrl =  $block->getPaymentInfo(); ?>
 	<input class="action primary btn-boleto" type="button" id="rm_pagseguro_btnboleto" onclick="window.open('<?php echo @$boletoUrl['url'] ?>');" value="<?php echo @$boletoUrl['texto'] ?>"/>
 <?php endif; ?>

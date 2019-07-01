@@ -30,6 +30,7 @@ $visibleDob = $helper->isDobVisible() ? '1':'0';
             RMPagSeguroObj.updateBrand();
             RMPagSeguroObj.setInstallmentsQty(<?php echo $installments;?>);
             RMPagSeguroObj.getGrandTotal();
+            RMPagSeguroObj.removeUnavailableBanks();
     }
     window.visibleCpf = <?php echo $visibleCpf ?>;
     window.visibleDob = <?php echo $visibleDob ?>;
