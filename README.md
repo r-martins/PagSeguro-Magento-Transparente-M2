@@ -9,6 +9,7 @@ Acesse http://r-martins.github.io/PagSeguro-Magento-Transparente/magento2/wizard
     composer require ricardomartins/pagseguro:dev-master
     bin/magento cache:clean
     bin/magento setup:upgrade
+    bin/magento setup:di:compile
 
 #### 3. Configure o Magento
 
@@ -16,6 +17,8 @@ Acesse http://r-martins.github.io/PagSeguro-Magento-Transparente/magento2/wizard
 Altere para 4 linhas.
 
 * Em Formas de Pagamento, configure o e-mail da conta PagSeguro, Token PagSeguro e Public Key obtida no passo 1.
+
+* Em _Stores > Order Status_, configure a loja para exibir pedidos com status Pagamento Pendente no frontend (opcional). [Saiba mais](https://pagsegurotransparente.zendesk.com/hc/pt-br/articles/360029981831).
 
 * Limpe o cache, e pronto!
 
