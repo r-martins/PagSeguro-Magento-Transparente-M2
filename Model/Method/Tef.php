@@ -60,8 +60,6 @@ class Tef extends \Magento\Payment\Model\Method\AbstractMethod
         \Magento\Payment\Helper\Data $paymentData,        
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Payment\Model\Method\Logger $logger,
-        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
-        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         \RicardoMartins\PagSeguro\Helper\Data $pagSeguroHelper,
         \RicardoMartins\PagSeguro\Model\Notifications $pagSeguroAbModel,
         \Magento\Backend\Model\Auth\Session $adminSession,        
@@ -75,8 +73,8 @@ class Tef extends \Magento\Payment\Model\Method\AbstractMethod
             $paymentData,
             $scopeConfig,
             $logger,
-            $resource,
-            $resourceCollection,
+            null,
+            null,
             $data
         );
 
