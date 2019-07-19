@@ -12,4 +12,5 @@
             <argument name="customLogger" xsi:type="object">PagSeguroLogger</argument>
         </arguments>
     </type>
+    <preference for="Magento\Payment\Block\Info" type="RicardoMartins\PagSeguro\Block\Payment\Info" />
 </config>
