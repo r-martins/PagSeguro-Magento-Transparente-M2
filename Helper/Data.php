@@ -209,7 +209,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $config = array(
             'active_methods' => array(
                 'cc' => $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_CC_ACTIVE),
-                'boleto' => $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_BOLETO_ACTIVE)
+                'boleto' => $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_BOLETO_ACTIVE),
+                'tef' => $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_TEF_ACTIVE)
             ),
             'flag' => $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_CC_FLAG),
             'debug' => $this->isDebugActive(),

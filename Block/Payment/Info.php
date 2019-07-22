@@ -2,11 +2,13 @@
 
 namespace RicardoMartins\PagSeguro\Block\Payment;
 
-class Info extends \Magento\Framework\View\Element\Template
+class Info extends \Magento\Payment\Block\Info
 {
 	protected $_checkoutSession;
     protected $_orderFactory;
     protected $_scopeConfig;
+
+    protected $_template = 'RicardoMartins_PagSeguro::info/info.phtml';
 
     public function __construct(
         \Magento\Framework\View\Element\Template\Context $context,
@@ -30,8 +32,10 @@ class Info extends \Magento\Framework\View\Element\Template
     public function getOrder()
     {
         if ($this->_checkoutSession->getLastRealOrderId()) {
-             $order = $this->_orderFactory->create()->loadByIncrementId($this->_checkoutSession->getLastRealOrderId());
-        return $order;
+            return $this->_checkoutSession->getLastRealOrder();
+        }
+        if ($order = $this->getInfo()->getOrder()) {
+            return $order;
         }
         return false;
     }
@@ -45,8 +49,7 @@ class Info extends \Magento\Framework\View\Element\Template
     public function getPaymentInfo()
     {
         $order = $this->getOrder();
-        if ($order) {
-			$payment = $this->_checkoutSession->getLastRealOrder()->getPayment();        
+        if ($payment = $order->getPayment()) {
 			$paymentMethod = $payment->getMethod();
 			switch($paymentMethod)
 			{

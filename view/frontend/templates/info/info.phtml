@@ -1,0 +1,10 @@
+<?php
+/** @var \RicardoMartins\PagSeguro\Block\Payment\Info $block */
+?>
+
+<p><strong><?= $block->escapeHtml($block->getMethod()->getTitle()) ?></strong></p>
+<?php if($paymentInfo = $block->getPaymentInfo()): ?>
+<p>
+    <a href="<?php echo @$paymentInfo['url'];?>" target="_blank"><?php echo @$paymentInfo['texto'];?></a>
+</p>
+<?php endif;?>

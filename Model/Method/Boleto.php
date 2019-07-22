@@ -26,6 +26,7 @@ class Boleto extends \Magento\Payment\Model\Method\AbstractMethod
     protected $_minAmount = null;
     protected $_maxAmount = null;
     protected $_supportedCurrencyCodes = array('BRL');
+    protected $_infoBlockType = \RicardoMartins\PagSeguro\Block\Payment\Info::class;
 
     protected $_debugReplacePrivateDataKeys = ['number', 'exp_month', 'exp_year', 'cvc'];
     /**

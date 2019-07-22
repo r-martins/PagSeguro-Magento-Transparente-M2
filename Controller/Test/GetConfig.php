@@ -44,15 +44,16 @@ class GetConfig extends \Magento\Framework\App\Action\Action
     {
         $resultJson = $this->resultJsonFactory->create();
 
+        $tokenLen = strlen($this->_helper->getToken());
         $info = array(
-            'Magento Version' => substr($this->_helper->getMagentoVersion(),0,1),
+            'Magento Version' => substr($this->_helper->getMagentoVersion(), 0, 1),
             'RicardoMartins_PagSeguro' => array(
                 'version'   => $this->_helper->getModuleInformation()['setup_version'],
                 'debug'     => (boolean)$this->_helper->isDebugActive()
             ),
             'configJs'      => json_decode($this->_helper->getConfigJs()),
             'key_validate'  => $this->_helper->validateKey(),
-            'token_consistency' => (strlen($this->_helper->getToken()) == 32) ? "Good" : "Token does not consist 32 characters"
+            'token_consistency' => ($tokenLen == 32 || $tokenLen == 100) ? "Good" : "Token does not consist 32 or 100 characters"
         );
 
         $resultJson->setData($info);
