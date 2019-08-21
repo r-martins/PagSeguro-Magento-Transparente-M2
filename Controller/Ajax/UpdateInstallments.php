@@ -20,16 +20,22 @@ class UpdateInstallments extends \Magento\Framework\App\Action\Action
      */ 
     protected $checkoutSession;
 
-     /**
-     * @param \Magento\Checkout\Model\Session $checkoutSession
-     * @param \Magento\Framework\App\Action\Context $context
+    /** @var \Magento\Framework\Serialize\SerializerInterface  */
+    protected $serializer;
+
+    /**
+     * @param \Magento\Checkout\Model\Session                  $checkoutSession
+     * @param \Magento\Framework\App\Action\Context            $context
+     * @param \Magento\Framework\Serialize\SerializerInterface $serializer
      */
     public function __construct(
         \Magento\Checkout\Model\Session $checkoutSession,
-         \Magento\Framework\App\Action\Context $context
+         \Magento\Framework\App\Action\Context $context,
+        \Magento\Framework\Serialize\SerializerInterface $serializer
  
     ) {
         $this->checkoutSession = $checkoutSession;
+        $this->serializer = $serializer;
         parent::__construct($context);
     }
 
@@ -41,7 +47,7 @@ class UpdateInstallments extends \Magento\Framework\App\Action\Action
         $resultJson = $this->resultFactory->create(ResultFactory::TYPE_JSON);     
         try{
             $params = $this->getRequest()->getPost('installment');
-             $this->checkoutSession->setData('installment', serialize($params));
+             $this->checkoutSession->setData('installment', $this->serializer->serialize($params));
              $result = array(
                 'status'=> 'success',
                 'message' => __('Updated Installments.')

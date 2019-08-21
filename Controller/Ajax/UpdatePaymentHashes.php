@@ -20,16 +20,22 @@ class UpdatePaymentHashes extends \Magento\Framework\App\Action\Action
      */ 
     protected $checkoutSession;
 
-     /**
-     * @param \Magento\Checkout\Model\Session $checkoutSession
-     * @param \Magento\Framework\App\Action\Context $context
+    /** @var \Magento\Framework\Serialize\SerializerInterface  */
+    protected $serializer;
+
+    /**
+     * @param \Magento\Checkout\Model\Session                  $checkoutSession
+     * @param \Magento\Framework\App\Action\Context            $context
+     * @param \Magento\Framework\Serialize\SerializerInterface $serializer
      */
     public function __construct(
         \Magento\Checkout\Model\Session $checkoutSession,
-         \Magento\Framework\App\Action\Context $context
+         \Magento\Framework\App\Action\Context $context,
+        \Magento\Framework\Serialize\SerializerInterface $serializer
  
     ) {
         $this->checkoutSession = $checkoutSession;
+        $this->serializer = $serializer;
         parent::__construct($context);
     }
 
@@ -42,8 +48,8 @@ class UpdatePaymentHashes extends \Magento\Framework\App\Action\Action
         try{
             $params = $this->getRequest()->getPost('payment');
             $ownerData = $this->getRequest()->getPost('ownerdata');
-             $this->checkoutSession->setData('PsPayment', serialize($params));
-              $this->checkoutSession->setData('PsOwnerdata', serialize($ownerData));
+             $this->checkoutSession->setData('PsPayment', $this->serializer->serialize($params));
+              $this->checkoutSession->setData('PsOwnerdata', $this->serializer->serialize($ownerData));
              $result = array(
                 'status'=> 'success',
                 'message' => __('Updated Payment Hashes')

@@ -1,6 +1,11 @@
 <?php
 namespace RicardoMartins\PagSeguro\Controller\Notification;
 
+use Magento\Framework\App\CsrfAwareActionInterface;
+use Magento\Framework\App\Request\InvalidRequestException;
+use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Controller\ResultFactory;
+
 /**
  * Class Index
  *
@@ -10,7 +15,7 @@ namespace RicardoMartins\PagSeguro\Controller\Notification;
  * @license   https://www.gnu.org/licenses/gpl-3.0.pt-br.html GNU GPL, version 3
  * @package   RicardoMartins\PagSeguro\Controller\Notification
  */
-class Index extends \Magento\Framework\App\Action\Action
+class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareActionInterface
 {    
      /**
      * PagSeguro Helper
@@ -59,5 +64,33 @@ class Index extends \Magento\Framework\App\Action\Action
         }
 
         $this->pagSeguroAbModel->proccessNotificatonResult($response);
+        $result = $this->resultFactory->create(ResultFactory::TYPE_JSON);
+        return $result->setData(['success'=>true]);
+    }
+
+    /**
+     * Create exception in case CSRF validation failed.
+     * Return null if default exception will suffice.
+     *
+     * @param RequestInterface $request
+     *
+     * @return InvalidRequestException|null
+     */
+    public function createCsrfValidationException(RequestInterface $request): ?InvalidRequestException
+    {
+        return null;
+    }
+
+    /**
+     * Perform custom request validation.
+     * Return null if default validation is needed.
+     *
+     * @param RequestInterface $request
+     *
+     * @return bool|null
+     */
+    public function validateForCsrf(RequestInterface $request): ?bool
+    {
+        return true;
     }
 }

@@ -60,11 +60,20 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     protected $_curl;
 
+    /** @var \Magento\Framework\Serialize\SerializerInterface  */
+    protected $serializer;
+
     /**
-    * @param \Magento\Store\Model\StoreManagerInterface $storeManager
-    * @param \Magento\Checkout\Model\Session $checkoutSession
-    * @param \Magento\Customer\Model\Customer $customer
-    */
+     * @param \Magento\Store\Model\StoreManagerInterface       $storeManager
+     * @param \Magento\Checkout\Model\Session                  $checkoutSession
+     * @param \Magento\Customer\Model\Customer                 $customer
+     * @param \Magento\Framework\App\Helper\Context            $context
+     * @param Logger                                           $loggerHelper
+     * @param \Magento\Framework\App\ProductMetadataInterface  $productMetadata
+     * @param \Magento\Framework\Module\ModuleListInterface    $moduleList
+     * @param \Magento\Framework\HTTP\Client\Curl              $curl
+     * @param \Magento\Framework\Serialize\SerializerInterface $serializer
+     */
 
 	public function __construct(
         \Magento\Store\Model\StoreManagerInterface $storeManager,
@@ -74,7 +83,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         \RicardoMartins\PagSeguro\Helper\Logger $loggerHelper,
         \Magento\Framework\App\ProductMetadataInterface $productMetadata,
         \Magento\Framework\Module\ModuleListInterface $moduleList,
-        \Magento\Framework\HTTP\Client\Curl $curl
+        \Magento\Framework\HTTP\Client\Curl $curl,
+        \Magento\Framework\Serialize\SerializerInterface $serializer
  
     ) {
         $this->storeManager = $storeManager;
@@ -84,6 +94,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->productMetadata = $productMetadata;
         $this->moduleList = $moduleList;
         $this->_curl = $curl;
+        $this->serializer = $serializer;
 
         parent::__construct($context);
     }
@@ -249,7 +260,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $psPayment = $this->checkoutSession->getData('PsPayment');
        
-        $psPayment = unserialize($psPayment);
+        $psPayment = $this->serializer->unserialize($psPayment);
 //         $this->writeLog('getPaymentHash'.json_encode($psPayment));
         if (is_null($param)) {
             return $psPayment;
@@ -270,7 +281,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getCCOwnerData($param = null)
     {
         $psCcOwner = $this->checkoutSession->getData('PsOwnerdata');
-        $psCcOwner = unserialize($psCcOwner);
+        $psCcOwner = $this->serializer->unserialize($psCcOwner);
 
         if (isset($psCcOwner[$param])) {
             return $psCcOwner[$param];
@@ -287,7 +298,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getInstallments($param)
     {
         $ccinstallment = $this->checkoutSession->getData('installment');
-        $ccinstallment = unserialize($ccinstallment);
+        $ccinstallment = $this->serializer->unserialize($ccinstallment);
 
         if (isset($ccinstallment[$param])) {
             return $ccinstallment[$param];
@@ -935,7 +946,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 'SP'=>'SAO PAULO',
                 'TO'=>'TOCANTINS'
             );
-            if ($code = array_search($state, $codes)) {
+            $code = array_search($state, $codes);
+            if (false !== $code) {
                 return $code;
             }
         }
