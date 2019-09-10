@@ -89,6 +89,7 @@
             <span><!-- ko i18n: 'Credit Card Number'--><!-- /ko --></span>
         </label>
         <div class="control">
+          <div class="cc-number-input">
             <input type="number" name="payment[ps_cc_number]" class="input-text" value=""
                    data-bind="attr: {
                                     autocomplete: off,
@@ -99,45 +100,35 @@
                               enable: isActive($parents),
                               value: creditCardNumber,
                               valueUpdate: 'keyup' "/>
+            <span id="card-brand"></span>
+            <span id="card-msg"></span>
+          </div>
         </div>
-         <span id="card-brand"></span>
-          <span id="card-msg"></span>
     </div>
     <div class="field date required" data-bind="attr: {id: getCode() + '_cc_type_exp_div'}">
         <label data-bind="attr: {for: getCode() + '_expiration'}" class="label">
             <span><!-- ko i18n: 'Expiration Date'--><!-- /ko --></span>
         </label>
         <div class="control">
-            <div class="fields group group-2">
-                <div class="field no-label month">
-                    <div class="control">
-                        <select  name="payment[ps_cc_exp_month]"
-                                 class="select select-month"
-                                 data-bind="attr: {id: getCode() + '_expiration', 'data-container': getCode() + '-cc-month', 'data-validate': JSON.stringify({required:true, 'validate-cc-exp':'#' + getCode() + '_expiration_yr'})},
-                                            enable: isActive($parents),
-                                            options: getCcMonthsValues(),
-                                            optionsValue: 'value',
-                                            optionsText: 'month',
-                                            optionsCaption: $t('Month'),
-                                            value: creditCardExpMonth">
-                        </select>
-                    </div>
-                </div>
-                <div class="field no-label year">
-                    <div class="control">
-                        <select name="payment[ps_cc_exp_year]"
-                                class="select select-year"
-                                data-bind="attr: {id: getCode() + '_expiration_yr', 'data-container': getCode() + '-cc-year', 'data-validate': JSON.stringify({required:true})},
-                                           enable: isActive($parents),
-                                           options: getCcYearsValues(),
-                                           optionsValue: 'value',
-                                           optionsText: 'year',
-                                           optionsCaption: $t('Year'),
-                                           value: creditCardExpYear">
-                        </select>
-                    </div>
-                </div>
-            </div>
+            <input type="number" name="payment[ps_cc_exp_month]" class="input-text cc-exp-date" placeholder="MM" maxlength="2" value=""
+                   data-bind="attr: {
+                                    autocomplete: off,
+                                    id: getCode() + '_expiration',
+                                    'data-container': getCode() + '-cc-month',
+                                    'data-validate': JSON.stringify({'required-number':true, 'validate-length':true, 'validate-cc-exp':'#' + getCode() + '_expiration_yr'})},
+                              enable: isActive($parents),
+                              value: creditCardExpMonth,
+                              valueUpdate: 'keyup'
+                               "/>
+            <input type="number" placeholder="YY" name="payment[ps_cc_exp_year]" class="input-text cc-exp-date" maxlength="4" value=""
+                    data-bind="attr: {
+                                    autocomplete: off,
+                                    id: getCode() + '_expiration_yr',
+                                    'data-container': getCode() + '-cc-year',
+                                    'data-validate': JSON.stringify({'required-number':true, 'validate-length':true})},
+                              enable: isActive($parents),
+                              value: creditCardExpYear,
+                              valueUpdate: 'keyup' "/>
         </div>
     </div>
     <!-- ko if: (hasVerification())-->

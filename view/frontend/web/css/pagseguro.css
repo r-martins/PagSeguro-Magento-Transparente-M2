@@ -1,3 +1,20 @@
-.checkout-payment-method .input-text.ps_cc_birthdate {
+.checkout-payment-method .input-text.ps_cc_birthdate, .checkout-payment-method .input-text.cc-exp-date {
     width: 50px !important;
+}
+
+.cc-number-input {position: relative; display: inline-block;}
+
+#card-brand {
+    position: absolute;
+    left: 9px;
+    top: 6px;
+}
+
+.checkout-payment-method .input-text[name="payment[ps_cc_number]"] {
+	padding-left:58px;
+}
+
+.checkout-payment-method .ccard .fields .select-installments {
+    padding-left: 5px;
+    padding-right: 25px;
 }

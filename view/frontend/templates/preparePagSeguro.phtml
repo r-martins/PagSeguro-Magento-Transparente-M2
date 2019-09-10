@@ -6,7 +6,7 @@ $grandTotal = $helper->getGrandTotal();
 $installments = $helper->getInstallmentQty();
 $visibleCpf = $helper->isCpfVisible() ? '1':'0';
 $visibleDob = $helper->isDobVisible() ? '1':'0';
-
+$ccPlaceholderImage = $this->getViewFileUrl('RicardoMartins_PagSeguro::images/cc-placeholder.png');
 ?>
 
 <script src="<?php echo $viewJsPath;?>"></script>
@@ -31,6 +31,7 @@ $visibleDob = $helper->isDobVisible() ? '1':'0';
             RMPagSeguroObj.setInstallmentsQty(<?php echo $installments;?>);
             RMPagSeguroObj.getGrandTotal();
             RMPagSeguroObj.removeUnavailableBanks();
+            RMPagSeguroObj.setCardPlaceHolderImage("<?php echo $ccPlaceholderImage ?>");
     }
     window.visibleCpf = <?php echo $visibleCpf ?>;
     window.visibleDob = <?php echo $visibleDob ?>;

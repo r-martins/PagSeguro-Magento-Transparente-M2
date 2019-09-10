@@ -55,8 +55,8 @@ RMPagSeguro.prototype.updateSenderHash = function(){
 RMPagSeguro.prototype.addCardFieldsObserver = function(obj){ 
     try {
         var ccNumElm = jQuery('input[name="payment[ps_cc_number]"]');
-        var ccExpMoElm = jQuery('select[name="payment[ps_cc_exp_month]"]');
-        var ccExpYrElm = jQuery('select[name="payment[ps_cc_exp_year]"]');
+        var ccExpMoElm = jQuery('input[name="payment[ps_cc_exp_month]"]');
+        var ccExpYrElm = jQuery('input[name="payment[ps_cc_exp_year]"]');
         var ccCvvElm = jQuery('input[name="payment[ps_cc_cid]"]');
         var cpf = jQuery('input[name="payment[ps_cc_cpf]"]');
         var boletocpf = jQuery('input[name="payment[pagseguro_boleto_cpf]"]');
@@ -118,9 +118,9 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
 }
 
 RMPagSeguro.prototype.updateCreditCardToken = function(){
-     var ccNum = jQuery('input[name="payment[ps_cc_number]"]').val().replace(/^\s+|\s+$/g,'');
-    var ccExpMo = jQuery('select[name="payment[ps_cc_exp_month]"]').val().replace(/^\s+|\s+$/g,'');
-    var ccExpYr = jQuery('select[name="payment[ps_cc_exp_year]"]').val().replace(/^\s+|\s+$/g,'');
+    var ccNum = jQuery('input[name="payment[ps_cc_number]"]').val().replace(/^\s+|\s+$/g,'');
+    var ccExpMo = jQuery('input[name="payment[ps_cc_exp_month]"]').val().replace(/^\s+|\s+$/g,'');
+    var ccExpYr = jQuery('input[name="payment[ps_cc_exp_year]"]').val().replace(/^\s+|\s+$/g,'');
     var ccCvv = jQuery('input[name="payment[ps_cc_cid]"]').val().replace(/^\s+|\s+$/g,'');
     var brandName = '';
     var self = this;
@@ -436,4 +436,17 @@ RMPagSeguro.prototype.removeUnavailableBanks = function() {
 			}
 		}
 	})
+}
+
+RMPagSeguro.prototype.setCardPlaceHolderImage = function(ccPlaceholderImage){
+    var ccNum ='';
+    var placeholderImage = '<img src="'+ccPlaceholderImage+'"/>';
+
+    jQuery('#card-brand').html(placeholderImage);
+    jQuery('input[name="payment[ps_cc_number]"]').keyup(function( event ) {
+        ccNum = jQuery('input[name="payment[ps_cc_number]"]').val().replace(/^\s+|\s+$/g,'');
+        if (ccNum.length <= 0) {
+            jQuery('#card-brand').html(placeholderImage);
+        }
+    });
 }
