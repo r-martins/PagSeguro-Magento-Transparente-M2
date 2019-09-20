@@ -61,7 +61,7 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
         var cpf = jQuery('input[name="payment[ps_cc_cpf]"]');
         var boletocpf = jQuery('input[name="payment[pagseguro_boleto_cpf]"]');
         var tefcpf = jQuery('input[name="payment[pagseguro_tef_cpf]"]');
-        
+        var ccExpYrVisibileElm = jQuery('#rm_pagseguro_cc_cc_year_visible');
 
         jQuery(ccNumElm).keyup(function( event ) {
             obj.updateCreditCardToken();
@@ -78,6 +78,18 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
         /*jQuery(cpf).keyup(function( event ) {
             obj.updateCreditCardToken();
         });*/
+        jQuery(ccExpYrVisibileElm).keyup(function( event ) {
+
+            if(jQuery(ccExpYrVisibileElm).length == 0) {
+                ccExpYr = '200' + jQuery(ccExpYrVisibileElm).val();
+            }
+
+            if(jQuery(ccExpYrVisibileElm).length == 1) {
+                ccExpYr = '20' + jQuery(ccExpYrVisibileElm).val();
+            }
+
+            jQuery('input[name="payment[ps_cc_exp_year]"]').val(ccExpYr);
+        });
         
         jQuery( "#pagseguro_cc_method .actions-toolbar .checkout" ).on("click", function() { 
 			if(cpf.val()!=''){

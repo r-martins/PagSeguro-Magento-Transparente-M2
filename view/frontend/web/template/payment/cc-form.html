@@ -118,9 +118,22 @@
                                     'data-validate': JSON.stringify({'required-number':true, 'validate-length':true, 'validate-cc-exp':'#' + getCode() + '_expiration_yr'})},
                               enable: isActive($parents),
                               value: creditCardExpMonth,
-                              valueUpdate: 'keyup'
-                               "/>
-            <input type="number" placeholder="YY" name="payment[ps_cc_exp_year]" class="input-text cc-exp-date" maxlength="4" value=""
+                              valueUpdate: 'keyup',
+                              event: {keypress: limitvalue} "/>
+
+            <input type="number" placeholder="AA" name="payment[ps_cc_exp_year_visible]" class="input-text cc-exp-date" maxlength="2" value=""
+                    data-bind="attr: {
+                                    autocomplete: off,
+                                    id: getCode() + '_cc_year_visible',
+                                    'data-container': getCode() + '-cc-year',
+                                    'data-validate': JSON.stringify({'required-number':true})},
+                              enable: isActive($parents),
+                              value: creditCardExpYear,
+                              valueUpdate: 'keyup',
+                              event: {keypress: limitvalue} "/>
+
+
+            <input type="hidden" placeholder="AA" name="payment[ps_cc_exp_year]" class="input-text cc-exp-date" maxlength="4" value=""
                     data-bind="attr: {
                                     autocomplete: off,
                                     id: getCode() + '_expiration_yr',
@@ -128,7 +141,8 @@
                                     'data-validate': JSON.stringify({'required-number':true, 'validate-length':true})},
                               enable: isActive($parents),
                               value: creditCardExpYear,
-                              valueUpdate: 'keyup' "/>
+                              valueUpdate: 'keyup',
+                              event: {keypress: limitvalue} "/>
         </div>
     </div>
     <!-- ko if: (hasVerification())-->

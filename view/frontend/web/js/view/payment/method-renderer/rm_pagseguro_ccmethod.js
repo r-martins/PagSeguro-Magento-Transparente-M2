@@ -26,6 +26,13 @@ define(
             validate: function() {
                 var $form = $('#' + this.getCode() + '-form');
                 return $form.validation() && $form.validation('isValid');
+            },
+
+            limitvalue: function(data, e) {
+                if($(e.currentTarget).val().length == 2 && e.key!=8) {
+                    return false;
+                }
+                return true;
             }
         });
     }
