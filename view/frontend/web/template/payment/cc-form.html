@@ -90,17 +90,24 @@
         </label>
         <div class="control">
           <div class="cc-number-input">
-            <input type="number" name="payment[ps_cc_number]" class="input-text" value=""
+            <input type="text" class="input-text cc_number_visible" value=""
+                   data-bind="attr: {
+                                    autocomplete: off,
+                                    id: getCode() + '_cc_number_visible'},
+                              enable: isActive($parents),
+                              valueUpdate: 'keyup',
+                              event: {keypress: numbervalidation} "/>
+
+            <input type="hidden" name="payment[ps_cc_number]" class="input-text" value=""
                    data-bind="attr: {
                                     autocomplete: off,
                                     id: getCode() + '_cc_number',
                                     title: $t('Credit Card Number'),
                                     'data-container': getCode() + '-cc-number',
-                                    'data-validate': JSON.stringify({'required-number':true, 'validate-card-type':getCcAvailableTypesValues(), 'validate-card-number':'#' + getCode() + '_cc_type', 'validate-cc-type':'#' + getCode() + '_cc_type'})},
+                                    'data-validate': JSON.stringify({'required-number':false, 'validate-card-type':getCcAvailableTypesValues(), 'validate-card-number':'#' + getCode() + '_cc_type', 'validate-cc-type':'#' + getCode() + '_cc_type'})},
                               enable: isActive($parents),
                               value: creditCardNumber,
                               valueUpdate: 'keyup' "/>
-            <span id="card-brand"></span>
             <span id="card-msg"></span>
           </div>
         </div>
@@ -121,7 +128,7 @@
                               valueUpdate: 'keyup',
                               event: {keypress: limitvalue} "/>
 
-            <input type="number" placeholder="AA" name="payment[ps_cc_exp_year_visible]" class="input-text cc-exp-date" maxlength="2" value=""
+            <input type="number" placeholder="AA" class="input-text cc-exp-date" maxlength="2" value=""
                     data-bind="attr: {
                                     autocomplete: off,
                                     id: getCode() + '_cc_year_visible',

@@ -62,8 +62,32 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
         var boletocpf = jQuery('input[name="payment[pagseguro_boleto_cpf]"]');
         var tefcpf = jQuery('input[name="payment[pagseguro_tef_cpf]"]');
         var ccExpYrVisibileElm = jQuery('#rm_pagseguro_cc_cc_year_visible');
+        var ccNumVisibleElm = jQuery('.cc_number_visible');
 
         jQuery(ccNumElm).keyup(function( event ) {
+            obj.updateCreditCardToken();
+        });
+        jQuery(ccNumVisibleElm).keyup(function( event ) {
+
+            jQuery(this).val(function (index, value) {
+                var cc_num;
+                var key = event.which || event.keyCode || event.charCode;
+                if(key == 8) {
+                    cc_num = value.replace(/\s+/g, '');
+                    jQuery(ccNumElm).val(cc_num);
+
+                } else {
+                    if (value != ' ') {
+                        var cc_num_original = value.replace(/\s+/g, '');
+
+                        jQuery(ccNumElm).val(cc_num_original);
+                    }
+                }
+
+                cc_num = value.replace(/\W/gi, '').replace(/(.{4})/g, '$1 ');
+                cc_num = cc_num.trim();
+                return cc_num;
+            });
             obj.updateCreditCardToken();
         });
         jQuery(ccExpMoElm).keyup(function( event ) {
@@ -80,15 +104,14 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
         });*/
         jQuery(ccExpYrVisibileElm).keyup(function( event ) {
 
-            if(jQuery(ccExpYrVisibileElm).length == 0) {
+            if(jQuery(this).val().length == 1) {
                 ccExpYr = '200' + jQuery(ccExpYrVisibileElm).val();
             }
 
-            if(jQuery(ccExpYrVisibileElm).length == 1) {
+            if(jQuery(this).val().length == 2) {
                 ccExpYr = '20' + jQuery(ccExpYrVisibileElm).val();
             }
-
-            jQuery('input[name="payment[ps_cc_exp_year]"]').val(ccExpYr);
+            jQuery(ccExpYrElm).val(ccExpYr);
         });
         
         jQuery( "#pagseguro_cc_method .actions-toolbar .checkout" ).on("click", function() { 
@@ -201,7 +224,7 @@ RMPagSeguro.prototype.updateBrand = function(){
     if(ccNum.length >= 6){
         if (typeof this.cardBin != "undefined" && currentBin == this.cardBin) {
             if(typeof this.brand != "undefined"){
-                jQuery('#card-brand').html('<img src="https://stc.pagseguro.uol.com.br/public/img/payment-methods-flags/' +flag + '/' + this.brand.name + '.png" alt="' + this.brand.name + '" title="' + this.brand.name + '"/>');
+                jQuery('.cc_number_visible').attr('style','background-image:url("https://stc.pagseguro.uol.com.br/public/img/payment-methods-flags/' +flag + '/' + this.brand.name + '.png") !important');
             }
             return;
         }
@@ -210,11 +233,9 @@ RMPagSeguro.prototype.updateBrand = function(){
             cardBin: currentBin,
             success: function(psresponse){
                 self.brand = psresponse.brand;
-                jQuery('#card-brand').html(psresponse.brand.name);
                 if(flag != ''){
-                    jQuery('#card-brand').html('<img src="https://stc.pagseguro.uol.com.br/public/img/payment-methods-flags/' +flag + '/' + psresponse.brand.name + '.png" alt="' + psresponse.brand.name + '" title="' + psresponse.brand.name + '"/>');
+                    jQuery('.cc_number_visible').attr('style','background-image:url("https://stc.pagseguro.uol.com.br/public/img/payment-methods-flags/' +flag + '/' + psresponse.brand.name + '.png") !important');
                 }
-                jQuery('#card-brand').addClass(psresponse.brand.name.replace(/[^a-zA-Z]*!/g,''));
             },
             error: function(psresponse){
                 console.error('Failed to get card flag.');
@@ -451,14 +472,10 @@ RMPagSeguro.prototype.removeUnavailableBanks = function() {
 }
 
 RMPagSeguro.prototype.setCardPlaceHolderImage = function(ccPlaceholderImage){
-    var ccNum ='';
-    var placeholderImage = '<img src="'+ccPlaceholderImage+'"/>';
-
-    jQuery('#card-brand').html(placeholderImage);
-    jQuery('input[name="payment[ps_cc_number]"]').keyup(function( event ) {
-        ccNum = jQuery('input[name="payment[ps_cc_number]"]').val().replace(/^\s+|\s+$/g,'');
-        if (ccNum.length <= 0) {
-            jQuery('#card-brand').html(placeholderImage);
+    jQuery('.cc_number_visible').keyup(function( event ) {
+        if (jQuery(this).val().length <= 0) {
+            console.log(ccPlaceholderImage);
+            jQuery(this).attr('style','background-image:url("' + ccPlaceholderImage + '") !important');
         }
     });
 }

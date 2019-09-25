@@ -1,20 +1,19 @@
 .checkout-payment-method .input-text.ps_cc_birthdate, .checkout-payment-method .input-text.cc-exp-date {
-    width: 50px !important;
+	width: 50px !important;
 }
 
-.cc-number-input {position: relative; display: inline-block;}
-
-#card-brand {
-    position: absolute;
-    left: 9px;
-    top: 6px;
+.input-text.cc_number_visible {
+	background-image: url('../images/cc-placeholder.png');
+	background-size: 35px 20px;
+	background-position: 5px 5px;
+	background-repeat: no-repeat;
 }
 
-.checkout-payment-method .input-text[name="payment[ps_cc_number]"] {
-	padding-left:58px;
+.checkout-payment-method .input-text.cc_number_visible{
+	padding-left:50px;
 }
 
 .checkout-payment-method .ccard .fields .select-installments {
-    padding-left: 5px;
-    padding-right: 25px;
+	padding-left: 5px;
+	padding-right: 25px;
 }
