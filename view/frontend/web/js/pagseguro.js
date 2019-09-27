@@ -39,7 +39,6 @@ function RMPagSeguro(config) {
          parcelsDrop.append('<option value="">Informe os dados do cartão para calcular</option>');
 }
 
-
 RMPagSeguro.prototype.updateSenderHash = function(){
    var senderHash = PagSeguroDirectPayment.getSenderHash();
     if(typeof senderHash != "undefined" && senderHash != '')
@@ -247,6 +246,7 @@ RMPagSeguro.prototype.updateBrand = function(){
         })
     }
 }
+
 RMPagSeguro.prototype.updatePaymentHashes = function(){
     var self = this;
     var url = self.storeUrl +'pseguro/ajax/updatePaymentHashes';
@@ -254,16 +254,17 @@ RMPagSeguro.prototype.updatePaymentHashes = function(){
     var tefcpf = jQuery('input[name="payment[pagseguro_tef_cpf]"]').val();
     var tefbank = jQuery('input[name="payment[pagseguropro_tef_bank]"]').val();
     var cpf = jQuery('input[name="payment[ps_cc_cpf]"]').val();
-    
-    if(boletocpf!='' && boletocpf != undefined){
+    var currnetSelectedPayment = jQuery('input[name="payment[method]"]:checked').attr('id');
+
+    if (boletocpf!='' && boletocpf != undefined && currnetSelectedPayment == 'rm_pagseguro_boleto') {
 		var boletocpf = jQuery('input[name="payment[pagseguro_boleto_cpf]"]').val();
 		var paymentHashes = {
 			"payment[sender_hash]": this.senderHash,
 			"ownerdata[boleto_cpf]": boletocpf,			
 		};
 	}
-	
-	if(tefcpf!='' && tefcpf != undefined){
+
+	if (tefcpf!='' && tefcpf != undefined && currnetSelectedPayment == 'rm_pagseguro_tef') {
 		var tefcpf = jQuery('input[name="payment[pagseguro_tef_cpf]"]').val();
 		var paymentHashes = {
 			"payment[sender_hash]": this.senderHash,
@@ -271,8 +272,8 @@ RMPagSeguro.prototype.updatePaymentHashes = function(){
 			"ownerdata[tef_bank]": tefbank,
 		};
 	}
-	
-	if(cpf !='' && cpf != undefined){
+
+	if (cpf !='' && cpf != undefined && currnetSelectedPayment == 'rm_pagseguro_cc') {
 		var ccOwner = jQuery('input[name="payment[ps_cc_owner]"]').val();
 		var ccOwnerBirthDay = jQuery('input[name="payment[ps_cc_owner_birthday_day]"]').val();
 		var ccOwnerBirthMonth = jQuery('input[name="payment[ps_cc_owner_birthday_month]"]').val();
@@ -290,7 +291,7 @@ RMPagSeguro.prototype.updatePaymentHashes = function(){
 			"ownerdata[credit_card_cpf]": cpf,
 		};	
 	}
-    
+
     jQuery.ajax({
         url: url,
         type: 'POST',
@@ -310,7 +311,6 @@ RMPagSeguro.prototype.updatePaymentHashes = function(){
         }
     });
 }
-
 
 RMPagSeguro.prototype.setStoreUrl = function(storeUrl){
     this.storeUrl = storeUrl;
