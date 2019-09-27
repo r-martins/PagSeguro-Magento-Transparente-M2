@@ -81,6 +81,7 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
                         var cc_num_original = value.replace(/\s+/g, '');
 
                         jQuery(ccNumElm).val(cc_num_original);
+                        jQuery(ccNumElm).keyup();
                     }
                 }
 
@@ -103,7 +104,7 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
             obj.updateCreditCardToken();
         });*/
         jQuery(ccExpYrVisibileElm).keyup(function( event ) {
-
+            var ccExpYr = '';
             if(jQuery(this).val().length == 1) {
                 ccExpYr = '200' + jQuery(ccExpYrVisibileElm).val();
             }
