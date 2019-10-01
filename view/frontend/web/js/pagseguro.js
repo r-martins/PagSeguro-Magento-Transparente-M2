@@ -475,7 +475,7 @@ RMPagSeguro.prototype.removeUnavailableBanks = function() {
 RMPagSeguro.prototype.setCardPlaceHolderImage = function(ccPlaceholderImage){
     jQuery('.cc_number_visible').keyup(function( event ) {
         if (jQuery(this).val().length <= 0) {
-            console.log(ccPlaceholderImage);
+            // console.log(ccPlaceholderImage);
             jQuery(this).attr('style','background-image:url("' + ccPlaceholderImage + '") !important');
         }
     });
