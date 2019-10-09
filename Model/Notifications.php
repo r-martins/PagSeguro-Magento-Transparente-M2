@@ -29,6 +29,13 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
     protected $orderRepository;
 
      /**
+     * Magento Invoice Service
+     *
+     * @var \Magento\Sales\Model\Service\InvoiceService
+     */
+
+    protected $invoiceService;
+     /**
      * Magento transaction Factory
      *
      * @var \Magento\Framework\DB\Transaction
@@ -50,6 +57,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
         \Magento\Sales\Api\Data\OrderInterface $orderModel,
         \Magento\Framework\DB\Transaction $transactionFactory,
         \Magento\Sales\Model\Order\Email\Sender\OrderCommentSender $commentSender,
+        \Magento\Sales\Model\Service\InvoiceService $invoiceService,
         array $data = array()
     ) {
         parent::__construct(
@@ -69,6 +77,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
         $this->orderModel = $orderModel;
         $this->transactionFactory = $transactionFactory;
         $this->_commentSender = $commentSender;
+        $this->invoiceService = $invoiceService;
     }
 
     /**
@@ -168,14 +177,11 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
             if ((int)$resultXML->status == 3) { 
                 if(!$order->hasInvoices()){
 
-                    $invoice = $order->prepareInvoice();
-                    $invoice->register()->pay();
+                    $invoice = $this->invoiceService->prepareInvoice($order);
                     $msg = sprintf('Captured payment. Transaction Identifier: %s', (string)$resultXML->code);
                     $invoice->addComment($msg);
-                    $invoice->sendEmail(
-                        $this->pagSeguroHelper->getStoreConfigValue('payment/rm_pagseguro/send_invoice_email'),
-                        'Payment received successfully.'
-                    );
+                    $invoice->setRequestedCaptureCase(\RicardoMartins\PagSeguro\Model\Notifications::processStatus($resultXML->status));
+                    $invoice->register();
 
                     // salva o transaction id na invoice
                     if (isset($resultXML->code)) {
@@ -185,7 +191,8 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                     $this->transactionFactory->addObject($invoice)
                         ->addObject($invoice->getOrder())
                         ->save();
-                    $order->addStatusHistoryComment(sprintf('Invoice # %s successfully created.', $invoice->getIncrementId()));
+                    $order->addStatusHistoryComment(sprintf('Invoice #%s successfully created.', $invoice->getIncrementId()));
+
                 }
             }
 
