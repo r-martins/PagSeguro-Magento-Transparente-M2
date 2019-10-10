@@ -89,21 +89,12 @@ class Cc extends \Magento\Payment\Model\Method\Cc
 
         $this->_countryFactory = $countryFactory;
 
-        //@TODO Remove
-        // $this->_minAmount = 1;
-        // $this->_maxAmount = 999999999; 
         $this->pagSeguroHelper = $pagSeguroHelper;  
         $this->pagSeguroAbModel = $pagSeguroAbModel; 
         $this->adminSession = $adminSession;
         $this->messageManager = $messageManager;
     }
 
-    public function order(\Magento\Payment\Model\InfoInterface $payment, $amount)
-    {
-        //@TODO Review. Necessary?
-          /*@var \Magento\Sales\Model\Order $order */
-          $this->pagSeguroHelper->writeLog('Inside Order');
-    }
 
      public function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
@@ -119,7 +110,7 @@ class Cc extends \Magento\Payment\Model\Method\Cc
      * @return $this
      * @throws \Magento\Framework\Validator\Exception
      */
-    public function capture(\Magento\Payment\Model\InfoInterface $payment, $amount)
+    public function order(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
         /*@var \Magento\Sales\Model\Order $order */
         $order = $payment->getOrder();
