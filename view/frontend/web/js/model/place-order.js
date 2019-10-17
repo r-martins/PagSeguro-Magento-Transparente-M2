@@ -29,10 +29,12 @@ define(
                        errorProcessor.process(response, messageContainer);
                    }
 
+                   var responseMessage = JSON.parse(response.responseText);
+                   var errorMessage = '<div role="alert" class="message message-error error"><div data-ui-id="checkout-cart-validationmessages-message-error" data-bind="text: $data">'+responseMessage.message+'</div></div>'
+                   $("div[data-role='checkout-messages']").html(errorMessage);
+
                    $(document).scrollTop(0);
                    fullScreenLoader.stopLoader();
-
-
                 }
             );
         };
