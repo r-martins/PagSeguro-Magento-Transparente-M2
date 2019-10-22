@@ -3,7 +3,7 @@
     "description": "Magento 2 Transparent Payment Module / PagSeguro Transparente para Magento 2",
     "type": "magento2-module",
     "license": "GPL-3.0-or-later",
-    "version": "2.3.2",
+    "version": "2.3.3",
     "autoload": {
         "files": [
             "registration.php"
