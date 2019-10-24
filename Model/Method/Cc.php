@@ -126,13 +126,15 @@ class Cc extends \Magento\Payment\Model\Method\Cc
             if (isset($returnXml->errors)) {
                 $errMsg = array();
                 foreach ($returnXml->errors as $error) {
-                    $errMsg[] = __((string)$error->message) . '(' . $error->code . ')';
+                    $message = $this->pagSeguroHelper->translateError((string)$error->message);
+                    $errMsg[] = $message . '(' . $error->code . ')';
                 }
                 throw new \Magento\Framework\Validator\Exception('Um ou mais erros ocorreram no seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg));
             }
             if (isset($returnXml->error)) {
                 $error = $returnXml->error;
-                $errMsg[] = __((string)$error->message) . ' (' . $error->code . ')';
+                $message = $this->pagSeguroHelper->translateError((string)$error->message);
+                $errMsg[] = $message . ' (' . $error->code . ')';
                 throw new \Magento\Framework\Validator\Exception('Um erro ocorreu em seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg));
             }
             /* process return result code status*/
@@ -189,7 +191,7 @@ class Cc extends \Magento\Payment\Model\Method\Cc
             $returnXml  = $this->pagSeguroHelper->callApi($params, $payment, 'transactions/refunds');
 
             if ($returnXml === null) {
-                $errorMsg = $this->_getHelper()->__('Erro ao solicitar o reembolso.\n');
+                $errorMsg = 'Impossível gerar reembolso. Aldo deu errado.';
                 throw new \Magento\Framework\Validator\Exception($errorMsg);
             }
         } catch (\Exception $e) {
