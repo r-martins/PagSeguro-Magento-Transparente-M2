@@ -70,7 +70,7 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
         }
 
         //checks if it's a duplicated notification
-        $contentCacheId = md5($response->asXML());
+        $contentCacheId = hash('sha256', $response->asXML());
         if($this->cache->load($contentCacheId)){
             $result = $this->resultFactory->create(ResultFactory::TYPE_JSON);
             return $result->setData(['success'=>false, 'message'=>'Duplicated Transaction. This transaction was already received in less than 60 seconds.']);

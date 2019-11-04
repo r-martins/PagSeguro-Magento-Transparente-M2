@@ -124,7 +124,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
             }
 
             //PagSeguro sends the same notification multiple times in the same minute. Let's cache it and check if it's a duplicated.
-            $contentCacheId = md5($resultXML->asXML());
+            $contentCacheId = hash('sha256', $resultXML->asXML());
             $this->cache->save('1', $contentCacheId, ['RM_PAGSEGURO_NOTIFICATION'], 60);
 
 
