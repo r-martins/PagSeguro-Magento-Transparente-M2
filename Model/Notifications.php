@@ -40,6 +40,9 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
     /** @var \Magento\Sales\Model\Order\Email\Sender\InvoiceSender  */
     protected $invoiceSender;
 
+    /** @var \Magento\Framework\App\CacheInterface */
+    protected $cache;
+
     /**
      * Magento transaction Factory
      *
@@ -64,6 +67,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
         \Magento\Sales\Model\Order\Email\Sender\OrderCommentSender $commentSender,
         \Magento\Sales\Model\Service\InvoiceService $invoiceService,
         \Magento\Sales\Model\Order\Email\Sender\InvoiceSender $invoiceSender,
+        \Magento\Framework\App\CacheInterface $cache,
         array $data = array()
     ) {
         parent::__construct(
@@ -85,6 +89,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
         $this->_commentSender = $commentSender;
         $this->invoiceService = $invoiceService;
         $this->invoiceSender = $invoiceSender;
+        $this->cache = $cache;
     }
 
     /**
@@ -117,6 +122,11 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                 }
                 $payment = $order->getPayment();
             }
+
+            //PagSeguro sends the same notification multiple times in the same minute. Let's cache it and check if it's a duplicated.
+            $contentCacheId = md5($resultXML->asXML());
+            $this->cache->save('1', $contentCacheId, ['RM_PAGSEGURO_NOTIFICATION'], 60);
+
 
             $this->_code = $payment->getMethod();
             $processedState = $this->processStatus((int)$resultXML->status);
