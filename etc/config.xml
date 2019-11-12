@@ -4,7 +4,7 @@
         <payment>
             <rm_pagseguro_cc>
                 <active>1</active>
-                <payment_action>authorize_capture</payment_action>
+                <payment_action>order</payment_action>
                 <model>RicardoMartins\PagSeguro\Model\Method\Cc</model>
                 <title>Cartão de Crédito via PagSeguro UOL</title>
                 <order_status>pending</order_status>
