@@ -34,9 +34,9 @@ function RMPagSeguro(config) {
             }, 3000 );
         } 
 
-         var parcelsDrop = jQuery('#rm_pagseguro_cc_cc_installments');
-        //                                    Please enter credit card data to calculate
-         parcelsDrop.append('<option value="">Informe os dados do cartão para calcular</option>');
+        var parcelsDrop = jQuery('#rm_pagseguro_cc_cc_installments');
+        //Please enter credit card data to calculate
+        parcelsDrop.append('<option value="">Informe os dados do cartão para calcular</option>');
 }
 
 RMPagSeguro.prototype.updateSenderHash = function(){
@@ -62,6 +62,7 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
         var tefcpf = jQuery('input[name="payment[pagseguro_tef_cpf]"]');
         var ccExpYrVisibileElm = jQuery('#rm_pagseguro_cc_cc_year_visible');
         var ccNumVisibleElm = jQuery('.cc_number_visible');
+        var billingCpf = jQuery('input[name="vat_id"]');
 
         jQuery(ccNumElm).keyup(function( event ) {
             obj.updateCreditCardToken();
@@ -114,42 +115,41 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
             jQuery(ccExpYrElm).val(ccExpYr);
         });
         
-        jQuery( "#pagseguro_cc_method .actions-toolbar .checkout" ).on("click", function() { 
-			if(cpf.val()!=''){
-				obj.updateCreditCardToken();
-			}	
-		});
-		
-		jQuery( "#pagseguro_boleto_method .actions-toolbar .checkout" ).on("click", function() { 
-			if(boletocpf.val()!=''){
-				obj.updatePaymentHashes();
-			}	
-		});
-		
-		jQuery( "#pagseguro_tef_method .actions-toolbar .checkout" ).on("click", function() { 
-			if(tefcpf.val()!=''){
-				obj.updatePaymentHashes();
-			}	
-		});
+        jQuery( "#pagseguro_cc_method .actions-toolbar .checkout" ).on("click", function() {
+            if(cpf.val() != '' || billingCpf.val() != '') {
+                obj.updateCreditCardToken();
+            }
+        });
+
+        jQuery( "#pagseguro_boleto_method .actions-toolbar .checkout" ).on("click", function() {
+            if(boletocpf.val()!=''){
+                obj.updatePaymentHashes();
+            }
+        });
         
+        jQuery( "#pagseguro_tef_method .actions-toolbar .checkout" ).on("click", function() {
+            if(tefcpf.val()!=''){
+                obj.updatePaymentHashes();
+            }
+        });
+
         jQuery("#rm_pagseguro_cc_cc_installments").change(function( event ) {
             obj.updateInstallments();
         });
-        
+
         jQuery("#pagseguropro_tef_bank").change(function( event ) {
             jQuery(".tefbank").val(jQuery(this).val());
         });
-        
+
         jQuery('#rm_pagseguro_tef').change(function() {
-			if(this.checked) {
-			   obj.removeUnavailableBanks();
-			}
-		});
-		
-    }catch(e){
+            if(this.checked) {
+               obj.removeUnavailableBanks();
+            }
+        });
+
+    } catch(e) {
         console.error('Unable to add greeting to cards. ' + e.message);
     }
-
 }
 
 RMPagSeguro.prototype.updateCreditCardToken = function(){
@@ -213,9 +213,9 @@ RMPagSeguro.prototype.updateCreditCardToken = function(){
 
 RMPagSeguro.prototype.updateBrand = function(){
     var ccNum ='';
-	if(jQuery('input[name="payment[ps_cc_number]"]').val()){
-		var ccNum = jQuery('input[name="payment[ps_cc_number]"]').val().replace(/^\s+|\s+$/g,'');
-	}
+    if(jQuery('input[name="payment[ps_cc_number]"]').val()){
+        var ccNum = jQuery('input[name="payment[ps_cc_number]"]').val().replace(/^\s+|\s+$/g,'');
+    }
     var currentBin = ccNum.substring(0, 6);
     var flag = this.config.flag;
     var debug = this.config.debug;
@@ -254,43 +254,45 @@ RMPagSeguro.prototype.updatePaymentHashes = function(){
     var tefcpf = jQuery('input[name="payment[pagseguro_tef_cpf]"]').val();
     var tefbank = jQuery('input[name="payment[pagseguropro_tef_bank]"]').val();
     var cpf = jQuery('input[name="payment[ps_cc_cpf]"]').val();
+    var billingCpf = jQuery('input[name="vat_id"]').val();
+    if(cpf == '' || cpf == undefined) {
+        cpf = billingCpf;
+    }
+
     var currnetSelectedPayment = jQuery('input[name="payment[method]"]:checked').attr('id');
 
-    if (boletocpf!='' && boletocpf != undefined && currnetSelectedPayment == 'rm_pagseguro_boleto') {
-		var boletocpf = jQuery('input[name="payment[pagseguro_boleto_cpf]"]').val();
-		var paymentHashes = {
-			"payment[sender_hash]": this.senderHash,
-			"ownerdata[boleto_cpf]": boletocpf,			
-		};
-	}
+    if (boletocpf != '' && boletocpf != undefined && currnetSelectedPayment == 'rm_pagseguro_boleto') {
+        var paymentHashes = {
+            "payment[sender_hash]": this.senderHash,
+            "ownerdata[boleto_cpf]": boletocpf,
+        };
+    }
 
-	if (tefcpf!='' && tefcpf != undefined && currnetSelectedPayment == 'rm_pagseguro_tef') {
-		var tefcpf = jQuery('input[name="payment[pagseguro_tef_cpf]"]').val();
-		var paymentHashes = {
-			"payment[sender_hash]": this.senderHash,
-			"ownerdata[tef_cpf]": tefcpf,
-			"ownerdata[tef_bank]": tefbank,
-		};
-	}
+    if (tefcpf != '' && tefcpf != undefined && currnetSelectedPayment == 'rm_pagseguro_tef') {
+        var paymentHashes = {
+            "payment[sender_hash]": this.senderHash,
+            "ownerdata[tef_cpf]": tefcpf,
+            "ownerdata[tef_bank]": tefbank,
+        };
+    }
 
-	if (cpf !='' && cpf != undefined && currnetSelectedPayment == 'rm_pagseguro_cc') {
-		var ccOwner = jQuery('input[name="payment[ps_cc_owner]"]').val();
-		var ccOwnerBirthDay = jQuery('input[name="payment[ps_cc_owner_birthday_day]"]').val();
-		var ccOwnerBirthMonth = jQuery('input[name="payment[ps_cc_owner_birthday_month]"]').val();
-		var ccOwnerBirthYear = jQuery('input[name="payment[ps_cc_owner_birthday_year]"]').val();
-		var cpf = jQuery('input[name="payment[ps_cc_cpf]"]').val();
-		var paymentHashes = {
-			"payment[sender_hash]": this.senderHash,
-			"payment[credit_card_token]": this.creditCardToken,
-			"payment[cc_type]": (this.brand)?this.brand.name:'',
-			"payment[is_admin]": this.config.is_admin,
-			"ownerdata[credit_card_owner]": ccOwner,
-			"ownerdata[credit_card_birthday]":ccOwnerBirthDay,
-			"ownerdata[credit_card_birthmonth]":ccOwnerBirthMonth,
-			"ownerdata[credit_card_birthyear]":ccOwnerBirthYear,
-			"ownerdata[credit_card_cpf]": cpf,
-		};	
-	}
+    if (cpf != '' && cpf != undefined && currnetSelectedPayment == 'rm_pagseguro_cc') {
+        var ccOwner = jQuery('input[name="payment[ps_cc_owner]"]').val();
+        var ccOwnerBirthDay = jQuery('input[name="payment[ps_cc_owner_birthday_day]"]').val();
+        var ccOwnerBirthMonth = jQuery('input[name="payment[ps_cc_owner_birthday_month]"]').val();
+        var ccOwnerBirthYear = jQuery('input[name="payment[ps_cc_owner_birthday_year]"]').val();
+        var paymentHashes = {
+            "payment[sender_hash]": this.senderHash,
+            "payment[credit_card_token]": this.creditCardToken,
+            "payment[cc_type]": (this.brand)?this.brand.name:'',
+            "payment[is_admin]": this.config.is_admin,
+            "ownerdata[credit_card_owner]": ccOwner,
+            "ownerdata[credit_card_birthday]":ccOwnerBirthDay,
+            "ownerdata[credit_card_birthmonth]":ccOwnerBirthMonth,
+            "ownerdata[credit_card_birthyear]":ccOwnerBirthYear,
+            "ownerdata[credit_card_cpf]": cpf,
+        };
+    }
 
     jQuery.ajax({
         url: url,
@@ -436,46 +438,45 @@ RMPagSeguro.prototype.updateInstallments = function(){
 }
 
 RMPagSeguro.prototype.removeUnavailableBanks = function() {
-	var self = this;
-	var parcelsDrop = jQuery('#pagseguropro_tef_bank');
-	parcelsDrop.empty();
-	var tefnodeName = jQuery('#pagseguropro_tef_bank').prop("nodeName");
-	if(tefnodeName != "SELECT"){
-		//se houve customizações no elemento dropdown de bancos, não selecionaremos aqui
-		return;
-	}
-	PagSeguroDirectPayment.getPaymentMethods({  
-		amount: this.grandTotal,
-		success: function (response) {
-			if (response.error == true && this.config.debug) {
-				console.log('Não foi possível obter os meios de pagamento que estão funcionando no momento.');
-				return;
-			}
-			try {
-				parcelsDrop.empty();
-				parcelsDrop.append('<option value="">Selecione o banco</option>');
-				for (y in response.paymentMethods.ONLINE_DEBIT.options) {
-					if (response.paymentMethods.ONLINE_DEBIT.options[y].status != 'UNAVAILABLE') {
-						var optName = response.paymentMethods.ONLINE_DEBIT.options[y].displayName.toString();
-						var optValue = response.paymentMethods.ONLINE_DEBIT.options[y].name.toString();
-						parcelsDrop.append('<option value="'+optValue+'">'+optName+'</option>');
-					}
-				}
+    var self = this;
+    var parcelsDrop = jQuery('#pagseguropro_tef_bank');
+    parcelsDrop.empty();
+    var tefnodeName = jQuery('#pagseguropro_tef_bank').prop("nodeName");
+    if(tefnodeName != "SELECT"){
+        //se houve customizações no elemento dropdown de bancos, não selecionaremos aqui
+        return;
+    }
+    PagSeguroDirectPayment.getPaymentMethods({
+        amount: this.grandTotal,
+        success: function (response) {
+            if (response.error == true && this.config.debug) {
+                console.log('Não foi possível obter os meios de pagamento que estão funcionando no momento.');
+                return;
+            }
+            try {
+                parcelsDrop.empty();
+                parcelsDrop.append('<option value="">Selecione o banco</option>');
+                for (y in response.paymentMethods.ONLINE_DEBIT.options) {
+                    if (response.paymentMethods.ONLINE_DEBIT.options[y].status != 'UNAVAILABLE') {
+                        var optName = response.paymentMethods.ONLINE_DEBIT.options[y].displayName.toString();
+                        var optValue = response.paymentMethods.ONLINE_DEBIT.options[y].name.toString();
+                        parcelsDrop.append('<option value="'+optValue+'">'+optName+'</option>');
+                    }
+                }
 
-				if(this.config.debug){
-					console.info('Bancos TEF atualizados com sucesso.');
-				}
-			} catch (err) {
-				console.log(err.message);
-			}
-		}
-	})
+                if(this.config.debug){
+                    console.info('Bancos TEF atualizados com sucesso.');
+                }
+            } catch (err) {
+                console.log(err.message);
+            }
+        }
+    })
 }
 
 RMPagSeguro.prototype.setCardPlaceHolderImage = function(ccPlaceholderImage){
     jQuery('.cc_number_visible').keyup(function( event ) {
         if (jQuery(this).val().length <= 0) {
-            // console.log(ccPlaceholderImage);
             jQuery(this).attr('style','background-image:url("' + ccPlaceholderImage + '") !important');
         }
     });
