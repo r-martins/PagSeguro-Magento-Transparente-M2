@@ -89,21 +89,12 @@ class Cc extends \Magento\Payment\Model\Method\Cc
 
         $this->_countryFactory = $countryFactory;
 
-        //@TODO Remove
-        // $this->_minAmount = 1;
-        // $this->_maxAmount = 999999999; 
         $this->pagSeguroHelper = $pagSeguroHelper;  
         $this->pagSeguroAbModel = $pagSeguroAbModel; 
         $this->adminSession = $adminSession;
         $this->messageManager = $messageManager;
     }
 
-    public function order(\Magento\Payment\Model\InfoInterface $payment, $amount)
-    {
-        //@TODO Review. Necessary?
-          /*@var \Magento\Sales\Model\Order $order */
-          $this->pagSeguroHelper->writeLog('Inside Order');
-    }
 
      public function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
@@ -119,7 +110,7 @@ class Cc extends \Magento\Payment\Model\Method\Cc
      * @return $this
      * @throws \Magento\Framework\Validator\Exception
      */
-    public function capture(\Magento\Payment\Model\InfoInterface $payment, $amount)
+    public function order(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
         /*@var \Magento\Sales\Model\Order $order */
         $order = $payment->getOrder();
@@ -135,13 +126,15 @@ class Cc extends \Magento\Payment\Model\Method\Cc
             if (isset($returnXml->errors)) {
                 $errMsg = array();
                 foreach ($returnXml->errors as $error) {
-                    $errMsg[] = __((string)$error->message) . '(' . $error->code . ')';
+                    $message = $this->pagSeguroHelper->translateError((string)$error->message);
+                    $errMsg[] = $message . '(' . $error->code . ')';
                 }
                 throw new \Magento\Framework\Validator\Exception('Um ou mais erros ocorreram no seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg));
             }
             if (isset($returnXml->error)) {
                 $error = $returnXml->error;
-                $errMsg[] = __((string)$error->message) . ' (' . $error->code . ')';
+                $message = $this->pagSeguroHelper->translateError((string)$error->message);
+                $errMsg[] = $message . ' (' . $error->code . ')';
                 throw new \Magento\Framework\Validator\Exception('Um erro ocorreu em seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg));
             }
             /* process return result code status*/
@@ -198,7 +191,7 @@ class Cc extends \Magento\Payment\Model\Method\Cc
             $returnXml  = $this->pagSeguroHelper->callApi($params, $payment, 'transactions/refunds');
 
             if ($returnXml === null) {
-                $errorMsg = $this->_getHelper()->__('Erro ao solicitar o reembolso.\n');
+                $errorMsg = 'Impossível gerar reembolso. Aldo deu errado.';
                 throw new \Magento\Framework\Validator\Exception($errorMsg);
             }
         } catch (\Exception $e) {

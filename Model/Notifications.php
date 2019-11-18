@@ -16,23 +16,38 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
      * PagSeguro Helper
      *
      * @var RicardoMartins\PagSeguro\Helper\Data;
-     */ 
+     */
     protected $pagSeguroHelper;
 
     /**
      * Magento Sales Order Model
      *
      * @var \Magento\Sales\Model\Order
-     */ 
+     */
     protected $orderModel;
 
     protected $orderRepository;
 
-     /**
+    /**
+     * Magento Invoice Service
+     *
+     * @var \Magento\Sales\Model\Service\InvoiceService
+     */
+
+    /** @var \Magento\Sales\Model\Service\InvoiceService  */
+    protected $invoiceService;
+
+    /** @var \Magento\Sales\Model\Order\Email\Sender\InvoiceSender  */
+    protected $invoiceSender;
+
+    /** @var \Magento\Framework\App\CacheInterface */
+    protected $cache;
+
+    /**
      * Magento transaction Factory
      *
      * @var \Magento\Framework\DB\Transaction
-     */ 
+     */
     protected $transactionFactory;
 
     public function __construct(
@@ -50,6 +65,9 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
         \Magento\Sales\Api\Data\OrderInterface $orderModel,
         \Magento\Framework\DB\Transaction $transactionFactory,
         \Magento\Sales\Model\Order\Email\Sender\OrderCommentSender $commentSender,
+        \Magento\Sales\Model\Service\InvoiceService $invoiceService,
+        \Magento\Sales\Model\Order\Email\Sender\InvoiceSender $invoiceSender,
+        \Magento\Framework\App\CacheInterface $cache,
         array $data = array()
     ) {
         parent::__construct(
@@ -65,10 +83,13 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
             $data
         );
 
-        $this->pagSeguroHelper = $pagSeguroHelper;  
+        $this->pagSeguroHelper = $pagSeguroHelper;
         $this->orderModel = $orderModel;
         $this->transactionFactory = $transactionFactory;
         $this->_commentSender = $commentSender;
+        $this->invoiceService = $invoiceService;
+        $this->invoiceSender = $invoiceSender;
+        $this->cache = $cache;
     }
 
     /**
@@ -80,10 +101,8 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
         if (isset($resultXML->error)) {
             $errMsg = __((string)$resultXML->error->message);
             throw new \Magento\Framework\Validator\Exception(
-              __(
-                    'Problemas ao processar seu pagamento. %s(%s)',
-                    $errMsg,
-                    (string)$resultXML->error->code
+                __(
+                    'Problemas ao processar seu pagamento. %s(%s)', $errMsg, (string)$resultXML->error->code
                 )
             );
         }
@@ -103,6 +122,11 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                 }
                 $payment = $order->getPayment();
             }
+
+            //PagSeguro sends the same notification multiple times in the same minute. Let's cache it and check if it's a duplicated.
+            $contentCacheId = hash('sha256', $resultXML->asXML());
+            $this->cache->save('1', $contentCacheId, ['RM_PAGSEGURO_NOTIFICATION'], 60);
+
 
             $this->_code = $payment->getMethod();
             $processedState = $this->processStatus((int)$resultXML->status);
@@ -165,17 +189,22 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                 $order->addStatusHistoryComment($message);
             }
 
-            if ((int)$resultXML->status == 3) { 
+            if ((int)$resultXML->status == 3) {
                 if(!$order->hasInvoices()){
 
-                    $invoice = $order->prepareInvoice();
-                    $invoice->register()->pay();
+                    $invoice = $this->invoiceService->prepareInvoice($order);
                     $msg = sprintf('Captured payment. Transaction Identifier: %s', (string)$resultXML->code);
                     $invoice->addComment($msg);
-                    $invoice->sendEmail(
-                        $this->pagSeguroHelper->getStoreConfigValue('payment/rm_pagseguro/send_invoice_email'),
-                        'Payment received successfully.'
-                    );
+                    $invoice->setRequestedCaptureCase(\Magento\Sales\Model\Order\Invoice::CAPTURE_ONLINE);
+                    $invoice->register();
+
+                    if ($this->pagSeguroHelper->getStoreConfigValue('payment/rm_pagseguro/send_invoice_email')) {
+                        try {
+                            $this->invoiceSender->send($invoice);
+                        } catch (\Exception $e) {
+                            $this->logger->debug(__('We can\'t send the invoice email right now.'));
+                        }
+                    }
 
                     // salva o transaction id na invoice
                     if (isset($resultXML->code)) {
@@ -185,7 +214,8 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                     $this->transactionFactory->addObject($invoice)
                         ->addObject($invoice->getOrder())
                         ->save();
-                    $order->addStatusHistoryComment(sprintf('Invoice # %s successfully created.', $invoice->getIncrementId()));
+                    $order->addStatusHistoryComment(sprintf('Invoice #%s successfully created.', $invoice->getIncrementId()));
+
                 }
             }
 
@@ -249,7 +279,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
         return $xml;
     }
 
-     /**
+    /**
      * Processes order status and return information about order status
      * @param $statusCode
      * @return Object

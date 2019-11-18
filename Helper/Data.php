@@ -1,6 +1,8 @@
 <?php
 namespace RicardoMartins\PagSeguro\Helper;
 
+use Magento\Framework\Phrase;
+
 /**
  * Class Data Helper
  *
@@ -395,16 +397,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $xmlError = $xmlError['error'];
             
 			if(isset($xmlError['code'])) {
-				$errArray[] = $xmlError['message'];
+				$errArray[] = $this->translateError($xmlError['message']);
 			} else {
 				foreach ($xmlError as $xmlErr) {					
-					$errArray[] = $xmlErr['message'];
+					$errArray[] = $this->translateError($xmlErr['message']);
 				}
 			}
             
-			$errArray = implode(",", $errArray);
+			$errArray = implode(" / ", $errArray);
             if($errArray) {
-                throw new \Magento\Framework\Validator\Exception(__($errArray));
+                throw new \Magento\Framework\Validator\Exception(new Phrase($errArray));
             }
 
             $this->setSessionVl($errArray);
@@ -1074,6 +1076,29 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $params;
     }
 
+    /**
+     * Translate dynamic words from PagSeguro errors and messages
+     * @author Ricardo Martins
+     * @return string
+     */
+    public function translateError()
+    {
+        $args = func_get_args();
+        $text = $args[0];
+        preg_match('/(.*)\:(.*)/', $text, $matches);
+        if ($matches!==false && isset($matches[1])) {
+            array_shift($matches);
+            $matches[0] .= ': %1';
+            $args = $matches;
+        }
+        return call_user_func_array('__', $args);
+    }
+  
+    /**
+     * Sends the header details.
+     * @author Ricardo Martins
+     * @return Array
+     */
     public function getHeaders()
     {
         $moduleVersion = $this->moduleList->getOne('RicardoMartins_PagSeguro')['setup_version'];

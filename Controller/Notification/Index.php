@@ -1,6 +1,7 @@
 <?php
 namespace RicardoMartins\PagSeguro\Controller\Notification;
 
+use Magento\Framework\App\CacheInterface;
 use Magento\Framework\App\CsrfAwareActionInterface;
 use Magento\Framework\App\Request\InvalidRequestException;
 use Magento\Framework\App\RequestInterface;
@@ -31,6 +32,9 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
      */ 
     protected $pagSeguroAbModel;
 
+    /** @var CacheInterface */
+    protected $cache;
+
      /**
      * @param \RicardoMartins\PagSeguro\Helper\Data $pagSeguroHelper
      * @param \RicardoMartins\PagSeguro\Model\Notifications $pagSeguroAbModel
@@ -39,11 +43,13 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
     public function __construct(
         \RicardoMartins\PagSeguro\Helper\Data $pagSeguroHelper,
         \RicardoMartins\PagSeguro\Model\Notifications $pagSeguroAbModel,
+         \Magento\Framework\App\CacheInterface $cache,
          \Magento\Framework\App\Action\Context $context
  
     ) {
         $this->pagSeguroHelper = $pagSeguroHelper;
-        $this->pagSeguroAbModel = $pagSeguroAbModel;       
+        $this->pagSeguroAbModel = $pagSeguroAbModel;
+        $this->cache = $cache;
         parent::__construct($context);
     }
         
@@ -62,6 +68,14 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
         if (false === $response) {
             throw new \Magento\Framework\Validator\Exception(new \Magento\Framework\Phrase('Failed to process PagSeguro XML return.'));
         }
+
+        //checks if it's a duplicated notification
+        $contentCacheId = hash('sha256', $response->asXML());
+        if($this->cache->load($contentCacheId)){
+            $result = $this->resultFactory->create(ResultFactory::TYPE_JSON);
+            return $result->setData(['success'=>false, 'message'=>'Duplicated Transaction. This transaction was already received in less than 60 seconds.']);
+        }
+
 
         $this->pagSeguroAbModel->proccessNotificatonResult($response);
         $result = $this->resultFactory->create(ResultFactory::TYPE_JSON);
