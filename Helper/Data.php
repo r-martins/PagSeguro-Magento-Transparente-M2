@@ -367,6 +367,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
         curl_setopt($ch, CURLOPT_USERAGENT, $this->getUserAgentDetails());
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $this->getHeaders());
 
         try{
             $response = curl_exec($ch);
@@ -1071,5 +1072,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $params['paymentMethod'] = 'eft';
         $params['bankName'] = $payment['additional_information']['tef_bank'];
         return $params;
+    }
+
+    public function getHeaders()
+    {
+        $moduleVersion = $this->moduleList->getOne('RicardoMartins_PagSeguro')['setup_version'];
+        $headers = array('Platform: Magento', 'Platform-Version: ' . $this->getMagentoVersion(), 'Module-Version: ' . $moduleVersion);
+
+        return $headers;
     }
 }
