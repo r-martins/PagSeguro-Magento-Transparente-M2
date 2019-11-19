@@ -368,7 +368,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         curl_setopt($ch, CURLOPT_TIMEOUT, 45);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($ch, CURLOPT_USERAGENT, $this->getUserAgentDetails());
         curl_setopt($ch, CURLOPT_HTTPHEADER, $this->getHeaders());
 
         try{
@@ -1030,20 +1029,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->_curl->getBody();
     }
 
-
-    /**
-     * Get environment details for usage statistics
-     * return string
-     */
-    public function getUserAgentDetails()
-    {
-        $ua = 'PagSeguro M2/';
-        $ua .= $this->moduleList->getOne('RicardoMartins_PagSeguro')['setup_version'];
-
-        $ua .= ' (Magento ' . $this->getMagentoVersion() . ')';
-        return $ua;
-    }
-    
     
     public function getBoletoApiCallParams($order, $payment)
     {
