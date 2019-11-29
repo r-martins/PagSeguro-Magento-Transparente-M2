@@ -15,7 +15,7 @@ use Magento\Framework\Phrase;
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
 
-	const XML_PATH_PAYMENT_PAGSEGURO_EMAIL              = 'payment/rm_pagseguro/merchant_email';
+    const XML_PATH_PAYMENT_PAGSEGURO_EMAIL              = 'payment/rm_pagseguro/merchant_email';
     const XML_PATH_PAYMENT_PAGSEGURO_TOKEN              = 'payment/rm_pagseguro/token';
     const XML_PATH_PAYMENT_PAGSEGURO_DEBUG              = 'payment/rm_pagseguro/debug';
     const XML_PATH_PAUMENT_PAGSEGURO_SANDBOX            = 'payment/rm_pagseguro/sandbox';
@@ -77,7 +77,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Magento\Framework\Serialize\SerializerInterface $serializer
      */
 
-	public function __construct(
+    public function __construct(
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Customer\Model\Customer $customer,
@@ -213,7 +213,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $token;
     }
 
-	/**
+    /**
      * Return serialized (json) string with module configuration
      * return string
      */
@@ -386,24 +386,23 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         curl_close($ch);
 
         $this->writeLog('Retorno PagSeguro (/'.$type.'): ' . var_export($response, true));
-
         $xml = \simplexml_load_string(trim($response));
 
         if ($xml->error->code) {
-
+            $logger->info('inside the error');
             $errArray = array();
             $xmlError = json_decode(json_encode($xml), true);
             $xmlError = $xmlError['error'];
             
-			if(isset($xmlError['code'])) {
-				$errArray[] = $this->translateError($xmlError['message']);
-			} else {
-				foreach ($xmlError as $xmlErr) {					
-					$errArray[] = $this->translateError($xmlErr['message']);
-				}
-			}
+            if(isset($xmlError['code'])) {
+                $errArray[] = $this->translateError($xmlError['message']);
+            } else {
+                foreach ($xmlError as $xmlErr) {
+                    $errArray[] = $this->translateError($xmlErr['message']);
+                }
+            }
             
-			$errArray = implode(" / ", $errArray);
+            $errArray = implode(" / ", $errArray);
             if($errArray) {
                 throw new \Magento\Framework\Validator\Exception(new Phrase($errArray));
             }
@@ -1090,5 +1089,45 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $headers = array('Platform: Magento', 'Platform-Version: ' . $this->getMagentoVersion(), 'Module-Version: ' . $moduleVersion);
 
         return $headers;
+    }
+
+    /**
+     *  Returns associative array with required parameters to API, used on in redirect payment method
+     * @param $order
+     * @param $payment
+     *
+     * @return array
+     */
+    public function getRedirectParams($order, $payment)
+    {
+        $phone = $this->extractPhone($order->getBillingAddress()->getTelephone());
+
+        if ($order->getCustomerIsGuest()) {
+            $senderName = $this->removeDuplicatedSpaces(
+            sprintf('%s %s', $order->getBillingAddress()->getFirstname(), $order->getBillingAddress()->getLastname())
+            );
+        } else {
+            $senderName = $this->removeDuplicatedSpaces(
+                sprintf('%s %s', $order->getCustomerFirstname(), $order->getCustomerLastname())
+            );
+        }
+
+        $senderName = substr($senderName, 0, 50);
+        $enableRecover = $this->scopeConfig->getValue('payment/rm_pagseguro_pagar_no_pagseguro/enable_recovery') ? 'true' : 'false';
+
+        $params['acceptPaymentMethodGroup'] = $this->scopeConfig->getValue('payment/rm_pagseguro_pagar_no_pagseguro/accepted_groups');
+        $params['email'] = $this->getMerchantEmail();
+        $params['reference'] = $order->getIncrementId();
+        $params['senderName'] = $senderName;
+        $params['senderAreaCode'] = $phone['area'];
+        $params['senderPhone'] = $phone['number'];
+        $params['senderEmail'] = trim($order->getCustomerEmail());
+        $params['enableRecover'] = $enableRecover;
+        $params['shippingAddressRequired'] = 'false';
+        $params['paymentMethod'] = 'redirect';
+        $params['currency'] = 'BRL';
+        $params = array_merge($params, $this->getItemsParams($order));
+
+        return $params;
     }
 }

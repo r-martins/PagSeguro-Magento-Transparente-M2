@@ -53,6 +53,14 @@
                                                                         </item>
                                                                     </item>
                                                                 </item>
+                                                                <item name="pagseguro_rm_pagseguro_pagar_no_pagseguro" xsi:type="array">
+                                                                    <item name="component" xsi:type="string">RicardoMartins_PagSeguro/js/view/payment/rm_pagseguro_pagar_no_pagseguro</item>
+                                                                    <item name="methods" xsi:type="array">
+                                                                        <item name="rm_pagseguro_pagar_no_pagseguro" xsi:type="array">
+                                                                            <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                                        </item>
+                                                                    </item>
+                                                                </item>
 															</item>                                                            
                                                         </item>
                                                     </item>

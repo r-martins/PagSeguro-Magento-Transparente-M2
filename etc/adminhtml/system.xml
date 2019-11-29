@@ -159,6 +159,43 @@
                     <frontend_class>validate-number</frontend_class>
                 </field>
             </group>
+            <!-- Pagar no PagSeguro -->
+            <group id="rm_pagseguro_pagar_no_pagseguro" translate="label" sortOrder="21" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>PagSeguro - Pagar no PagSeguro - Ricardo Martins</label>
+                <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="title" translate="label" type="text" sortOrder="2" showInDefault="2" showInWebsite="1" showInStore="1">
+                    <label>Title</label>
+                </field>
+                <field id="description" translate="label" type="textarea" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Description</label>
+                </field>
+                <field id="order_status" translate="label" type="select" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>New Order Status</label>
+                    <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
+                </field>
+                <field id="accepted_groups" translate="label" type="multiselect" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Pagamentos aceitos</label>
+                    <source_model>RicardoMartins\PagSeguro\Model\System\Config\Source\Paymentgroups</source_model>
+                </field>
+                <field id="enable_recovery" translate="label" type="select" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Recuperação de pedido</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Obs: Caso a conta PagSeguro estiver com a opção recuperação de carrinho desabilitada, não será possível habilitá-la por aqui.
+                    </comment>
+                </field>
+                <field id="disable_frontend" translate="label" type="select" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Desabilitar no front end</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Ao ativar esta opção este método ficará disponível apenas no admin</comment>
+                </field>
+                <field id="sort_order" translate="label comment" type="text" sortOrder="8" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Sort Order</label>
+                    <frontend_class>validate-number</frontend_class>
+                </field>
+            </group>
         </section>
     </system>
 </config>

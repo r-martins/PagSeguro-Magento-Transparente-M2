@@ -67,6 +67,13 @@ class Info extends \Magento\Payment\Block\Info
 						'texto' => 'Clique aqui para realizar o pagamento',
 					);
 				break;
+                case 'rm_pagseguro_pagar_no_pagseguro':
+                    return array(
+                        'tipo' => 'Redirect',
+                        'url' => $payment->getAdditionalInformation('redirectUrl'),
+                        'texto' => 'Clique aqui para pagar no PagSeguro',
+                    );
+                break;
 			}
 		}
         return false;
