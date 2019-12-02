@@ -3,10 +3,9 @@ define(
         'Magento_Checkout/js/view/payment/default',
         'mage/url',
         'Magento_Checkout/js/action/place-order',
-        'RicardoMartins_PagSeguro/js/action/set-payment-method-action',
         'Magento_Checkout/js/model/payment-service',
     ],
-    function (Component,url,placeOrder,setPaymentMethodAction,paymentService) {
+    function (Component,url,placeOrder,paymentService) {
         'use strict';
 
         return Component.extend({
@@ -32,7 +31,6 @@ define(
             getInstructions: function () {
                 return window.checkoutConfig.payment[this.getCode()].description;
             }
-           
         });
     }
 );

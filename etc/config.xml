@@ -48,10 +48,10 @@
                 <order_status>pending</order_status>
                 <description><![CDATA[Você será redirecionado para o PagSeguro onde poderá escolher a forma de pagamento desejada.]]></description>
                 <payment_action>order</payment_action>
-               <!--  <sort_order>4</sort_order>
+                <sort_order>4</sort_order>
                 <enable_recovery>1</enable_recovery>
                 <disable_frontend>0</disable_frontend>
-                <accepted_groups>CREDIT_CARD,BOLETO</accepted_groups> -->
+                <accepted_groups>CREDIT_CARD,BOLETO</accepted_groups>
                 <model>RicardoMartins\PagSeguro\Model\Method\Redirect</model>
             </rm_pagseguro_pagar_no_pagseguro>
         </payment>

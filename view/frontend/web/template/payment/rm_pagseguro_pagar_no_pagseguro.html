@@ -6,8 +6,8 @@
                data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()"/>
         <label data-bind="attr: {'for': getCode()}" class="label"><span data-bind="text: getTitle()"></span></label>
     </div>
-    <p data-bind="html: getInstructions()" id="pagseguro_redirect_message"></p>
     <div class="payment-method-content" id="pagseguro_redirect_method">
+        <p data-bind="html: getInstructions()" id="pagseguro_redirect_message"></p>
         <!-- ko foreach: getRegion('messages') -->
         <!-- ko template: getTemplate() --><!-- /ko -->
         <!--/ko-->

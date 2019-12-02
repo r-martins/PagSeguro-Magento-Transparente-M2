@@ -389,8 +389,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $xml = \simplexml_load_string(trim($response));
 
         if ($xml->error->code) {
-            $logger->info('inside the error');
-            $errArray = array();
+                $errArray = array();
             $xmlError = json_decode(json_encode($xml), true);
             $xmlError = $xmlError['error'];
             
