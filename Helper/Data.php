@@ -355,9 +355,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $params = $paramsObj->getParams();
         $paramsString = $this->convertToCURLString($params);
 
-        $this->writeLog('Parameters being sent to API (/'.$type.'): '. var_export($params, true));
+        $this->writeLog('Parameters being sent to API (/v2/'.$type.'): '. var_export($params, true));
 
-        $this->writeLog('WSDL URL:'.$this->getWsUrl($type));
 
         //@TODO Remove curl
         $ch = curl_init();

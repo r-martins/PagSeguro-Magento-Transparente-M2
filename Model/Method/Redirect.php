@@ -99,10 +99,6 @@ class Redirect extends AbstractMethod
     
     public function order(InfoInterface $payment, $amount)
     {
-        //@TODO Review. Necessary?
-        /*@var \Magento\Sales\Model\Order $order */
-        $this->pagSeguroHelper->writeLog('Inside Order');
-      
         /*@var \Magento\Sales\Model\Order $order */
         $order = $payment->getOrder();
         try {
