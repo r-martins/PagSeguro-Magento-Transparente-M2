@@ -41,7 +41,6 @@ class Redirect extends AbstractMethod
     protected $_canSaveCc               = false;
     protected $_supportedCurrencyCodes  = array('BRL');
     protected $_infoBlockType           = \RicardoMartins\PagSeguro\Block\Payment\Info::class;
-    protected $_formBlockType           = \RicardoMartins\PagSeguro\Block\Form\Redirect::class;
     protected $_debugReplacePrivateDataKeys = ['number', 'exp_month', 'exp_year', 'cvc'];
     /**
      * PagSeguro Helper
