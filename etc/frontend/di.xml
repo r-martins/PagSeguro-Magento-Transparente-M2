@@ -10,7 +10,8 @@
     <type name="Magento\Checkout\Model\CompositeConfigProvider">
         <arguments>
             <argument name="configProviders" xsi:type="array">
-                <item name="rm_pagseguro_config_provider" xsi:type="object">RicardoMartins\PagSeguro\Model\AdditionalConfigProvider</item>
+                <item name="rm_pagseguro_cc_config_provider" xsi:type="object">RicardoMartins\PagSeguro\Model\ConfigProvider</item>\
+                <item name="rm_pagseguro_redirect_config_provider" xsi:type="object">RicardoMartins\PagSeguro\Model\AdditionalConfigProvider</item>
             </argument>
         </arguments>
     </type>
