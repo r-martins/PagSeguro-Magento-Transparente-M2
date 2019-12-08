@@ -556,20 +556,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         $phone = $this->extractPhone($order->getBillingAddress()->getTelephone());
 
-        if($order->getCustomerIsGuest()){
-            $senderName = $this->removeDuplicatedSpaces(
-            sprintf('%s %s', $order->getBillingAddress()->getFirstname(), $order->getBillingAddress()->getLastname())
-            );
-        }else{
-             $senderName = $this->removeDuplicatedSpaces(
-            sprintf('%s %s', $order->getCustomerFirstname(), $order->getCustomerLastname())
-            );
-        }
-
-        $senderName = substr($senderName, 0, 50);
-
         $return = array(
-            'senderName'    => $senderName,
+            'senderName'    => $this->getSenderName($order),
             'senderEmail'   => trim($order->getCustomerEmail()),
             'senderHash'    => $this->getPaymentHash('sender_hash'),
             'senderCPF'     => $digits->filter($cpf),
@@ -652,7 +640,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         //address attributes
         /** @var Mage_Sales_Model_Order_Address $address */
         $address = ($type=='shipping' && !$order->getIsVirtual()) ?
-            $order->getShippingAddress() : $order->getBillingAddress();
+        $order->getShippingAddress() : $order->getBillingAddress();
         $addressStreetAttribute = $this->scopeConfig->getValue('payment/rm_pagseguro/address_street_attribute');
         $addressNumberAttribute = $this->scopeConfig->getValue('payment/rm_pagseguro/address_number_attribute');
         $addressComplementAttribute = $this->scopeConfig->getValue('payment/rm_pagseguro/address_complement_attribute');
@@ -1100,6 +1088,39 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $phone = $this->extractPhone($order->getBillingAddress()->getTelephone());
 
+        $enableRecover = $this->scopeConfig->getValue('payment/rm_pagseguro_pagar_no_pagseguro/enable_recovery') ? 'true' : 'false';
+        $paymentAcceptedGroups = $this->scopeConfig->getValue('payment/rm_pagseguro_pagar_no_pagseguro/accepted_groups');
+
+        $params = array(
+            'email' => $this->getMerchantEmail(),
+            'paymentMethod' => 'redirect',
+            'currency' => 'BRL',
+            'reference' => $order->getIncrementId(),
+            'extraAmount' => $this->getExtraAmount($order),
+            'senderName' => $this->getSenderName($order),
+            'senderAreaCode' => $phone['area'],
+            'senderPhone' => $phone['number'],
+            'senderEmail' => trim($order->getCustomerEmail()),
+            'enableRecover' => $enableRecover,
+            'shippingAddressRequired' => '',
+            'acceptPaymentMethodGroup' => $paymentAcceptedGroups,
+        );
+
+        $params = array_merge($params, $this->getItemsParams($order));
+        $params = array_merge($params, $this->getAddressParams($order, 'shipping'));
+        $params = array_merge($params, $this->getAddressParams($order, 'billing'));
+
+        return $params;
+    }
+
+    /**
+     *  Returns Sender Name
+     * @param $order
+     *
+     * @return string
+     */
+    public function getSenderName($order)
+    {
         if ($order->getCustomerIsGuest()) {
             $senderName = $this->removeDuplicatedSpaces(
             sprintf('%s %s', $order->getBillingAddress()->getFirstname(), $order->getBillingAddress()->getLastname())
@@ -1111,21 +1132,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         $senderName = substr($senderName, 0, 50);
-        $enableRecover = $this->scopeConfig->getValue('payment/rm_pagseguro_pagar_no_pagseguro/enable_recovery') ? 'true' : 'false';
 
-        $params['acceptPaymentMethodGroup'] = $this->scopeConfig->getValue('payment/rm_pagseguro_pagar_no_pagseguro/accepted_groups');
-        $params['email'] = $this->getMerchantEmail();
-        $params['reference'] = $order->getIncrementId();
-        $params['senderName'] = $senderName;
-        $params['senderAreaCode'] = $phone['area'];
-        $params['senderPhone'] = $phone['number'];
-        $params['senderEmail'] = trim($order->getCustomerEmail());
-        $params['enableRecover'] = $enableRecover;
-        $params['shippingAddressRequired'] = 'false';
-        $params['paymentMethod'] = 'redirect';
-        $params['currency'] = 'BRL';
-        $params = array_merge($params, $this->getItemsParams($order));
-
-        return $params;
+        return $senderName;
     }
 }
