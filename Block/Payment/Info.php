@@ -66,7 +66,7 @@ class Info extends \Magento\Framework\View\Element\Template
 					);
 				break;
 			}
-		}	
+		}
         return false;
     }
 }

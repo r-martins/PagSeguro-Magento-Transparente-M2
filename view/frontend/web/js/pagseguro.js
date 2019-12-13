@@ -2,7 +2,7 @@
  * PagSeguro Transparente para Magento
  * @author Ricardo Martins <pagseguro-transparente@ricardomartins.net.br>
  * @link http://bit.ly/pagseguromagento
- * @version 1.0.0
+ * @version 2.1.0
  */
 
 function RMPagSeguro(config) {
