@@ -85,11 +85,11 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
 			}	
 		});
 		
-		jQuery( "#pagseguro_boleto_method .actions-toolbar .checkout" ).on("click", function() { 
+		/* jQuery( "#pagseguro_boleto_method .actions-toolbar .checkout" ).on("click", function() { 
 			if(boletocpf.val()!=''){
 				obj.updatePaymentHashes();
 			}	
-		});
+		}); */
 		
 		jQuery( "#pagseguro_tef_method .actions-toolbar .checkout" ).on("click", function() { 
 			if(tefcpf.val()!=''){
