@@ -120,12 +120,6 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
                 obj.updateCreditCardToken();
             }
         });
-
-        jQuery( "#pagseguro_boleto_method .actions-toolbar .checkout" ).on("click", function() {
-            if(boletocpf.val()!=''){
-                obj.updatePaymentHashes();
-            }
-        });
         
         jQuery( "#pagseguro_tef_method .actions-toolbar .checkout" ).on("click", function() {
             if(tefcpf.val()!=''){
