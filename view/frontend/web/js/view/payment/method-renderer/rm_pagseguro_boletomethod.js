@@ -76,10 +76,14 @@ define(
 
                 return false;
             },
-
             updatePaymentHashes: function(senderHash){
                 var url = urlBuilder.build('pseguro/ajax/updatePaymentHashes');
                 var boletocpf = $('input[name="payment[pagseguro_boleto_cpf]"]').val();
+                var billingCpf = $('input[name="vat_id"]').val();
+
+                if (boletocpf == '' || boletocpf == undefined) {
+                    boletocpf = billingCpf;
+                }
 
                 var currnetSelectedPayment = $('input[name="payment[method]"]:checked').attr('id');
 

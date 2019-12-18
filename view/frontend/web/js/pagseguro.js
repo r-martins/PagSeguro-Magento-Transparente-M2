@@ -58,7 +58,6 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
         var ccExpYrElm = jQuery('input[name="payment[ps_cc_exp_year]"]');
         var ccCvvElm = jQuery('input[name="payment[ps_cc_cid]"]');
         var cpf = jQuery('input[name="payment[ps_cc_cpf]"]');
-        var boletocpf = jQuery('input[name="payment[pagseguro_boleto_cpf]"]');
         var tefcpf = jQuery('input[name="payment[pagseguro_tef_cpf]"]');
         var ccExpYrVisibileElm = jQuery('#rm_pagseguro_cc_cc_year_visible');
         var ccNumVisibleElm = jQuery('.cc_number_visible');
@@ -244,23 +243,19 @@ RMPagSeguro.prototype.updateBrand = function(){
 RMPagSeguro.prototype.updatePaymentHashes = function(){
     var self = this;
     var url = self.storeUrl +'pseguro/ajax/updatePaymentHashes';
-    var boletocpf = jQuery('input[name="payment[pagseguro_boleto_cpf]"]').val();
     var tefcpf = jQuery('input[name="payment[pagseguro_tef_cpf]"]').val();
     var tefbank = jQuery('input[name="payment[pagseguropro_tef_bank]"]').val();
     var cpf = jQuery('input[name="payment[ps_cc_cpf]"]').val();
     var billingCpf = jQuery('input[name="vat_id"]').val();
-    if(cpf == '' || cpf == undefined) {
+    if (cpf == '' || cpf == undefined) {
         cpf = billingCpf;
     }
 
-    var currnetSelectedPayment = jQuery('input[name="payment[method]"]:checked').attr('id');
-
-    if (boletocpf != '' && boletocpf != undefined && currnetSelectedPayment == 'rm_pagseguro_boleto') {
-        var paymentHashes = {
-            "payment[sender_hash]": this.senderHash,
-            "ownerdata[boleto_cpf]": boletocpf,
-        };
+    if (tefcpf == '' || tefcpf == undefined) {
+        tefcpf = billingCpf;
     }
+
+    var currnetSelectedPayment = jQuery('input[name="payment[method]"]:checked').attr('id');
 
     if (tefcpf != '' && tefcpf != undefined && currnetSelectedPayment == 'rm_pagseguro_tef') {
         var paymentHashes = {
