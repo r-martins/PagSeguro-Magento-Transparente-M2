@@ -148,7 +148,7 @@ class Boleto extends \Magento\Payment\Model\Method\AbstractMethod
 					throw new \Magento\Framework\Validator\Exception('An error occurred in your payment.');
 				}
 
-				$payment->setSkipOrderProcessing(true);
+				$payment->setSkipOrderProcessing(false);
 
 				if (isset($returnXml->code)) {
 
