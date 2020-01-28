@@ -50,6 +50,9 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
      */
     protected $transactionFactory;
 
+    /** @var \Magento\Sales\Model\Order */
+    protected $orderData;
+
     public function __construct(
         \Magento\Framework\Model\Context $context,
         \Magento\Framework\Registry $registry,
@@ -68,6 +71,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
         \Magento\Sales\Model\Service\InvoiceService $invoiceService,
         \Magento\Sales\Model\Order\Email\Sender\InvoiceSender $invoiceSender,
         \Magento\Framework\App\CacheInterface $cache,
+        \Magento\Sales\Model\Order $orderData,
         array $data = array()
     ) {
         parent::__construct(
@@ -90,6 +94,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
         $this->invoiceService = $invoiceService;
         $this->invoiceSender = $invoiceSender;
         $this->cache = $cache;
+        $this->orderData = $orderData;
     }
 
     /**
@@ -166,6 +171,9 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
 
                 $order->setState(\Magento\Sales\Model\Order::STATE_CANCELED);
                 $order->setStatus(\Magento\Sales\Model\Order::STATE_CANCELED);
+
+                $cancelOrder = $this->orderData->load($order->getId());
+                $cancelOrder->cancel()->save();
             }
 
             if ($processedState->getStateChanged()) {
