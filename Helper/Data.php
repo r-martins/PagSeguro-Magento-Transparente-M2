@@ -385,6 +385,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         curl_close($ch);
 
         $this->writeLog('Retorno PagSeguro (/'.$type.'): ' . var_export($response, true));
+        libxml_use_internal_errors(true);
         $xml = \simplexml_load_string(trim($response));
 
         if ($xml->error->code) {
@@ -423,7 +424,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                     $this->writeLog('Unexpected return of PagSeguro. Return: ' . $response);
             }
             throw new \Magento\Framework\Validator\Exception(
-                'There was a problem processing your request / payment. Please contact us.'
+                new Phrase('There was a problem processing your request / payment. Please contact us.')
             );
         }
 
