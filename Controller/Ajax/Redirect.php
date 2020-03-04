@@ -1,7 +1,7 @@
 <?php
 namespace RicardoMartins\PagSeguro\Controller\Ajax;
 use Magento\Framework\Controller\ResultFactory;
-use Magento\Framework\View\Result\PageFactory;
+use Magento\Framework\Phrase;
 
 /**
  * Class Redirect
@@ -24,25 +24,33 @@ class Redirect extends \Magento\Framework\App\Action\Action
     /** @var \Magento\Framework\Serialize\SerializerInterface  */
     protected $serializer;
 
-    protected $resultRedirect;
+    protected $result;
+
+    /** @var \Magento\Framework\Message\Manager  */
+    protected $messageManager;
 
     /**
      * @param \Magento\Checkout\Model\Session                  $checkoutSession
      * @param \Magento\Framework\App\Action\Context            $context
      * @param \Magento\Framework\Serialize\SerializerInterface $serializer
+     * @param ResultFactory                                    $result
+     * @param \Magento\Sales\Api\Data\OrderInterfaceFactory    $orderFactory
+     * @param \Magento\Framework\Message\Manager               $messageManager
      */
     public function __construct(
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Framework\App\Action\Context $context,
         \Magento\Framework\Serialize\SerializerInterface $serializer,
         \Magento\Framework\Controller\ResultFactory $result,
-        \Magento\Sales\Api\Data\OrderInterfaceFactory $orderFactory
+        \Magento\Sales\Api\Data\OrderInterfaceFactory $orderFactory,
+        \Magento\Framework\Message\Manager $messageManager
  
     ) {
         $this->checkoutSession = $checkoutSession;
-        $this->resultRedirect = $result;
+        $this->result = $result;
         $this->serializer = $serializer;
         $this->orderFactory = $orderFactory;
+        $this->messageManager = $messageManager;
         parent::__construct($context);
     }
 
@@ -51,9 +59,14 @@ class Redirect extends \Magento\Framework\App\Action\Action
     {
         $lastorderId = $this->checkoutSession->getLastRealOrderId();
         $order = $this->orderFactory->create()->loadByIncrementId($lastorderId);
+        if (!$order->getPayment()) {
+            $this->messageManager->addErrorMessage(new Phrase('Something went wrong when placing the order with PagSeguro. Please try again.'));
+            $resultRedirect = $this->result->create(ResultFactory::TYPE_REDIRECT);
+            return $resultRedirect->setUrl($this->_redirect->getRefererUrl());
+        }
         $url = $order->getPayment()->getAdditionalInformation('redirectUrl');
 
-        $resultRedirect = $this->resultRedirect->create(\Magento\Framework\Controller\ResultFactory::TYPE_REDIRECT);
+        $resultRedirect = $this->result->create(ResultFactory::TYPE_REDIRECT);
         $resultRedirect->setUrl($url);
 
         return $resultRedirect;
