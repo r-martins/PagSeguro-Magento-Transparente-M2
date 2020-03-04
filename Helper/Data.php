@@ -385,6 +385,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         curl_close($ch);
 
         $this->writeLog('Retorno PagSeguro (/'.$type.'): ' . var_export($response, true));
+        libxml_use_internal_errors(true);
         $xml = \simplexml_load_string(trim($response));
 
         if ($xml->error->code) {
@@ -409,21 +410,23 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         if (false === $xml) {
+            $errMsg = 'There was a problem processing your request / payment. Please contact us.';
             switch($response){
                 case 'Unauthorized':
                     $this->writeLog(
-                        'Token / email not authorized by PagSeguro. Check your settings on the panel.'
+                        'Token / email não autorizado no PagSeguro. Verifique as configurações do módulo.'
                     );
                     break;
                 case 'Forbidden':
-                    $this->writeLog('Unauthorized access to Api Pagseguro. Make sure you have permission to  use this service. Return: ' . var_export($response, true)
+                    $this->writeLog('Acesso não autorizado à API do PagSeguro. Veja se você tem permissão e se a chave usada pertence à esta conta. Retorno do PagSeguro: ' . var_export($response, true)
                     );
                     break;
                 default:
-                    $this->writeLog('Unexpected return of PagSeguro. Return: ' . $response);
+                    $this->writeLog('Retorno inesperado do PagSeguro: ' . $response);
+                    $errMsg = 'There was a problem with PagSeguro communication. Could you try again?';
             }
             throw new \Magento\Framework\Validator\Exception(
-                'There was a problem processing your request / payment. Please contact us.'
+                new Phrase($errMsg)
             );
         }
 
