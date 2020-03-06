@@ -60,7 +60,9 @@ class Redirect extends \Magento\Framework\App\Action\Action
         $lastorderId = $this->checkoutSession->getLastRealOrderId();
         $order = $this->orderFactory->create()->loadByIncrementId($lastorderId);
         if (!$order->getPayment()) {
-            $this->messageManager->addErrorMessage(new Phrase('Something went wrong when placing the order with PagSeguro. Please try again.'));
+            $this->messageManager->addErrorMessage(
+                new Phrase('Something went wrong when placing the order with PagSeguro. Please try again.')
+            );
             $resultRedirect = $this->result->create(ResultFactory::TYPE_REDIRECT);
             return $resultRedirect->setUrl($this->_redirect->getRefererUrl());
         }

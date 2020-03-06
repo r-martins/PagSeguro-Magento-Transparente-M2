@@ -5,6 +5,8 @@ use Magento\Payment\Model\Method\AbstractMethod;
 use Magento\Payment\Model\InfoInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Api\Data\CartInterface;
+use Magento\Sales\Model\Order;
+
 /**
  * Class Redirect
  *
@@ -129,12 +131,13 @@ class Redirect extends AbstractMethod
             $payment->setSkipOrderProcessing(true);
 
             if (isset($returnXml->code)) {
-                
                 $code = (string)$returnXml->code;
                 $redirUrl = 'https://pagseguro.uol.com.br/v2/checkout/payment.html?code=' . $code;
                 $payment->setAdditionalInformation(array('redirectUrl' => $redirUrl));
                 //$order->queueNewOrderEmail();
                 $this->setRedirectUrl($redirUrl);
+                $order->setStatus($this->getConfigData('order_status'));
+                $order->setState(Order::STATE_NEW);
             }
             
         } catch (\Exception $e) {
