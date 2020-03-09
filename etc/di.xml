@@ -12,4 +12,5 @@
             <argument name="customLogger" xsi:type="object">PagSeguroLogger</argument>
         </arguments>
     </type>
+    <preference for="Magento\Sales\Model\CronJob\CleanExpiredOrders" type="RicardoMartins\PagSeguro\Model\CronJob\CleanExpiredOrders"/>
 </config>
