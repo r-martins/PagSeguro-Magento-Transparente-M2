@@ -508,7 +508,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         //Discounting gift products
-        $orderItems = $order->getAllVisibleItems();
+        $orderItems = $this->getAllVisibleItems($order);
         foreach ($orderItems as $item) {
             if ($item->getPrice() == 0) {
                 $extra -= 0.01 * $item->getQtyOrdered();
@@ -525,7 +525,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getItemsParams(\Magento\Sales\Model\Order $order)
     {
         $return = array();
-        $items = $order->getAllVisibleItems();
+        $items = $this->getAllVisibleItems($order);
         if ($items) {
             $itemsCount = count($items);
             for ($x=1, $y=0; $x <= $itemsCount; $x++, $y++) {
@@ -805,7 +805,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $extraAmount = $discount + $taxAmount;
 
         $totalAmount = 0;
-        foreach ($order->getAllVisibleItems() as $item) {
+        foreach ($this->getAllVisibleItems($order) as $item) {
             $totalAmount += $item->getRowTotal();
         }
         return (abs($extraAmount) == $totalAmount);
@@ -1137,5 +1137,22 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $senderName = substr($senderName, 0, 50);
 
         return $senderName;
+    }
+
+    /**
+     * Retrieves visible products of the order, omitting its children (yes, this is different than Magento's method)
+     * @param Magento\Sales\Model\Order $order
+     *
+     * @return array
+     */
+    public function getAllVisibleItems($order)
+    {
+        $items = [];
+        foreach ($order->getItems() as $item) {
+            if (!$item->isDeleted() && !$item->getParentItem()) {
+                $items[] = $item;
+            }
+        }
+        return $items;
     }
 }
