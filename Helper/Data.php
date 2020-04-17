@@ -1107,6 +1107,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'enableRecover' => $enableRecover,
             'shippingAddressRequired' => '',
             'acceptPaymentMethodGroup' => $paymentAcceptedGroups,
+            'notificationURL'   => $this->getStoreUrl().'pseguro/notification/index',
         );
 
         $params = array_merge($params, $this->getItemsParams($order));
