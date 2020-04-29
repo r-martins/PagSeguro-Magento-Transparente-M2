@@ -1110,6 +1110,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'notificationURL'   => $this->getStoreUrl().'pseguro/notification/index',
         );
 
+        $redirectURL = $this->scopeConfig->getValue('payment/rm_pagseguro_pagar_no_pagseguro/redirectURL');
+        if ($redirectURL) {
+            $params['redirectURL'] = $this->_urlBuilder->getUrl($redirectURL);
+        }
+
         $params = array_merge($params, $this->getItemsParams($order));
         $params = array_merge($params, $this->getAddressParams($order, 'shipping'));
         $params = array_merge($params, $this->getAddressParams($order, 'billing'));

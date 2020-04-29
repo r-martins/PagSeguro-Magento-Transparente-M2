@@ -235,3 +235,4 @@
 "There was a problem processing your request / payment. Please contact us.","Houve um problema ao processar sua requisição / pagamento. Por favor entre em contato conosco."
 "There was a problem with PagSeguro communication. Could you try again?","Houve um problema de comunicação com o PagSeguro. Você poderia tentar novamente?"
 "Something went wrong when placing the order with PagSeguro. Please try again.","Algo deu errado ao enviar o pedido ao PagSeguro. Por favor, tente novamente."
+"Success URL","URL de Sucesso"
