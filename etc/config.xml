@@ -45,6 +45,7 @@
             <rm_pagseguro_pagar_no_pagseguro>
                 <active>1</active>
                 <title>PagSeguro - Pagar no PagSeguro</title>
+                <redirectURL>checkout/onepage/success</redirectURL>
                 <order_status>pending</order_status>
                 <description><![CDATA[Você será redirecionado para o PagSeguro onde poderá escolher a forma de pagamento desejada.]]></description>
                 <payment_action>order</payment_action>

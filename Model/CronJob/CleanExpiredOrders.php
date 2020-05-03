@@ -1,0 +1,61 @@
+<?php
+
+namespace RicardoMartins\PagSeguro\Model\CronJob;
+
+use Magento\Sales\Api\OrderManagementInterface;
+use Magento\Sales\Model\Order;
+use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
+use Magento\Store\Model\StoresConfig;
+
+/**
+ * Class CleanExpiredOrders - Avoiding automatic order cancellation for PagSeguro
+ *
+ * @see       http://bit.ly/pagseguromagento Official Website
+ * @author    Ricardo Martins (and others) <pagseguro-transparente@ricardomartins.net.br>
+ * @copyright 2018-2019 Ricardo Martins
+ * @license   https://www.gnu.org/licenses/gpl-3.0.pt-br.html GNU GPL, version 3
+ */
+class CleanExpiredOrders extends \Magento\Sales\Model\CronJob\CleanExpiredOrders
+{
+    /**
+     * @var StoresConfig
+     */
+    protected $storesConfig;
+
+    /**
+     * @var CollectionFactory
+     */
+    protected $orderCollectionFactory;
+
+    /**
+     * @var OrderManagementInterface
+     */
+    private $orderManagement;
+
+    /** @inheritDoc */
+    public function execute()
+    {
+        $lifetimes = $this->storesConfig->getStoresConfigByPath('sales/orders/delete_pending_after');
+        foreach ($lifetimes as $storeId => $lifetime) {
+            /** @var $orders \Magento\Sales\Model\ResourceModel\Order\Collection */
+            $orders = $this->orderCollectionFactory->create();
+            $orders->addFieldToFilter('store_id', $storeId);
+            $orders->addFieldToFilter('status', Order::STATE_PENDING_PAYMENT);
+            $orders->getSelect()->joinLeft(
+                ['payment' => 'sales_order_payment'],
+                'payment.parent_id = main_table.entity_id',
+                ['payment_method' => 'payment.method']
+            );
+
+            //avoids automatically order cancellation in orders made with rm_pagseguro*
+            $orders->getSelect()->where(
+                new \Zend_Db_Expr('TIME_TO_SEC(TIMEDIFF(CURRENT_TIMESTAMP, `updated_at`)) >= ' . $lifetime * 60)
+            )
+                ->where('payment.method NOT LIKE \'rm_pagseguro%\'');
+
+            foreach ($orders->getAllIds() as $entityId) {
+                $this->orderManagement->cancel((int)$entityId);
+            }
+        }
+    }
+}

@@ -2,7 +2,7 @@
 
 ### Instalação
 #### 1. Autorize sua loja 
-Acesse http://r-martins.github.io/PagSeguro-Magento-Transparente/magento2/wizard.html e autorize sua loja PagSeguro.
+Acesse https://pagseguro.ricardomartins.net.br/magento2/wizard.html e autorize sua loja PagSeguro.
 
 #### 2. Instale o módulo via composer
  
@@ -28,7 +28,7 @@ Se preferir, assista o passo a passo de instalação:
 [![ASSISTA O PASSO A PASSO DE INSTALAÇÃO](https://img.youtube.com/vi/DQJ3W9Qfn58/0.jpg)](https://www.youtube.com/watch?v=DQJ3W9Qfn58)
 
 ### Site Oficial
-http://r-martins.github.io/PagSeguro-Magento-Transparente/
+https://pagseguro.ricardomartins.net.br/
 
 ### Central de ajuda e suporte
 https://pagsegurotransparente.zendesk.com/hc/pt-br/
@@ -37,4 +37,4 @@ https://pagsegurotransparente.zendesk.com/hc/pt-br/
 https://github.com/r-martins/PagSeguro-Magento-Transparente-M2/issues
 
 ### Autor
-Ricardo Martins / [Magenteiro.com](https://www.magenteiro.com/cursos) / [Contribuidores especiais](https://github.com/r-martins/PagSeguro-Magento-Transparente-M2/pulls?utf8=%E2%9C%93&q=is%3Apr+is%3Amerged)
+Ricardo Martins / [Magenteiro.com](https://www.magenteiro.com/) / [Contribuidores especiais](https://github.com/r-martins/PagSeguro-Magento-Transparente-M2/pulls?utf8=%E2%9C%93&q=is%3Apr+is%3Amerged)
