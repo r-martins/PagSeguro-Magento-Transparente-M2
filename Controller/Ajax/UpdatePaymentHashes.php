@@ -46,15 +46,14 @@ class UpdatePaymentHashes extends \Magento\Framework\App\Action\Action
     {
         $resultJson = $this->resultFactory->create(ResultFactory::TYPE_JSON);     
         try{
-            $params = $this->getRequest()->getPost('payment');
-            $ownerData = $this->getRequest()->getPost('ownerdata');
-             $this->checkoutSession->setData('PsPayment', $this->serializer->serialize($params));
-              $this->checkoutSession->setData('PsOwnerdata', $this->serializer->serialize($ownerData));
-             $result = array(
+            $params = $this->getRequest()->getPost('payment');            
+            $this->checkoutSession->setData('PsPayment', $this->serializer->serialize($params));
+              
+            $result = array(
                 'status'=> 'success',
                 'message' => __('Updated Payment Hashes')
             );
-         }catch (\Exception $e) {
+        }catch (\Exception $e) {
             $result = array('status'=> 'error','message' => $e->getMessage());
         }
 

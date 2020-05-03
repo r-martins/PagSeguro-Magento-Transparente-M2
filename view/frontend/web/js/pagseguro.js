@@ -243,43 +243,21 @@ RMPagSeguro.prototype.updateBrand = function(){
 RMPagSeguro.prototype.updatePaymentHashes = function(){
     var self = this;
     var url = self.storeUrl +'pseguro/ajax/updatePaymentHashes';
-    var tefcpf = jQuery('input[name="payment[pagseguro_tef_cpf]"]').val();
-    var tefbank = jQuery('input[name="payment[pagseguropro_tef_bank]"]').val();
-    var cpf = jQuery('input[name="payment[ps_cc_cpf]"]').val();
-    var billingCpf = jQuery('input[name="vat_id"]').val();
-    if (cpf == '' || cpf == undefined) {
-        cpf = billingCpf;
-    }
-
-    if (tefcpf == '' || tefcpf == undefined) {
-        tefcpf = billingCpf;
-    }
-
+    
     var currnetSelectedPayment = jQuery('input[name="payment[method]"]:checked').attr('id');
 
-    if (tefcpf != '' && tefcpf != undefined && currnetSelectedPayment == 'rm_pagseguro_tef') {
+    if (currnetSelectedPayment == 'rm_pagseguro_tef' || currnetSelectedPayment == 'rm_pagseguro_boleto') {
         var paymentHashes = {
-            "payment[sender_hash]": this.senderHash,
-            "ownerdata[tef_cpf]": tefcpf,
-            "ownerdata[tef_bank]": tefbank,
+            "payment[sender_hash]": this.senderHash            
         };
     }
 
-    if (cpf != '' && cpf != undefined && currnetSelectedPayment == 'rm_pagseguro_cc') {
-        var ccOwner = jQuery('input[name="payment[ps_cc_owner]"]').val();
-        var ccOwnerBirthDay = jQuery('input[name="payment[ps_cc_owner_birthday_day]"]').val();
-        var ccOwnerBirthMonth = jQuery('input[name="payment[ps_cc_owner_birthday_month]"]').val();
-        var ccOwnerBirthYear = jQuery('input[name="payment[ps_cc_owner_birthday_year]"]').val();
+    if (currnetSelectedPayment == 'rm_pagseguro_cc') {
         var paymentHashes = {
             "payment[sender_hash]": this.senderHash,
             "payment[credit_card_token]": this.creditCardToken,
             "payment[cc_type]": (this.brand)?this.brand.name:'',
-            "payment[is_admin]": this.config.is_admin,
-            "ownerdata[credit_card_owner]": ccOwner,
-            "ownerdata[credit_card_birthday]":ccOwnerBirthDay,
-            "ownerdata[credit_card_birthmonth]":ccOwnerBirthMonth,
-            "ownerdata[credit_card_birthyear]":ccOwnerBirthYear,
-            "ownerdata[credit_card_cpf]": cpf,
+            "payment[is_admin]": this.config.is_admin            
         };
     }
 

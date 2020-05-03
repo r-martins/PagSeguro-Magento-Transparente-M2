@@ -276,23 +276,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Get CC Owner Data hashes (credit_card_owner & cpf) from session
-     * @param string 
-     * @return bool|string
-     */
-    public function getCCOwnerData($param = null)
-    {
-        $psCcOwner = $this->checkoutSession->getData('PsOwnerdata');
-        $psCcOwner = $this->serializer->unserialize($psCcOwner);
-
-        if (isset($psCcOwner[$param])) {
-            return $psCcOwner[$param];
-        }
-
-        return false;
-    }
-
-    /**
      * Get cc installment from session
      * @param string 
      * @return bool|string
