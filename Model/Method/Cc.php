@@ -119,7 +119,6 @@ class Cc extends \Magento\Payment\Model\Method\Cc
 
             //will grab data to be send via POST to API inside $params
             $params = $this->pagSeguroHelper->getCreditCardApiCallParams($order, $payment);
-
             //call API
             $returnXml = $this->pagSeguroHelper->callApi($params, $payment);
 
@@ -224,7 +223,7 @@ class Cc extends \Magento\Payment\Model\Method\Cc
         $info = $this->getInfoInstance();
         $info->setAdditionalInformation('sender_hash', $this->pagSeguroHelper->getPaymentHash('sender_hash'))
             ->setAdditionalInformation('credit_card_token', $this->pagSeguroHelper->getPaymentHash('credit_card_token'))
-            ->setAdditionalInformation('credit_card_owner', $this->pagSeguroHelper->getCCOwnerData('credit_card_owner'))
+            ->setAdditionalInformation('credit_card_owner', $data['additional_data']['cc_owner_name'])
             ->setCcType($this->pagSeguroHelper->getPaymentHash('cc_type'))
             ->setCcLast4(substr($data['additional_data']['cc_number'], -4))
             ->setCcExpYear($data['additional_data']['cc_exp_year'])
@@ -232,7 +231,7 @@ class Cc extends \Magento\Payment\Model\Method\Cc
 
         // set cpf
         if ($this->pagSeguroHelper->isCpfVisible()) {
-            $info->setAdditionalInformation($this->getCode() . '_cpf', $this->pagSeguroHelper->getCCOwnerData('credit_card_cpf'));
+            $info->setAdditionalInformation($this->getCode() . '_cpf', $data['additional_data']['cc_owner_cpf']);
         }
 
         //DOB value
@@ -242,18 +241,19 @@ class Cc extends \Magento\Payment\Model\Method\Cc
                 date(
                     'd/m/Y',
                     strtotime(
-                        $this->pagSeguroHelper->getCCOwnerData('credit_card_birthyear').
+                        $data['additional_data']['cc_owner_birthday_day'].
                         '/'.
-                        $this->pagSeguroHelper->getCCOwnerData('credit_card_birthmonth').
-                        '/'.$this->pagSeguroHelper->getCCOwnerData('credit_card_birthday')
+                        $data['additional_data']['cc_owner_birthday_month'].
+                        '/'.
+                        $data['additional_data']['cc_owner_birthday_year']
                     )
                 )
             );
         }
 
         //Installments value
-        if ($this->pagSeguroHelper->getInstallments('cc_installment')) {
-            $installments = explode('|', $this->pagSeguroHelper->getInstallments('cc_installment'));
+        if ($data['additional_data']['cc_installments']) {
+            $installments = explode('|', $data['additional_data']['cc_installments']);
             if (false !== $installments && count($installments)==2) {
                 $info->setAdditionalInformation('installment_quantity', (int)$installments[0]);
                 $info->setAdditionalInformation('installment_value', $installments[1]);
