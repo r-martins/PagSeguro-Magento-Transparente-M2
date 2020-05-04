@@ -26,7 +26,9 @@
                                     id: getCode() + '_cc_owner',
                                     title: $t('Credit Card Owner Name'),
                                     'data-container': getCode() + '-cc-owner',
-                                    'data-validate': JSON.stringify({'required':true})}"
+                                    'data-validate': JSON.stringify({'required':true})},
+                            value: creditCardOwnerName,
+                            valueUpdate: 'keyup'"
                                     />
         </div>
     </div>
@@ -43,7 +45,9 @@
                                     id: getCode() + '_cc_owner_birthday_day',
                                     title: $t('DD'),
                                     'data-container': getCode() + '-cc-owner-birthday-day',
-                                    'data-validate': JSON.stringify({'required':true})}"
+                                    'data-validate': JSON.stringify({'required':true})},
+                            value: creditCardOwnerBirthDay,
+                            valueUpdate: 'keyup'"
                                     />
              <input type="text" name="payment[ps_cc_owner_birthday_month]" class="input-text ps_cc_birthdate" value=""
                    data-bind="attr: {
@@ -52,7 +56,9 @@
                                     id: getCode() + '_cc_owner_birthday_month',
                                     title: $t('MM'),
                                     'data-container': getCode() + '-cc-owner-birthday-month',
-                                    'data-validate': JSON.stringify({'required':true})}"
+                                    'data-validate': JSON.stringify({'required':true})},
+                            value: creditCardOwnerBirthMonth,
+                            valueUpdate: 'keyup'"
                                     />
                <input type="text" name="payment[ps_cc_owner_birthday_year]" class="input-text ps_cc_birthdate" value=""
                    data-bind="attr: {
@@ -61,7 +67,9 @@
                                     id: getCode() + '_cc_owner_birthday_year',
                                     title: $t('YYYY'),
                                     'data-container': getCode() + '-cc-owner-birthday-year',
-                                    'data-validate': JSON.stringify({'required':true})}"
+                                    'data-validate': JSON.stringify({'required':true})},
+                            value: creditCardOwnerBirthYear,
+                            valueUpdate: 'keyup'"
                                     />
         </div>
     </div>
@@ -78,7 +86,9 @@
                                     id: getCode() + '_cpf',
                                     title: $t('CPF'),
                                     'data-container': getCode() + '-cpf',
-                                    'data-validate': JSON.stringify({'required':true})}"
+                                    'data-validate': JSON.stringify({'required':true})},
+                            value: creditCardOwnerCpf,
+                            valueUpdate: 'keyup'"
                                     />
         </div>
         <span id="card-cpf-msg"></span>
@@ -198,7 +208,7 @@
                                             optionsValue: 'value',
                                             optionsText: 'Installments',
                                             optionsCaption: $t('Installments'),
-                                            value: 'Informe os dados do cartão para calcular'">
+                                            value: creditCardInstallments">
                         </select>
                     </div>
                 </div>

@@ -12,11 +12,53 @@ define(
 
         return Component.extend({
             defaults: {
-                template: 'RicardoMartins_PagSeguro/payment/rm_pagseguro_cc'
+                template: 'RicardoMartins_PagSeguro/payment/rm_pagseguro_cc',
+                creditCardOwnerName: '',
+                creditCardOwnerBirthDay: '',
+                creditCardOwnerBirthMonth: '',
+                creditCardOwnerBirthYear: '',
+                creditCardOwnerCpf: '',
+                creditCardInstallments: ''
+            },
+            
+            initObservable: function () {
+                this._super()
+                    .observe([
+                        'creditCardOwnerName',
+                        'creditCardOwnerBirthDay',
+                        'creditCardOwnerBirthMonth',
+                        'creditCardOwnerBirthYear',
+                        'creditCardOwnerCpf',
+                        'creditCardInstallments'
+                    ]);
+
+                return this;
             },
 
             getCode: function() {
                 return 'rm_pagseguro_cc';
+            },
+            
+            getData: function () {
+            return {
+                    'method': this.item.method,
+                    'additional_data': {
+                        'cc_cid': this.creditCardVerificationNumber(),
+                        'cc_ss_start_month': this.creditCardSsStartMonth(),
+                        'cc_ss_start_year': this.creditCardSsStartYear(),
+                        'cc_ss_issue': this.creditCardSsIssue(),
+                        'cc_type': this.creditCardType(),
+                        'cc_exp_year': this.creditCardExpYear(),
+                        'cc_exp_month': this.creditCardExpMonth(),
+                        'cc_number': this.creditCardNumber(),
+                        'cc_owner_name' : this.creditCardOwnerName(),
+                        'cc_owner_birthday_day' : this.creditCardOwnerBirthDay(),
+                        'cc_owner_birthday_month' : this.creditCardOwnerBirthMonth(),
+                        'cc_owner_birthday_year' : this.creditCardOwnerBirthYear(),
+                        'cc_owner_cpf' : this.creditCardOwnerCpf(),
+                        'cc_installments' : this.creditCardInstallments(),
+                    }
+                };
             },
 
             isActive: function() {
