@@ -276,23 +276,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Get CC Owner Data hashes (credit_card_owner & cpf) from session
-     * @param string 
-     * @return bool|string
-     */
-    public function getCCOwnerData($param = null)
-    {
-        $psCcOwner = $this->checkoutSession->getData('PsOwnerdata');
-        $psCcOwner = $this->serializer->unserialize($psCcOwner);
-
-        if (isset($psCcOwner[$param])) {
-            return $psCcOwner[$param];
-        }
-
-        return false;
-    }
-
-    /**
      * Get cc installment from session
      * @param string 
      * @return bool|string
@@ -701,7 +684,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             if (isset($payment['additional_information'][$payment->getMethod() . '_cpf'])) {
                 return $payment['additional_information'][$payment->getMethod() . '_cpf'];
             }
-        }
+        }       
         $entity = explode('|', $customerCpfAttribute);
         $cpf = '';
         if (count($entity) == 1 || $entity[0] == 'customer') {
@@ -714,7 +697,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         } else if (count($entity) == 2 && $entity[0] == 'billing' ) { //billing
             $cpf = $order->getShippingAddress()->getData($entity[1]);
         }
-
+        
         if ($order->getCustomerIsGuest() && empty($cpf)) {
             $cpf = $order->getData('customer_' . $customerCpfAttribute);
         }
@@ -1109,6 +1092,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'acceptPaymentMethodGroup' => $paymentAcceptedGroups,
             'notificationURL'   => $this->getStoreUrl().'pseguro/notification/index',
         );
+
+        $redirectURL = $this->scopeConfig->getValue('payment/rm_pagseguro_pagar_no_pagseguro/redirectURL');
+        if ($redirectURL) {
+            $params['redirectURL'] = $this->_urlBuilder->getUrl($redirectURL);
+        }
 
         $params = array_merge($params, $this->getItemsParams($order));
         $params = array_merge($params, $this->getAddressParams($order, 'shipping'));
