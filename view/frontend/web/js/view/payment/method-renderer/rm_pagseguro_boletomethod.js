@@ -16,11 +16,30 @@ define(
             isPlaceOrderActionAllowed: ko.observable(quote.billingAddress() != null),
 
             defaults: {
-                template: 'RicardoMartins_PagSeguro/payment/rm_pagseguro_boleto'
+                template: 'RicardoMartins_PagSeguro/payment/rm_pagseguro_boleto',
+                boletoOwnerCpf: ''
+            },
+            
+            initObservable: function () {
+                this._super()
+                    .observe([
+                        'boletoOwnerCpf'                        
+                    ]);
+
+                return this;
             },
 
             getCode: function() {
                 return 'rm_pagseguro_boleto';
+            },
+            
+            getData: function () {
+            return {
+                    'method': this.item.method,
+                    'additional_data': {
+                        'boleto_cpf' : this.boletoOwnerCpf()
+                    }
+                };
             },
 
             isActive: function() {

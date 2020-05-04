@@ -6,61 +6,63 @@
                data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()"/>
         <label data-bind="attr: {'for': getCode()}" class="label"><span data-bind="text: getTitle()"></span></label>
     </div>
-	<div class="payment-method-content" id="pagseguro_boleto_method">
-		<form class="form" data-bind="attr: {'id': getCode() + '-form'}">	
-			<fieldset data-bind="attr: {class: 'fieldset payment items boleto ' + getCode(), id: 'payment_' + getCode()}">
-			
-				<!-- ko foreach: getRegion('messages') -->
-				<!-- ko template: getTemplate() --><!-- /ko -->
-				<!--/ko-->
-				<div class="payment-method-billing-address">
-					<!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
-					<!-- ko template: getTemplate() --><!-- /ko -->
-					<!--/ko-->
-				</div>
-				
-				<!-- ko if: (window.visibleCpf)-->
-				<div class="field number required">
-					<label data-bind="attr: {for: getCode() + '_cpf'}" class="label">
-						<span><!-- ko i18n: 'CPF '--><!-- /ko --></span>
-					</label>
-					<div class="control">
-						<input type="text" name="payment[pagseguro_boleto_cpf]" class="input-text" value=""
-							   data-bind="attr: {
-												autocomplete: off,
-												id: getCode() + '_cpf',
-												title: $t('CPF'),
-												'data-container': getCode() + '-cpf',
-												'data-validate': JSON.stringify({'required':true})}"
-												/>
-					</div>
-					<span id="card-cpf-msg"></span>
-				</div>
-				 <!-- /ko -->
-				
-				<div class="checkout-agreements-block">
-					<!-- ko foreach: $parent.getRegion('before-place-order') -->
-					<!-- ko template: getTemplate() --><!-- /ko -->
-					<!--/ko-->
-				</div>
-				<div class="actions-toolbar">
-					<div class="primary">
-						<button class="action primary checkout"
-								type="submit"
-								data-bind="
-								click: placeOrder,
-								attr: {title: $t('Place Order')},
-								css: {disabled: !isPlaceOrderActionAllowed()},
-								enable: (getCode() == isChecked())
-								"
-								disabled>
-							<span data-bind="text: $t('Place Order')"></span>
-						</button>
-					</div>
-				</div>
-			
-			</fieldset>
-		</form>
-	</div>
+    <div class="payment-method-content" id="pagseguro_boleto_method">
+        <form class="form" data-bind="attr: {'id': getCode() + '-form'}">	
+            <fieldset data-bind="attr: {class: 'fieldset payment items boleto ' + getCode(), id: 'payment_' + getCode()}">
+
+                <!-- ko foreach: getRegion('messages') -->
+                <!-- ko template: getTemplate() --><!-- /ko -->
+                <!--/ko-->
+                <div class="payment-method-billing-address">
+                    <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
+                    <!-- ko template: getTemplate() --><!-- /ko -->
+                    <!--/ko-->
+                </div>
+
+                <!-- ko if: (window.visibleCpf)-->
+                <div class="field number required">
+                    <label data-bind="attr: {for: getCode() + '_cpf'}" class="label">
+                        <span><!-- ko i18n: 'CPF '--><!-- /ko --></span>
+                    </label>
+                    <div class="control">
+                        <input type="text" name="payment[pagseguro_boleto_cpf]" class="input-text" value=""
+                               data-bind="attr: {
+                                                    autocomplete: off,
+                                                    id: getCode() + '_cpf',
+                                                    title: $t('CPF'),
+                                                    'data-container': getCode() + '-cpf',
+                                                    'data-validate': JSON.stringify({'required':true})},
+                                        value: boletoOwnerCpf,
+                                        valueUpdate: 'keyup'"
+                               />
+                    </div>
+                    <span id="card-cpf-msg"></span>
+                </div>
+                <!-- /ko -->
+
+                <div class="checkout-agreements-block">
+                    <!-- ko foreach: $parent.getRegion('before-place-order') -->
+                    <!-- ko template: getTemplate() --><!-- /ko -->
+                    <!--/ko-->
+                </div>
+                <div class="actions-toolbar">
+                    <div class="primary">
+                        <button class="action primary checkout"
+                                type="submit"
+                                data-bind="
+                                        click: placeOrder,
+                                        attr: {title: $t('Place Order')},
+                                        css: {disabled: !isPlaceOrderActionAllowed()},
+                                        enable: (getCode() == isChecked())
+                                "
+                                disabled>
+                            <span data-bind="text: $t('Place Order')"></span>
+                        </button>
+                    </div>
+                </div>
+
+            </fieldset>
+        </form>
+    </div>
 </div>
 <div data-bind="afterRender: preparePagSeguro()"></div>
