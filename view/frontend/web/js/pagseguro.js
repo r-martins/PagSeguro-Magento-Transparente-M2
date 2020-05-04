@@ -57,12 +57,9 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
         var ccExpMoElm = jQuery('input[name="payment[ps_cc_exp_month]"]');
         var ccExpYrElm = jQuery('input[name="payment[ps_cc_exp_year]"]');
         var ccCvvElm = jQuery('input[name="payment[ps_cc_cid]"]');
-        var cpf = jQuery('input[name="payment[ps_cc_cpf]"]');
-        var tefcpf = jQuery('input[name="payment[pagseguro_tef_cpf]"]');
         var ccExpYrVisibileElm = jQuery('#rm_pagseguro_cc_cc_year_visible');
         var ccNumVisibleElm = jQuery('.cc_number_visible');
-        var billingCpf = jQuery('input[name="vat_id"]');
-
+        
         jQuery(ccNumElm).keyup(function( event ) {
             obj.updateCreditCardToken();
         });
@@ -114,16 +111,12 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
             jQuery(ccExpYrElm).val(ccExpYr);
         });
         
-        jQuery( "#pagseguro_cc_method .actions-toolbar .checkout" ).on("click", function() {
-            if(cpf.val() != '' || billingCpf.val() != '') {
-                obj.updateCreditCardToken();
-            }
+        jQuery( "#pagseguro_cc_method .actions-toolbar .checkout" ).on("click", function() {            
+                obj.updateCreditCardToken();            
         });
         
-        jQuery( "#pagseguro_tef_method .actions-toolbar .checkout" ).on("click", function() {
-            if(tefcpf.val()!=''){
-                obj.updatePaymentHashes();
-            }
+        jQuery( "#pagseguro_tef_method .actions-toolbar .checkout" ).on("click", function() {            
+                obj.updatePaymentHashes();            
         });
 
         jQuery("#rm_pagseguro_cc_cc_installments").change(function( event ) {
