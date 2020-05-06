@@ -2,13 +2,12 @@
 namespace RicardoMartins\PagSeguro\Model;
 
 /**
- * Class Notifications
+ * Processes notifications from PagSeguro
  *
  * @see       http://bit.ly/pagseguromagento Official Website
  * @author    Ricardo Martins (and others) <pagseguro-transparente@ricardomartins.net.br>
  * @copyright 2018-2019 Ricardo Martins
  * @license   https://www.gnu.org/licenses/gpl-3.0.pt-br.html GNU GPL, version 3
- * @package   RicardoMartins\PagSeguro\Model
  */
 class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
 {
@@ -72,7 +71,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
         \Magento\Sales\Model\Order\Email\Sender\InvoiceSender $invoiceSender,
         \Magento\Framework\App\CacheInterface $cache,
         \Magento\Sales\Model\Order $orderData,
-        array $data = array()
+        array $data = []
     ) {
         parent::__construct(
             $context,
@@ -107,16 +106,18 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
             $errMsg = __((string)$resultXML->error->message);
             throw new \Magento\Framework\Validator\Exception(
                 __(
-                    'Problemas ao processar seu pagamento. %s(%s)', $errMsg, (string)$resultXML->error->code
+                    'Problemas ao processar seu pagamento. %s(%s)',
+                    $errMsg,
+                    (string)$resultXML->error->code
                 )
             );
         }
 
         if (isset($resultXML->reference)) {
-            if(is_object($_payment) && $_payment instanceof \Magento\Payment\Model\InfoInterface) {
+            if (is_object($_payment) && $_payment instanceof \Magento\Payment\Model\InfoInterface) {
                 $order = $_payment->getOrder();
                 $payment = $_payment;
-            }else {
+            } else {
                 $orderNo = (string)$resultXML->reference;
                 $order = $this->orderModel->loadByIncrementId($orderNo);
                 if (!$order->getId()) {
@@ -128,7 +129,8 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                 $payment = $order->getPayment();
             }
 
-            //PagSeguro sends the same notification multiple times in the same minute. Let's cache it and check if it's a duplicated.
+            //PagSeguro sends the same notification multiple times in the same minute.
+            //Let's cache it and check if it's a duplicated.
             $contentCacheId = hash('sha256', $resultXML->asXML());
             $this->cache->save('1', $contentCacheId, ['RM_PAGSEGURO_NOTIFICATION'], 60);
 
@@ -159,8 +161,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
 
             if ((int)$resultXML->status == 7 && isset($resultXML->cancellationSource)) {
                 //Especificamos a fonte do cancelamento do pedido
-                switch((string)$resultXML->cancellationSource)
-                {
+                switch ((string)$resultXML->cancellationSource) {
                     case 'INTERNAL':
                         $message .= __('PagSeguro itself denied or canceled the transaction.');
                         break;
@@ -187,7 +188,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                     $order->setStatus($processedState->getState());
                     $order->addStatusHistoryComment($message);
 
-                    if((int)$resultXML->status == 1 && is_object($_payment)) {
+                    if ((int)$resultXML->status == 1 && is_object($_payment)) {
                         $_payment->setIsTransactionPending(true);
                     }
 
@@ -198,8 +199,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
             }
 
             if ((int)$resultXML->status == 3) {
-                if(!$order->hasInvoices()){
-
+                if (!$order->hasInvoices()) {
                     $invoice = $this->invoiceService->prepareInvoice($order);
                     $msg = sprintf('Captured payment. Transaction Identifier: %s', (string)$resultXML->code);
                     $invoice->addComment($msg);
@@ -222,20 +222,22 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                     $this->transactionFactory->addObject($invoice)
                         ->addObject($invoice->getOrder())
                         ->save();
-                    $order->addStatusHistoryComment(sprintf('Invoice #%s successfully created.', $invoice->getIncrementId()));
+                    $order->addStatusHistoryComment(
+                        sprintf('Invoice #%s successfully created.', $invoice->getIncrementId())
+                    );
 
                 }
             }
 
-            if(!is_object($_payment)) {
+            if (!is_object($_payment)) {
                 try {
                     $payment->save();
                     $order->save();
 
-                    if($processedState->getIsCustomerNotified()) {
+                    if ($processedState->getIsCustomerNotified()) {
                         $this->_commentSender->send($order, true, $message);
                     }
-                }catch(\Exception $e) {
+                } catch (\Exception $e) {
                     $this->pagSeguroHelper->writeLog($e->getMessage());
                 }
             }
@@ -254,7 +256,8 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
         //@TODO Remove hard coded URL
         $url = "https://ws.pagseguro.uol.com.br/v2/transactions/notifications/" . $notificationCode;
 
-        $params = array('token' => $this->pagSeguroHelper->getToken(), 'email' => $this->pagSeguroHelper->getMerchantEmail());
+        $params = ['token' => $this->pagSeguroHelper->getToken(),
+                   'email' => $this->pagSeguroHelper->getMerchantEmail()];
         $url .= '?' . http_build_query($params);
 
         //@TODO Add ext-curl to composer
@@ -269,18 +272,24 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
             $return = curl_exec($ch);
         } catch (\Exception $e) {
             $this->pagSeguroHelper->writeLog(
-                sprintf('Failed to catch return for notificationCode %s: %s(%d)', $notificationCode, curl_error($ch),
+                sprintf(
+                    'Failed to catch return for notificationCode %s: %s(%d)',
+                    $notificationCode,
+                    curl_error($ch),
                     curl_errno($ch)
                 )
             );
         }
 
-        $this->pagSeguroHelper->writeLog(sprintf('Return of the Pagseguro to notificationCode %s: %s', $notificationCode, $return));
+        $this->pagSeguroHelper->writeLog(
+            sprintf('Return of the Pagseguro to notificationCode %s: %s', $notificationCode, $return)
+        );
 
         libxml_use_internal_errors(true);
         $xml = \simplexml_load_string(trim($return));
         if (false === $xml) {
-            $this->pagSeguroHelper->writeLog('Return XML notification PagSeguro in unexpected format. Return: ' . $return);
+            $this->pagSeguroHelper->writeLog('Return XML notification PagSeguro in unexpected format. Return: '
+                . $return);
         }
 
         curl_close($ch);
@@ -298,34 +307,37 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
         $return->setStateChanged(true);
         $return->setIsTransactionPending(true); //payment is pending?
 
-        switch($statusCode)
-        {
+        switch ($statusCode) {
             case '1':
                 $return->setState(\Magento\Sales\Model\Order::STATE_PENDING_PAYMENT);
                 $return->setIsCustomerNotified($this->getCode()!='pagseguro_cc');
 
                 $return->setMessage(
-                    __('Awaiting payment: the buyer initiated the transaction, but so far PagSeguro has not received any payment information.')
+                    __('Awaiting payment: the buyer initiated the transaction, but so far PagSeguro has not '
+                    . 'received any payment information.')
                 );
                 break;
             case '2':
                 $return->setState(\Magento\Sales\Model\Order::STATE_PAYMENT_REVIEW);
                 $return->setIsCustomerNotified(true);
                 $return->setMessage(
-                    __('Under review: the buyer chose to pay with a credit card and PagSeguro is analyzing the risk of the transaction.')
+                    __('Under review: the buyer chose to pay with a credit card and PagSeguro '
+                    . 'is analyzing the risk of the transaction.')
                 );
                 break;
             case '3':
                 $return->setState(\Magento\Sales\Model\Order::STATE_PROCESSING);
                 $return->setIsCustomerNotified(true);
                 $return->setMessage(
-                    __('Pay: the transaction was paid by the buyer and PagSeguro has already received a confirmation of the financial institution responsible for processing.')
+                    __('Pay: the transaction was paid by the buyer and PagSeguro has already received '
+                    . 'a confirmation of the financial institution responsible for processing.')
                 );
                 $return->setIsTransactionPending(false);
                 break;
             case '4':
                 $return->setMessage(
-                    __('Available: The transaction has been paid and has reached the end of its has been returned and there is no open dispute')
+                    __('Available: The transaction has been paid and has reached the end of its has been '
+                    . 'returned and there is no open dispute')
                 );
                 $return->setIsCustomerNotified(false);
                 $return->setStateChanged(false);
@@ -353,7 +365,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
             default:
                 $return->setIsCustomerNotified(false);
                 $return->setStateChanged(false);
-                $return->setMessage(__('Invalid status code returned by PagSeguro. (%s)', $statusCode ));
+                $return->setMessage(__('Invalid status code returned by PagSeguro. (%s)', $statusCode));
         }
         return $return;
     }

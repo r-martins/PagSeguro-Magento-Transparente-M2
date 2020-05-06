@@ -2,13 +2,12 @@
 namespace RicardoMartins\PagSeguro\Model\Method;
 
 /**
- * Class Cc
+ * Credit Card Payment Method for PagSeguro Payment
  *
  * @see       http://bit.ly/pagseguromagento Official Website
  * @author    Ricardo Martins (and others) <pagseguro-transparente@ricardomartins.net.br>
- * @copyright 2018-2019 Ricardo Martins
+ * @copyright 2018-2020 Ricardo Martins
  * @license   https://www.gnu.org/licenses/gpl-3.0.pt-br.html GNU GPL, version 3
- * @package   RicardoMartins\PagSeguro\Model\Method
  */
 class Cc extends \Magento\Payment\Model\Method\Cc
 {
@@ -28,28 +27,28 @@ class Cc extends \Magento\Payment\Model\Method\Cc
     protected $_countryFactory;
     protected $_minAmount = null;
     protected $_maxAmount = null;
-    protected $_supportedCurrencyCodes = array('BRL');
+    protected $_supportedCurrencyCodes = ['BRL'];
 
     protected $_debugReplacePrivateDataKeys = ['number', 'exp_month', 'exp_year', 'cvc'];
     /**
      * PagSeguro Helper
      *
      * @var RicardoMartins\PagSeguro\Helper\Data;
-     */ 
+     */
     protected $pagSeguroHelper;
 
     /**
      * PagSeguro Abstract Model
      *
      * @var RicardoMartins\PagSeguro\Model\Notifications
-     */ 
+     */
     protected $pagSeguroAbModel;
 
     /**
      * Backend Auth Session
      *
      * @var Magento\Backend\Model\Auth\Session $adminSession
-     */ 
+     */
     protected $adminSession;
 
     /** @var \Magento\Framework\Message\ManagerInterface */
@@ -70,7 +69,7 @@ class Cc extends \Magento\Payment\Model\Method\Cc
         \RicardoMartins\PagSeguro\Model\Notifications $pagSeguroAbModel,
         \Magento\Backend\Model\Auth\Session $adminSession,
         \Magento\Framework\Message\ManagerInterface $messageManager,
-        array $data = array()
+        array $data = []
     ) {
         parent::__construct(
             $context,
@@ -89,14 +88,14 @@ class Cc extends \Magento\Payment\Model\Method\Cc
 
         $this->_countryFactory = $countryFactory;
 
-        $this->pagSeguroHelper = $pagSeguroHelper;  
-        $this->pagSeguroAbModel = $pagSeguroAbModel; 
+        $this->pagSeguroHelper = $pagSeguroHelper;
+        $this->pagSeguroAbModel = $pagSeguroAbModel;
         $this->adminSession = $adminSession;
         $this->messageManager = $messageManager;
     }
 
 
-     public function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount)
+    public function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
         //@TODO Review. Necessary?
         $this->pagSeguroHelper->writeLog('Inside Auth');
@@ -123,18 +122,22 @@ class Cc extends \Magento\Payment\Model\Method\Cc
             $returnXml = $this->pagSeguroHelper->callApi($params, $payment);
 
             if (isset($returnXml->errors)) {
-                $errMsg = array();
+                $errMsg = [];
                 foreach ($returnXml->errors as $error) {
                     $message = $this->pagSeguroHelper->translateError((string)$error->message);
                     $errMsg[] = $message . '(' . $error->code . ')';
                 }
-                throw new \Magento\Framework\Validator\Exception('Um ou mais erros ocorreram no seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg));
+                throw new \Magento\Framework\Validator\Exception(
+                    'Um ou mais erros ocorreram no seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg)
+                );
             }
             if (isset($returnXml->error)) {
                 $error = $returnXml->error;
                 $message = $this->pagSeguroHelper->translateError((string)$error->message);
                 $errMsg[] = $message . ' (' . $error->code . ')';
-                throw new \Magento\Framework\Validator\Exception('Um erro ocorreu em seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg));
+                throw new \Magento\Framework\Validator\Exception(
+                    'Um erro ocorreu em seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg)
+                );
             }
             /* process return result code status*/
             if ((int)$returnXml->status == 6 || (int)$returnXml->status == 7) {
@@ -145,7 +148,7 @@ class Cc extends \Magento\Payment\Model\Method\Cc
 
             if (isset($returnXml->code)) {
 
-                $additional = array('transaction_id'=>(string)$returnXml->code);
+                $additional = ['transaction_id' => (string)$returnXml->code];
                 if ($existing = $payment->getAdditionalInformation()) {
                     if (is_array($existing)) {
                         $additional = array_merge($additional, $existing);
@@ -155,7 +158,7 @@ class Cc extends \Magento\Payment\Model\Method\Cc
 
             }
 
-          $this->pagSeguroAbModel->proccessNotificatonResult($returnXml, $payment);
+            $this->pagSeguroAbModel->proccessNotificatonResult($returnXml, $payment);
         } catch (\Exception $e) {
 
             throw new \Magento\Framework\Exception\LocalizedException(__($e->getMessage()));
@@ -177,10 +180,10 @@ class Cc extends \Magento\Payment\Model\Method\Cc
         $info           = $this->getInfoInstance();
         $transactionId = $info->getAdditionalInformation('transaction_id');
 
-        $params = array(
+        $params = [
             'transactionCode'   => $transactionId,
-            'refundValue'       => number_format($amount, 2, '.', ''),
-        );
+            'refundValue'       => number_format($amount, 2, '.', '')
+        ];
     
         $params['token'] = $this->pagSeguroHelper->getToken();
         $params['email'] = $this->pagSeguroHelper->getMerchantEmail();
@@ -241,9 +244,9 @@ class Cc extends \Magento\Payment\Model\Method\Cc
                 date(
                     'd/m/Y',
                     strtotime(
-                        $data['additional_data']['cc_owner_birthday_day'].
-                        '/'.
                         $data['additional_data']['cc_owner_birthday_month'].
+                        '/'.
+                        $data['additional_data']['cc_owner_birthday_day'].
                         '/'.
                         $data['additional_data']['cc_owner_birthday_year']
                     )
@@ -269,8 +272,8 @@ class Cc extends \Magento\Payment\Model\Method\Cc
      * @return bool
      */
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
-    {   
-        if($this->adminSession->getUser()){
+    {
+        if ($this->adminSession->getUser()) {
             return false;
         }
         $isAvailable =  $this->getConfigData('active', $quote ? $quote->getStoreId() : null);
@@ -321,11 +324,11 @@ class Cc extends \Magento\Payment\Model\Method\Cc
             $missingInfo = sprintf('Token do cartão: %s', var_export($creditCardToken, true));
             $missingInfo .= sprintf('/ Sender_hash: %s', var_export($senderHash, true));
             $this->pagSeguroHelper->writeLog(
-                    "Falha ao obter o token do cartao ou sender_hash.
-                    Ative o modo debug e observe o console de erros do seu navegador.
-                    Se esta for uma atualização via Ajax, ignore esta mensagem até a finalização do pedido.
-                    $missingInfo"
-                );
+                "Falha ao obter o token do cartao ou sender_hash.
+                Ative o modo debug e observe o console de erros do seu navegador.
+                Se esta for uma atualização via Ajax, ignore esta mensagem até a finalização do pedido.
+                $missingInfo"
+            );
 
             $errorMsg = __('Falha ao processar seu pagamento. Por favor, entre em contato com nossa equipe.');
             throw new \Magento\Framework\Exception\LocalizedException($errorMsg);

@@ -8,9 +8,8 @@ use Magento\Framework\Phrase;
  *
  * @see       http://bit.ly/pagseguromagento Official Website
  * @author    Ricardo Martins (and others) <pagseguro-transparente@ricardomartins.net.br>
- * @copyright 2018-2019 Ricardo Martins
+ * @copyright 2018-2020 Ricardo Martins
  * @license   https://www.gnu.org/licenses/gpl-3.0.pt-br.html GNU GPL, version 3
- * @package   RicardoMartins\PagSeguro\Helper
  */
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
@@ -38,24 +37,24 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_PATH_PAYMENT_PAGSEGURO_CC_FORCE_INSTALLMENTS = 'payment/rm_pagseguro_cc/force_installments_selection';
 
      /**
-     * Store Manager
-     *
-     * @var  \Magento\Store\Model\StoreManagerInterface
-     */
+      * Store Manager
+      *
+      * @var  \Magento\Store\Model\StoreManagerInterface
+      */
     protected $storeManager;
 
      /**
-     * Quote Session
-     *
-     * @var  \Magento\Checkout\Model\Session
-     */
+      * Quote Session
+      *
+      * @var  \Magento\Checkout\Model\Session
+      */
     protected $checkoutSession;
 
      /**
-     * Quote Session
-     *
-     * @var  \Magento\Customer\Model\Customer
-     */
+      * Quote Session
+      *
+      * @var  \Magento\Customer\Model\Customer
+      */
     protected $customer;
 
     protected $authResponse;
@@ -87,7 +86,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Framework\Module\ModuleListInterface $moduleList,
         \Magento\Framework\HTTP\Client\Curl $curl,
         \Magento\Framework\Serialize\SerializerInterface $serializer
- 
     ) {
         $this->storeManager = $storeManager;
         $this->checkoutSession = $checkoutSession;
@@ -112,27 +110,27 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         //@TODO Replace forbidden curl_*
         $ch = curl_init($url);
         $params['email'] = $this->getMerchantEmail();
-        $params['token'] = $this->getToken();   
-        $params['public_key'] = $this->getPagSeguroPubKey();    
+        $params['token'] = $this->getToken();
+        $params['public_key'] = $this->getPagSeguroPubKey();
 
         //@TODO Replace curl
         curl_setopt_array(
             $ch,
-            array(
+            [
                 CURLOPT_POSTFIELDS      => http_build_query($params),
                 CURLOPT_POST            => count($params),
                 CURLOPT_RETURNTRANSFER  => 1,
                 CURLOPT_TIMEOUT         => 45,
                 CURLOPT_SSL_VERIFYPEER  => false,
-                CURLOPT_SSL_VERIFYHOST  => false,
-            )
+                CURLOPT_SSL_VERIFYHOST  => false
+            ]
         );
 
         $response = null;
 
-        try{
+        try {
             $response = curl_exec($ch);
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             return $e->getMessage();
         }
 
@@ -157,7 +155,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return (string)$xml->id;
     }
 
-    public function getAuthResponse() {
+    public function getAuthResponse()
+    {
         return $this->authResponse;
     }
 
@@ -180,15 +179,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
      /**
-     * Get PagSeguro Public key (if exists)
-     * @return string
-     */
+      * Get PagSeguro Public key (if exists)
+      * @return string
+      */
     public function getPagSeguroPubKey()
     {
         return $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_KEY);
     }
 
-   /**
+    /**
      * Write something to pagseguro.log
      * @param $obj mixed|string
      */
@@ -219,19 +218,19 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getConfigJs()
     {
-        $config = array(
-            'active_methods' => array(
+        $config = [
+            'active_methods' => [
                 'cc' => $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_CC_ACTIVE),
                 'boleto' => $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_BOLETO_ACTIVE),
                 'tef' => $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_TEF_ACTIVE)
-            ),
+            ],
             'flag' => $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_CC_FLAG),
             'debug' => $this->isDebugActive(),
             'PagSeguroSessionId' => $this->getSessionId(),
             'show_total' => $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_CC_SHOW_TOTAL),
             'force_installments_selection' =>
                 $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_CC_FORCE_INSTALLMENTS)
-        );
+        ];
         return json_encode($config);
     }
 
@@ -244,7 +243,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->storeManager->getStore()->getBaseUrl();
     }
 
-     /**
+    /**
      * Return GrandTotal
      * return decimal
      */
@@ -255,7 +254,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * Get payment hashes (sender_hash & credit_card_token) from session
-     * @param string 
+     * @param string
      * @return bool|string
      */
     public function getPaymentHash($param = null)
@@ -264,7 +263,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
        
         $psPayment = $this->serializer->unserialize($psPayment);
 //         $this->writeLog('getPaymentHash'.json_encode($psPayment));
-        if (is_null($param)) {
+        if ($param === null) {
             return $psPayment;
         }
 
@@ -277,7 +276,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * Get cc installment from session
-     * @param string 
+     * @param string
      * @return bool|string
      */
     public function getInstallments($param)
@@ -293,9 +292,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
      /**
-     * Check if CPF should be visible with other payment fields
-     * @return bool
-     */
+      * Check if CPF should be visible with other payment fields
+      * @return bool
+      */
     public function isCpfVisible()
     {
         $customerCpfAttribute = $this->scopeConfig->getValue('payment/rm_pagseguro/customer_cpf_attribute');
@@ -303,9 +302,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
      /**
-     * Check if DOB should be visible with other payment fields
-     * @return bool
-     */
+      * Check if DOB should be visible with other payment fields
+      * @return bool
+      */
     public function isDobVisible()
     {
         $customerDobAttribute = $this->scopeConfig->getValue('payment/rm_pagseguro_cc/owner_dob_attribute');
@@ -329,11 +328,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return SimpleXMLElement
      */
-    public function callApi($params, $payment, $type='transactions')
+    public function callApi($params, $payment, $type = 'transactions')
     {
         $params['public_key'] = $this->getPagSeguroPubKey();
         $params = $this->convertEncoding($params);
-        $paramsObj = new \Magento\Framework\DataObject(array('params'=>$params));
+        $paramsObj = new \Magento\Framework\DataObject(['params' =>$params]);
 
         $params = $paramsObj->getParams();
         $paramsString = $this->convertToCURLString($params);
@@ -352,10 +351,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $this->getHeaders());
 
-        try{
+        try {
             $response = curl_exec($ch);
-        }catch(\Exception $e){
-            throw new \Magento\Framework\Validator\Exception('Communication failure with Pagseguro (' . $e->getMessage() . ')');
+        } catch (\Exception $e) {
+            throw new \Magento\Framework\Validator\Exception(
+                'Communication failure with Pagseguro (' . $e->getMessage() . ')'
+            );
         }
 
         //@TODO Remove curl
@@ -372,11 +373,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $xml = \simplexml_load_string(trim($response));
 
         if ($xml->error->code) {
-                $errArray = array();
+                $errArray = [];
             $xmlError = json_decode(json_encode($xml), true);
             $xmlError = $xmlError['error'];
             
-            if(isset($xmlError['code'])) {
+            if (isset($xmlError['code'])) {
                 $errArray[] = $this->translateError($xmlError['message']);
             } else {
                 foreach ($xmlError as $xmlErr) {
@@ -385,7 +386,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             }
             
             $errArray = implode(" / ", $errArray);
-            if($errArray) {
+            if ($errArray) {
                 throw new \Magento\Framework\Validator\Exception(new Phrase($errArray));
             }
 
@@ -394,14 +395,17 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         if (false === $xml) {
             $errMsg = 'There was a problem processing your request / payment. Please contact us.';
-            switch($response){
+            switch ($response) {
                 case 'Unauthorized':
                     $this->writeLog(
                         'Token / email não autorizado no PagSeguro. Verifique as configurações do módulo.'
                     );
                     break;
                 case 'Forbidden':
-                    $this->writeLog('Acesso não autorizado à API do PagSeguro. Veja se você tem permissão e se a chave usada pertence à esta conta. Retorno do PagSeguro: ' . var_export($response, true)
+                    $this->writeLog(
+                        'Acesso não autorizado à API do PagSeguro. Veja se você tem permissão '
+                        . 'e se a chave usada pertence à esta conta. Retorno do PagSeguro: '
+                        . var_export($response, true)
                     );
                     break;
                 default:
@@ -451,7 +455,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getCreditCardApiCallParams(\Magento\Sales\Model\Order $order, $payment)
     {
-        $params = array(
+        $params = [
             'email'             => $this->getMerchantEmail(),
             'token'             => $this->getToken(),
             'paymentMode'       => 'default',
@@ -462,7 +466,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'reference'         => $order->getIncrementId(),
             'extraAmount'       => $this->getExtraAmount($order),
             'notificationURL'   => $this->getStoreUrl().'pseguro/notification/index',
-        );
+            ];
         $params = array_merge($params, $this->getItemsParams($order));
         $params = array_merge($params, $this->getSenderParams($order, $payment));
         $params = array_merge($params, $this->getAddressParams($order, 'shipping'));
@@ -501,13 +505,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
      /**
-     * Return items information, to be send to API
-     * @param Magento\Sales\Model\Order $order
-     * @return array
-     */
+      * Return items information, to be send to API
+      * @param Magento\Sales\Model\Order $order
+      * @return array
+      */
     public function getItemsParams(\Magento\Sales\Model\Order $order)
     {
-        $return = array();
+        $return = [];
         $items = $this->getAllVisibleItems($order);
         if ($items) {
             $itemsCount = count($items);
@@ -542,14 +546,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         $phone = $this->extractPhone($order->getBillingAddress()->getTelephone());
 
-        $return = array(
+        $return = [
             'senderName'    => $this->getSenderName($order),
             'senderEmail'   => trim($order->getCustomerEmail()),
             'senderHash'    => $this->getPaymentHash('sender_hash'),
             'senderCPF'     => $digits->filter($cpf),
             'senderAreaCode'=> $phone['area'],
             'senderPhone'   => $phone['number'],
-        );
+            ];
         if (strlen($return['senderCPF']) > 11) {
             $return['senderCNPJ'] = $return['senderCPF'];
             unset($return['senderCPF']);
@@ -576,13 +580,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
 
         $holderName = $this->removeDuplicatedSpaces($payment['additional_information']['credit_card_owner']);
-        $return = array(
+        $return = [
             'creditCardHolderName'      => $holderName,
             'creditCardHolderBirthDate' => $creditCardHolderBirthDate,
             'creditCardHolderCPF'       => $digits->filter($cpf),
             'creditCardHolderAreaCode'  => $phone['area'],
             'creditCardHolderPhone'     => $phone['number'],
-        );
+            ];
 
         return $return;
     }
@@ -595,20 +599,23 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getCreditCardInstallmentsParams(\Magento\Sales\Model\Order $order, $payment)
     {
-        $return = array();
+        $return = [];
         if ($payment->getAdditionalInformation('installment_quantity')
             && $payment->getAdditionalInformation('installment_value')) {
-            $return = array(
+            $return = [
                 'installmentQuantity'   => $payment->getAdditionalInformation('installment_quantity'),
                 'installmentValue'      => number_format(
-                    $payment->getAdditionalInformation('installment_value'), 2, '.', ''
+                    $payment->getAdditionalInformation('installment_value'),
+                    2,
+                    '.',
+                    ''
                 ),
-            );
+            ];
         } else {
-            $return = array(
+            $return = [
                 'installmentQuantity'   => '1',
                 'installmentValue'      => number_format($order->getGrandTotal(), 2, '.', ''),
-            );
+                ];
         }
         return $return;
     }
@@ -630,7 +637,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $addressStreetAttribute = $this->scopeConfig->getValue('payment/rm_pagseguro/address_street_attribute');
         $addressNumberAttribute = $this->scopeConfig->getValue('payment/rm_pagseguro/address_number_attribute');
         $addressComplementAttribute = $this->scopeConfig->getValue('payment/rm_pagseguro/address_complement_attribute');
-        $addressNeighborhoodAttribute = $this->scopeConfig->getValue('payment/rm_pagseguro/address_neighborhood_attribute');
+        $addressNeighborhoodAttribute = $this->scopeConfig->getValue(
+            'payment/rm_pagseguro/address_neighborhood_attribute'
+        );
 
         //gathering address data
         $addressStreet = $this->getAddressAttributeValue($address, $addressStreetAttribute);
@@ -641,7 +650,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $addressCity = $address->getCity();
         $addressState = $this->getStateCode($address->getRegion());
 
-        $return = array(
+        $return = [
             $type.'AddressStreet'     => substr($addressStreet, 0, 80),
             $type.'AddressNumber'     => substr($addressNumber, 0, 20),
             $type.'AddressComplement' => substr($addressComplement, 0, 40),
@@ -650,7 +659,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $type.'AddressCity'       => substr($addressCity, 0, 60),
             $type.'AddressState'      => $addressState,
             $type.'AddressCountry'    => 'BRA',
-        );
+            ];
 
         //shipping specific
         if ($type == 'shipping') {
@@ -662,7 +671,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                     $shippingCost -= 0.01;
                 }
                 $return['shippingCost'] = number_format($shippingCost, 2, '.', '');
-            }else {
+            } else {
                 $return['shippingCost'] = '0.00';
             }
         }
@@ -684,7 +693,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             if (isset($payment['additional_information'][$payment->getMethod() . '_cpf'])) {
                 return $payment['additional_information'][$payment->getMethod() . '_cpf'];
             }
-        }       
+        }
         $entity = explode('|', $customerCpfAttribute);
         $cpf = '';
         if (count($entity) == 1 || $entity[0] == 'customer') {
@@ -694,7 +703,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $customer = $order->getCustomer();
 
             $cpf = $order->getData('customer_' . $customerCpfAttribute);
-        } else if (count($entity) == 2 && $entity[0] == 'billing' ) { //billing
+        } elseif (count($entity) == 2 && $entity[0] == 'billing') { //billing
             $cpf = $order->getShippingAddress()->getData($entity[1]);
         }
         
@@ -702,17 +711,17 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $cpf = $order->getData('customer_' . $customerCpfAttribute);
         }
 
-        $cpfObj = new \Magento\Framework\DataObject(array('cpf'=>$cpf));
+        $cpfObj = new \Magento\Framework\DataObject(['cpf' =>$cpf]);
 
         return $cpfObj->getCpf();
     }
 
      /**
-     * Extracts phone area code and returns phone number, with area code as key of the returned array
-     * @author Ricardo Martins <ricardo@ricardomartins.net.br>
-     * @param string $phone
-     * @return array
-     */
+      * Extracts phone area code and returns phone number, with area code as key of the returned array
+      * @author Ricardo Martins <ricardo@ricardomartins.net.br>
+      * @param string $phone
+      * @return array
+      */
     private function extractPhone($phone)
     {
         $digits = new \Zend\Filter\Digits();
@@ -727,16 +736,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         if (is_array($phone) && count($phone) == 2) {
             list($area, $number) = explode('-', $phone);
-            return array(
+            return [
                 'area' => $area,
                 'number'=>$number
-            );
+            ];
         }
 
-        return array(
+        return [
             'area' => (string)substr($originalPhone, 0, 2),
             'number'=> (string)substr($originalPhone, 2, 9),
-        );
+            ];
     }
 
     /**
@@ -752,14 +761,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
      /**
-     * Replace language-specific characters by ASCII-equivalents.
-     * @see http://stackoverflow.com/a/16427125/529403
-     * @param string $s
-     * @return string
-     */
+      * Replace language-specific characters by ASCII-equivalents.
+      * @see http://stackoverflow.com/a/16427125/529403
+      * @param string $s
+      * @return string
+      */
     public static function normalizeChars($s)
     {
-        $replace = array(
+        $replace = [
             'Ä' => 'A', 'Å' => 'A', 'Æ' => 'AE', 'È' => 'E', 'Ë' => 'E', 'Ì' => 'I', 'Î' => 'I', 'Ï' => 'I',
             'Ñ' => 'N', 'Ò' => 'O', 'Ö' => 'O', 'Ø' => 'O', 'Ù' => 'U', 'Û' => 'U', 'Ü' => 'U', 'Ý' => 'Y',
             'ä' => 'a', 'ã' => 'a', 'á' => 'a', 'à' => 'a', 'å' => 'a', 'æ' => 'ae', 'è' => 'e', 'ë' => 'e', 'ì' => 'i',
@@ -767,7 +776,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'ñ' => 'n', 'ò' => 'o', 'ô' => 'o', 'ö' => 'o', 'ø' => 'o', 'ù' => 'ú', 'û' => 'u', 'ü' => 'ý', 'ÿ' => 'y',
             'Œ' => 'OE', 'œ' => 'oe', 'Š' => 'š', 'Ÿ' => 'Y', 'ƒ' => 'f', 'Ğ'=>'G', 'ğ'=>'g', 'Š'=>'S',
             'š'=>'s', 'Ş'=>'S', 'ș'=>'s', 'Ș'=>'S', 'ş'=>'s', 'ț'=>'t', 'Ț'=>'T', 'ÿ'=>'y', 'Ž'=>'Z', 'ž'=>'z'
-        );
+        ];
         return preg_replace('/[^0-9A-Za-zÃÁÀÂÇÉÊÍÕÓÔÚÜãáàâçéêíõóôúü.\-\/ ]/u', '', strtr($s, $replace));
     }
 
@@ -795,32 +804,32 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
      /**
-     * Return shipping code based on PagSeguro Documentation
-     * 1 – PAC, 2 – SEDEX, 3 - Desconhecido
-     * @param \Magento\Sales\Model\Order $order
-     *
-     * @return string
-     */
+      * Return shipping code based on PagSeguro Documentation
+      * 1 – PAC, 2 – SEDEX, 3 - Desconhecido
+      * @param \Magento\Sales\Model\Order $order
+      *
+      * @return string
+      */
     private function getShippingType(\Magento\Sales\Model\Order $order)
     {
         $method =  strtolower($order->getShippingMethod());
         if (strstr($method, 'pac') !== false) {
             return '1';
-        } else if (strstr($method, 'sedex') !== false) {
+        } elseif (strstr($method, 'sedex') !== false) {
             return '2';
         }
         return '3';
     }
 
      /**
-     * Gets the shipping attribute based on one of the id's from
-     * RicardoMartins_PagSeguro_Model_Source_Customer_Address_*
-     *
-     * @param \Magento\Sales\Model\Order\Address $address
-     * @param string $attributeId
-     *
-     * @return string
-     */
+      * Gets the shipping attribute based on one of the id's from
+      * RicardoMartins_PagSeguro_Model_Source_Customer_Address_*
+      *
+      * @param \Magento\Sales\Model\Order\Address $address
+      * @param string $attributeId
+      *
+      * @return string
+      */
     private function getAddressAttributeValue($address, $attributeId)
     {
         $isStreetline = preg_match('/^street_(\d{1})$/', $attributeId, $matches);
@@ -829,10 +838,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
              $street[1] = $address->getStreetLine(1); //street
              $street[2] = $address->getStreetLine(2); //number
              $street[3] = !$address->getStreetLine(4) ? '' : $address->getStreetLine(3); // complement
-             $street[4] = !$address->getStreetLine(4) ? $address->getStreetLine(3) : $address->getStreetLine(4); // neighborhood
+             $street[4] = !$address->getStreetLine(4) ?
+                 $address->getStreetLine(3) : $address->getStreetLine(4); //neighborhood
              $lineNum = (int)$matches[1];
              return $street[$lineNum];
-        } else if ($attributeId == '') { //do not tell pagseguro
+        } elseif ($attributeId == '') { //do not tell pagseguro
             return '';
         }
         return (string)$address->getData($attributeId);
@@ -880,17 +890,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getStateCode($state)
     {
-        if(strlen($state) == 2 && is_string($state))
-        {
-            return mb_convert_case($state,MB_CASE_UPPER);
-        }
-        else if(strlen($state) > 2 && is_string($state))
-        {
+        if (strlen($state) == 2 && is_string($state)) {
+            return mb_convert_case($state, MB_CASE_UPPER);
+        } elseif (strlen($state) > 2 && is_string($state)) {
             $state = static::normalizeChars($state);
             $state = trim($state);
             $state = $this->stripAccents($state);
             $state = mb_convert_case($state, MB_CASE_UPPER);
-            $codes = array(
+            $codes = [
                 'AC'=>'ACRE',
                 'AL'=>'ALAGOAS',
                 'AM'=>'AMAZONAS',
@@ -918,7 +925,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 'SE'=>'SERGIPE',
                 'SP'=>'SAO PAULO',
                 'TO'=>'TOCANTINS'
-            );
+            ];
             $code = array_search($state, $codes);
             if (false !== $code) {
                 return $code;
@@ -946,7 +953,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return string
      */
-    public function getWsUrl($amend ='', $useApp = false)
+    public function getWsUrl($amend = '', $useApp = false)
     {
         return self::XML_PATH_PAYMENT_PAGSEGURO_WS_URL.$amend;
     }
@@ -978,19 +985,19 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->moduleList->getOne('RicardoMartins_PagSeguro');
     }
 
-    public function getMagentoVersion() {
+    public function getMagentoVersion()
+    {
         return $this->productMetadata->getVersion();
     }
 
     /**
      * Validate public key
      */
-    public function validateKey() {
-
-
+    public function validateKey()
+    {
         //@TODO Remove hardcoded url
         $pubKey = $this->getPagSeguroPubKey();
-        if(empty($pubKey)){
+        if (empty($pubKey)) {
             return 'Public Key is empty.';
         }
 
@@ -1003,7 +1010,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     
     public function getBoletoApiCallParams($order, $payment)
     {
-        $params = array(
+        $params = [
             'email' => $this->getMerchantEmail(),
             'token' => $this->getToken(),
             'paymentMode'   => 'default',
@@ -1013,7 +1020,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'reference'     => $order->getIncrementId(),
             'extraAmount'=> $this->getExtraAmount($order),
             'notificationURL' => $this->getStoreUrl().'pseguro/notification/index',
-        );
+            ];
         
         $params = array_merge($params, $this->getItemsParams($order));
         $params = array_merge($params, $this->getSenderParams($order, $payment));
@@ -1021,7 +1028,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $params = array_merge($params, $this->getAddressParams($order, 'billing'));
         
         return $params;
-
     }
     
     public function getTefApiCallParams($order, $payment)
@@ -1058,7 +1064,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getHeaders()
     {
         $moduleVersion = $this->moduleList->getOne('RicardoMartins_PagSeguro')['setup_version'];
-        $headers = array('Platform: Magento', 'Platform-Version: ' . $this->getMagentoVersion(), 'Module-Version: ' . $moduleVersion);
+        $headers = ['Platform: Magento', 'Platform-Version: '
+                    . $this->getMagentoVersion(), 'Module-Version: ' . $moduleVersion];
 
         return $headers;
     }
@@ -1074,10 +1081,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $phone = $this->extractPhone($order->getBillingAddress()->getTelephone());
 
-        $enableRecover = $this->scopeConfig->getValue('payment/rm_pagseguro_pagar_no_pagseguro/enable_recovery') ? 'true' : 'false';
+        $enableRecover = $this->scopeConfig->getValue('payment/rm_pagseguro_pagar_no_pagseguro/enable_recovery') ?
+            'true' : 'false';
         $paymentAcceptedGroups = $this->scopeConfig->getValue('payment/rm_pagseguro_pagar_no_pagseguro/accepted_groups');
 
-        $params = array(
+        $params = [
             'email' => $this->getMerchantEmail(),
             'paymentMethod' => 'redirect',
             'currency' => 'BRL',
@@ -1091,7 +1099,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'shippingAddressRequired' => '',
             'acceptPaymentMethodGroup' => $paymentAcceptedGroups,
             'notificationURL'   => $this->getStoreUrl().'pseguro/notification/index',
-        );
+            ];
 
         $redirectURL = $this->scopeConfig->getValue('payment/rm_pagseguro_pagar_no_pagseguro/redirectURL');
         if ($redirectURL) {
@@ -1114,9 +1122,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getSenderName($order)
     {
         if ($order->getCustomerIsGuest()) {
-            $senderName = $this->removeDuplicatedSpaces(
-            sprintf('%s %s', $order->getBillingAddress()->getFirstname(), $order->getBillingAddress()->getLastname())
-            );
+            $senderName = $this->removeDuplicatedSpaces(sprintf(
+                '%s %s',
+                $order->getBillingAddress()->getFirstname(),
+                $order->getBillingAddress()->getLastname()
+            ));
         } else {
             $senderName = $this->removeDuplicatedSpaces(
                 sprintf('%s %s', $order->getCustomerFirstname(), $order->getCustomerLastname())
