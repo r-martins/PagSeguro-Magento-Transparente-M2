@@ -184,7 +184,7 @@ class Cc extends \Magento\Payment\Model\Method\Cc
             'transactionCode'   => $transactionId,
             'refundValue'       => number_format($amount, 2, '.', '')
         ];
-    
+
         $params['token'] = $this->pagSeguroHelper->getToken();
         $params['email'] = $this->pagSeguroHelper->getMerchantEmail();
 
@@ -255,7 +255,7 @@ class Cc extends \Magento\Payment\Model\Method\Cc
         }
 
         //Installments value
-        if ($data['additional_data']['cc_installments']) {
+        if (isset($data['additional_data']['cc_installments'])) {
             $installments = explode('|', $data['additional_data']['cc_installments']);
             if (false !== $installments && count($installments)==2) {
                 $info->setAdditionalInformation('installment_quantity', (int)$installments[0]);
@@ -319,7 +319,7 @@ class Cc extends \Magento\Payment\Model\Method\Cc
 
         $senderHash = $this->pagSeguroHelper->getPaymentHash('sender_hash');
         $creditCardToken = $this->pagSeguroHelper->getPaymentHash('credit_card_token');
-        
+
         if (!$creditCardToken || !$senderHash) {
             $missingInfo = sprintf('Token do cartão: %s', var_export($creditCardToken, true));
             $missingInfo .= sprintf('/ Sender_hash: %s', var_export($senderHash, true));
