@@ -122,9 +122,13 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                 $order = $this->orderModel->loadByIncrementId($orderNo);
                 if (!$order->getId()) {
                     $this->pagSeguroHelper->writeLog(
-                        sprintf('Request %s not found on system. Unable to process return.', $orderNo)
+                        sprintf(
+                            'Order %s not found on system. Unable to process return. '
+                                . 'A new attempt may happen in a few minutes.',
+                            $orderNo
+                        )
                     );
-                    return $this;
+                    return false;
                 }
                 $payment = $order->getPayment();
             }
