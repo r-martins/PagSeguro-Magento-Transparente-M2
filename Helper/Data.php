@@ -260,7 +260,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getPaymentHash($param = null)
     {
         $psPayment = $this->checkoutSession->getData('PsPayment');
-       
+
         $psPayment = $this->serializer->unserialize($psPayment);
 //         $this->writeLog('getPaymentHash'.json_encode($psPayment));
         if ($param === null) {
@@ -376,7 +376,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 $errArray = [];
             $xmlError = json_decode(json_encode($xml), true);
             $xmlError = $xmlError['error'];
-            
+
             if (isset($xmlError['code'])) {
                 $errArray[] = $this->translateError($xmlError['message']);
             } else {
@@ -384,7 +384,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                     $errArray[] = $this->translateError($xmlErr['message']);
                 }
             }
-            
+
             $errArray = implode(" / ", $errArray);
             if ($errArray) {
                 throw new \Magento\Framework\Validator\Exception(new Phrase($errArray));
@@ -706,7 +706,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         } elseif (count($entity) == 2 && $entity[0] == 'billing') { //billing
             $cpf = $order->getShippingAddress()->getData($entity[1]);
         }
-        
+
         if ($order->getCustomerIsGuest() && empty($cpf)) {
             $cpf = $order->getData('customer_' . $customerCpfAttribute);
         }
@@ -969,7 +969,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return  $this->scopeConfig->getValue($scopeConfigPath);
     }
 
-   
+
     public function setSessionVl($value)
     {
         return $this->checkoutSession->setCustomparam($value);
@@ -1007,7 +1007,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->_curl->getBody();
     }
 
-    
+
     public function getBoletoApiCallParams($order, $payment)
     {
         $params = [
@@ -1021,15 +1021,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'extraAmount'=> $this->getExtraAmount($order),
             'notificationURL' => $this->getStoreUrl().'pseguro/notification/index',
             ];
-        
+
         $params = array_merge($params, $this->getItemsParams($order));
         $params = array_merge($params, $this->getSenderParams($order, $payment));
         $params = array_merge($params, $this->getAddressParams($order, 'shipping'));
         $params = array_merge($params, $this->getAddressParams($order, 'billing'));
-        
+
         return $params;
     }
-    
+
     public function getTefApiCallParams($order, $payment)
     {
         $params = $this->getBoletoApiCallParams($order, $payment);
@@ -1055,7 +1055,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return call_user_func_array('__', $args);
     }
-  
+
     /**
      * Sends the header details.
      * @author Ricardo Martins
