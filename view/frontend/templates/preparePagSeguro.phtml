@@ -12,7 +12,7 @@ $ccPlaceholderImage = $this->getViewFileUrl('RicardoMartins_PagSeguro::images/cc
 <script src="<?php echo $viewJsPath;?>"></script>
 <script type="text/javascript">
      //<![CDATA[
-    var preparePagSeguro = function(){
+    function preparePagSeguro(){
         
         if(typeof RMPagSeguroObj != "undefined"){
             <?php if ($helper->isDebugActive()): ?>
