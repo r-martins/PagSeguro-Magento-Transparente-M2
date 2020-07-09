@@ -2,6 +2,7 @@
 
 namespace RicardoMartins\PagSeguro\Model\CronJob;
 
+use Magento\Framework\App\ResourceConnection;
 use Magento\Sales\Api\OrderManagementInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
@@ -17,20 +18,22 @@ use Magento\Store\Model\StoresConfig;
  */
 class CleanExpiredOrders extends \Magento\Sales\Model\CronJob\CleanExpiredOrders
 {
-    
+
     /**
      * @var Resource
      */
-    protected $_resource;    
-    
+    protected $_resource;
+
     public function __construct(
-        \Magento\Backend\App\Action\Context $context,
-        \Magento\Framework\App\ResourceConnection $resource
-        ) {
+        StoresConfig $storesConfig,
+        CollectionFactory $collectionFactory,
+        OrderManagementInterface $orderManagement = null,
+        ResourceConnection $resource
+    ) {
         $this->_resource = $resource;
-        parent::__construct($context);
-    }    
-    
+        parent::__construct($storesConfig, $collectionFactory, $orderManagement);
+    }
+
     /**
      * @var StoresConfig
      */
@@ -51,7 +54,7 @@ class CleanExpiredOrders extends \Magento\Sales\Model\CronJob\CleanExpiredOrders
     {
         $connection  = $this->_resource->getConnection();
         $salesOrderPaymentTableName   = $connection->getTableName('sales_order_payment');
-        
+
         $lifetimes = $this->storesConfig->getStoresConfigByPath('sales/orders/delete_pending_after');
         foreach ($lifetimes as $storeId => $lifetime) {
             /** @var $orders \Magento\Sales\Model\ResourceModel\Order\Collection */
