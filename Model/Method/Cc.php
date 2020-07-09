@@ -15,6 +15,7 @@ class Cc extends \Magento\Payment\Model\Method\Cc
      * @var string
      */
     protected $_formBlockType = \RicardoMartins\PagSeguro\Block\Form\Cc::class;
+    protected $_infoBlockType = \RicardoMartins\PagSeguro\Block\Payment\InfoCc::class;
 
     const CODE = 'rm_pagseguro_cc';
 
