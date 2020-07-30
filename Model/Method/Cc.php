@@ -225,31 +225,34 @@ class Cc extends \Magento\Payment\Model\Method\Cc
         }
 
         $info = $this->getInfoInstance();
-        $info->setAdditionalInformation('sender_hash', $this->pagSeguroHelper->getPaymentHash('sender_hash'))
-            ->setAdditionalInformation('credit_card_token', $this->pagSeguroHelper->getPaymentHash('credit_card_token'))
-            ->setAdditionalInformation('credit_card_owner', $data['additional_data']['cc_owner_name'])
-            ->setCcType($this->pagSeguroHelper->getPaymentHash('cc_type'))
-            ->setCcLast4(substr($data['additional_data']['cc_number'], -4))
-            ->setCcExpYear($data['additional_data']['cc_exp_year'])
-            ->setCcExpMonth($data['additional_data']['cc_exp_month']);
+        $info->setAdditionalInformation('sender_hash', $this->pagSeguroHelper->getPaymentHash('sender_hash') ?? null)
+            ->setAdditionalInformation(
+                'credit_card_token',
+                $this->pagSeguroHelper->getPaymentHash('credit_card_token') ?? null
+            )
+            ->setAdditionalInformation('credit_card_owner', $data['additional_data']['cc_owner_name'] ?? null)
+            ->setCcType($this->pagSeguroHelper->getPaymentHash('cc_type') ?? null)
+            ->setCcLast4(substr($data['additional_data']['cc_number'] ?? null, -4))
+            ->setCcExpYear($data['additional_data']['cc_exp_year'] ?? null)
+            ->setCcExpMonth($data['additional_data']['cc_exp_month'] ?? null);
 
         // set cpf
         if ($this->pagSeguroHelper->isCpfVisible()) {
-            $info->setAdditionalInformation($this->getCode() . '_cpf', $data['additional_data']['cc_owner_cpf']);
+            $ccOwnerCpf = $data['additional_data']['cc_owner_cpf'] ?? null;
+            $info->setAdditionalInformation($this->getCode() . '_cpf', $ccOwnerCpf);
         }
 
         //DOB value
         if ($this->pagSeguroHelper->isDobVisible()) {
+            $dobDay = $data['additional_data']['cc_owner_birthday_day'] ?? '01';
+            $dobMonth = $data['additional_data']['cc_owner_birthday_month'] ?? '01';
+            $dobYear = $data['additional_data']['cc_owner_birthday_year'] ?? '1970';
             $info->setAdditionalInformation(
                 'credit_card_owner_birthdate',
                 date(
                     'd/m/Y',
                     strtotime(
-                        $data['additional_data']['cc_owner_birthday_month'].
-                        '/'.
-                        $data['additional_data']['cc_owner_birthday_day'].
-                        '/'.
-                        $data['additional_data']['cc_owner_birthday_year']
+                        $dobMonth . '/' . $dobDay . '/' . $dobYear
                     )
                 )
             );

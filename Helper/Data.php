@@ -2,6 +2,7 @@
 namespace RicardoMartins\PagSeguro\Helper;
 
 use Magento\Framework\Phrase;
+use Magento\Store\Model\ScopeInterface;
 
 /**
  * Class Data Helper
@@ -166,7 +167,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getMerchantEmail()
     {
-        return $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_EMAIL);
+        return $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_EMAIL, ScopeInterface::SCOPE_WEBSITE);
     }
 
     /**
@@ -175,7 +176,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function isDebugActive()
     {
-        return $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_DEBUG);
+        return $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_DEBUG, ScopeInterface::SCOPE_WEBSITE);
     }
 
      /**
@@ -184,7 +185,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
       */
     public function getPagSeguroPubKey()
     {
-        return $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_KEY);
+        return $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_KEY, ScopeInterface::SCOPE_WEBSITE);
     }
 
     /**
@@ -204,7 +205,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getToken()
     {
-        $token = $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_TOKEN);
+        $token = $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_TOKEN, ScopeInterface::SCOPE_WEBSITE);
         if (empty($token)) {
             return false;
         }
@@ -218,19 +219,37 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getConfigJs()
     {
+        $activeMethods = [
+            'cc' => $this->scopeConfig->getValue(
+                self::XML_PATH_PAYMENT_PAGSEGURO_CC_ACTIVE,
+                ScopeInterface::SCOPE_WEBSITE
+            ),
+            'boleto' => $this->scopeConfig->getValue(
+                self::XML_PATH_PAYMENT_PAGSEGURO_BOLETO_ACTIVE,
+                ScopeInterface::SCOPE_STORE
+            ),
+            'tef' => $this->scopeConfig->getValue(
+                self::XML_PATH_PAYMENT_PAGSEGURO_TEF_ACTIVE,
+                ScopeInterface::SCOPE_STORE
+            )];
+
         $config = [
-            'active_methods' => [
-                'cc' => $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_CC_ACTIVE),
-                'boleto' => $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_BOLETO_ACTIVE),
-                'tef' => $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_TEF_ACTIVE)
-            ],
-            'flag' => $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_CC_FLAG),
+            'active_methods' => $activeMethods,
+            'flag' => $this->scopeConfig->getValue(
+                self::XML_PATH_PAYMENT_PAGSEGURO_CC_FLAG,
+                ScopeInterface::SCOPE_WEBSITE
+            ),
             'debug' => $this->isDebugActive(),
             'PagSeguroSessionId' => $this->getSessionId(),
-            'show_total' => $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_CC_SHOW_TOTAL),
-            'force_installments_selection' =>
-                $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_CC_FORCE_INSTALLMENTS)
-        ];
+            'show_total' => $this->scopeConfig->getValue(
+                self::XML_PATH_PAYMENT_PAGSEGURO_CC_SHOW_TOTAL,
+                ScopeInterface::SCOPE_WEBSITE
+            ),
+            'force_installments_selection' => $this->scopeConfig->getValue(
+                self::XML_PATH_PAYMENT_PAGSEGURO_CC_FORCE_INSTALLMENTS,
+                ScopeInterface::SCOPE_WEBSITE
+            )];
+
         return json_encode($config);
     }
 
@@ -261,8 +280,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $psPayment = $this->checkoutSession->getData('PsPayment');
 
+        if (null == $psPayment) {
+            return false;
+        }
+
         $psPayment = $this->serializer->unserialize($psPayment);
-//         $this->writeLog('getPaymentHash'.json_encode($psPayment));
         if ($param === null) {
             return $psPayment;
         }
@@ -297,7 +319,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
       */
     public function isCpfVisible()
     {
-        $customerCpfAttribute = $this->scopeConfig->getValue('payment/rm_pagseguro/customer_cpf_attribute');
+        $customerCpfAttribute = $this->scopeConfig->getValue(
+            'payment/rm_pagseguro/customer_cpf_attribute',
+            ScopeInterface::SCOPE_WEBSITE
+        );
         return empty($customerCpfAttribute);
     }
 
@@ -307,7 +332,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
       */
     public function isDobVisible()
     {
-        $customerDobAttribute = $this->scopeConfig->getValue('payment/rm_pagseguro_cc/owner_dob_attribute');
+        $customerDobAttribute = $this->scopeConfig->getValue(
+            'payment/rm_pagseguro_cc/owner_dob_attribute',
+            ScopeInterface::SCOPE_WEBSITE
+        );
         return empty($customerDobAttribute);
     }
 
@@ -634,11 +662,21 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         /** @var Mage_Sales_Model_Order_Address $address */
         $address = ($type=='shipping' && !$order->getIsVirtual()) ?
         $order->getShippingAddress() : $order->getBillingAddress();
-        $addressStreetAttribute = $this->scopeConfig->getValue('payment/rm_pagseguro/address_street_attribute');
-        $addressNumberAttribute = $this->scopeConfig->getValue('payment/rm_pagseguro/address_number_attribute');
-        $addressComplementAttribute = $this->scopeConfig->getValue('payment/rm_pagseguro/address_complement_attribute');
+        $addressStreetAttribute = $this->scopeConfig->getValue(
+            'payment/rm_pagseguro/address_street_attribute',
+            ScopeInterface::SCOPE_WEBSITE
+        );
+        $addressNumberAttribute = $this->scopeConfig->getValue(
+            'payment/rm_pagseguro/address_number_attribute',
+            ScopeInterface::SCOPE_WEBSITE
+        );
+        $addressComplementAttribute = $this->scopeConfig->getValue(
+            'payment/rm_pagseguro/address_complement_attribute',
+            ScopeInterface::SCOPE_WEBSITE
+        );
         $addressNeighborhoodAttribute = $this->scopeConfig->getValue(
-            'payment/rm_pagseguro/address_neighborhood_attribute'
+            'payment/rm_pagseguro/address_neighborhood_attribute',
+            ScopeInterface::SCOPE_WEBSITE
         );
 
         //gathering address data
@@ -687,7 +725,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     private function getCustomerCpfValue(\Magento\Sales\Model\Order $order, $payment)
     {
-        $customerCpfAttribute = $this->scopeConfig->getValue('payment/rm_pagseguro/customer_cpf_attribute');
+        $customerCpfAttribute = $this->scopeConfig->getValue(
+            'payment/rm_pagseguro/customer_cpf_attribute',
+            ScopeInterface::SCOPE_WEBSITE
+        );
 
         if (empty($customerCpfAttribute)) { //Asked with payment data
             if (isset($payment['additional_information'][$payment->getMethod() . '_cpf'])) {
@@ -755,7 +796,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function removeDuplicatedSpaces($string)
     {
-        $string = static::normalizeChars($string);
+        $string = $this->normalizeChars($string);
 
         return preg_replace('/\s+/', ' ', trim($string));
     }
@@ -766,7 +807,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
       * @param string $s
       * @return string
       */
-    public static function normalizeChars($s)
+    public function normalizeChars($s)
     {
         $replace = [
             'Ä' => 'A', 'Å' => 'A', 'Æ' => 'AE', 'È' => 'E', 'Ë' => 'E', 'Ì' => 'I', 'Î' => 'I', 'Ï' => 'I',
@@ -857,7 +898,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     private function getCustomerCcDobValue(\Magento\Customer\Model\Customer $customer, $payment)
     {
-        $ccDobAttribute = $this->scopeConfig->getValue('payment/rm_pagseguro_cc/owner_dob_attribute');
+        $ccDobAttribute = $this->scopeConfig->getValue(
+            'payment/rm_pagseguro_cc/owner_dob_attribute',
+            ScopeInterface::SCOPE_WEBSITE
+        );
 
         if (empty($ccDobAttribute)) { //when asked with payment data
             if (isset($payment['additional_information']['credit_card_owner_birthdate'])) {
@@ -878,7 +922,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         $dob = $attribute->getFrontend()->getValue($customer);
 
-
         return date('d/m/Y', strtotime($dob));
     }
 
@@ -893,7 +936,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if (strlen($state) == 2 && is_string($state)) {
             return mb_convert_case($state, MB_CASE_UPPER);
         } elseif (strlen($state) > 2 && is_string($state)) {
-            $state = static::normalizeChars($state);
+            $state = $this->normalizeChars($state);
             $state = trim($state);
             $state = $this->stripAccents($state);
             $state = mb_convert_case($state, MB_CASE_UPPER);
@@ -966,9 +1009,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getStoreConfigValue($scopeConfigPath)
     {
-        return  $this->scopeConfig->getValue($scopeConfigPath);
+        return  $this->scopeConfig->getValue($scopeConfigPath, ScopeInterface::SCOPE_STORE);
     }
-
 
     public function setSessionVl($value)
     {
@@ -1006,7 +1048,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         return $this->_curl->getBody();
     }
-
 
     public function getBoletoApiCallParams($order, $payment)
     {
@@ -1081,9 +1122,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $phone = $this->extractPhone($order->getBillingAddress()->getTelephone());
 
-        $enableRecover = $this->scopeConfig->getValue('payment/rm_pagseguro_pagar_no_pagseguro/enable_recovery') ?
-            'true' : 'false';
-        $paymentAcceptedGroups = $this->scopeConfig->getValue('payment/rm_pagseguro_pagar_no_pagseguro/accepted_groups');
+        $enableRecover = $this->scopeConfig->getValue(
+            'payment/rm_pagseguro_pagar_no_pagseguro/enable_recovery',
+            ScopeInterface::SCOPE_STORE
+        ) ? 'true' : 'false';
+        $paymentAcceptedGroups = $this->scopeConfig->getValue(
+            'payment/rm_pagseguro_pagar_no_pagseguro/accepted_groups',
+            ScopeInterface::SCOPE_WEBSITE
+        );
 
         $params = [
             'email' => $this->getMerchantEmail(),
@@ -1101,7 +1147,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'notificationURL'   => $this->getStoreUrl().'pseguro/notification/index',
             ];
 
-        $redirectURL = $this->scopeConfig->getValue('payment/rm_pagseguro_pagar_no_pagseguro/redirectURL');
+        $redirectURL = $this->scopeConfig->getValue(
+            'payment/rm_pagseguro_pagar_no_pagseguro/redirectURL',
+            ScopeInterface::SCOPE_STORE
+        );
         if ($redirectURL) {
             $params['redirectURL'] = $this->_urlBuilder->getUrl($redirectURL);
         }

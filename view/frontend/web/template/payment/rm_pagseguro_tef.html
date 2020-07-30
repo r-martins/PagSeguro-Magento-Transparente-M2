@@ -35,11 +35,11 @@
                                 name="payment[payment_form_pagseguropro_tef]"
                                 data-validate="{required:true}"
                                 data-bind='attr: {title: $t("Pagseguropro Tef")},
-                                value: tefOwnerBank'>                           
+                                value: tefOwnerBank'>
                         </select>
                     </div>
                 </div>
-                <input type="hidden" name="payment[pagseguropro_tef_bank]" class="tefbank" data-bind="textInput: 'BANCO_BRASIL',  value:'BANCO_BRASIL'" />								
+                <input type="hidden" name="payment[pagseguropro_tef_bank]" class="tefbank" data-bind="textInput: 'BANCO_BRASIL',  value:'BANCO_BRASIL'" />
                 <!-- ko foreach: getRegion('messages') -->
                 <!-- ko template: getTemplate() --><!-- /ko -->
                 <!--/ko-->
@@ -71,7 +71,7 @@
                     </div>
                 </div>
             </fieldset>
-        </form>	
+        </form>
     </div>
 </div>
 <div data-bind="afterRender: preparePagSeguro()"></div>
