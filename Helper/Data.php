@@ -367,7 +367,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         $this->writeLog('Parameters being sent to API (/v2/'.$type.'): '. var_export($params, true));
 
-
         //@TODO Remove curl
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $this->getWsUrl($type));
@@ -400,7 +399,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         libxml_use_internal_errors(true);
         $xml = \simplexml_load_string(trim($response));
 
-        if ($xml->error->code) {
+        if (false !== $xml && $xml->error->code) {
                 $errArray = [];
             $xmlError = json_decode(json_encode($xml), true);
             $xmlError = $xmlError['error'];
@@ -435,6 +434,20 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                         . 'e se a chave usada pertence à esta conta. Retorno do PagSeguro: '
                         . var_export($response, true)
                     );
+                    break;
+                case 'Public_key missing.':
+                    $this->writeLog(
+                        'Configure corretamente o campo Chave Pública do módulo PagSeguro. '
+                        . 'Obtenha uma chave em https://pagseguro.ricardomartins.net.br/magento2/wizard.html.'
+                    );
+                    $errMsg = 'Public Key has not been defined in the module configuration.';
+                    break;
+                case stripos($response, 'chave publica inválida') !== false:
+                    $this->writeLog(
+                        'Chave Pública inválida. Se necessário reautentique a aplicação. '
+                        . 'Autorize em https://pagseguro.ricardomartins.net.br/magento2/wizard.html.'
+                    );
+                    $errMsg = 'Invalid PagSeguro Public Key';
                     break;
                 default:
                     $this->writeLog('Retorno inesperado do PagSeguro: ' . $response);
@@ -605,7 +618,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $customer = $this->customerRepo->load($order->getCustomerId());
         $creditCardHolderBirthDate = $this->getCustomerCcDobValue($customer, $payment);
         $phone = $this->extractPhone($order->getBillingAddress()->getTelephone());
-
 
         $holderName = $this->removeDuplicatedSpaces($payment['additional_information']['credit_card_owner']);
         $return = [

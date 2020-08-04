@@ -237,3 +237,5 @@
 "Something went wrong when placing the order with PagSeguro. Please try again.","Algo deu errado ao enviar o pedido ao PagSeguro. Por favor, tente novamente."
 "Success URL","URL de Sucesso"
 "Please select a bank to continue.","Por favor escolha um banco para continuar."
+"Public Key has not been defined in the module configuration.","Chave Pública não foi definida nas configurações do módulo."
+"Invalid PagSeguro Public Key","Chave Pública PagSeguro inválida"

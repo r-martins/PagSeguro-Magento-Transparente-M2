@@ -17,7 +17,7 @@ class UpdatePaymentHashes extends \Magento\Framework\App\Action\Action
      * Checkout Session
      *
      * @var \Magento\Checkout\Model\Session
-     */ 
+     */
     protected $checkoutSession;
 
     /** @var \Magento\Framework\Serialize\SerializerInterface  */
@@ -32,7 +32,7 @@ class UpdatePaymentHashes extends \Magento\Framework\App\Action\Action
         \Magento\Checkout\Model\Session $checkoutSession,
          \Magento\Framework\App\Action\Context $context,
         \Magento\Framework\Serialize\SerializerInterface $serializer
- 
+
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->serializer = $serializer;
@@ -44,20 +44,19 @@ class UpdatePaymentHashes extends \Magento\Framework\App\Action\Action
     */
     public function execute()
     {
-        $resultJson = $this->resultFactory->create(ResultFactory::TYPE_JSON);     
-        try{
-            $params = $this->getRequest()->getPost('payment');            
+        $resultJson = $this->resultFactory->create(ResultFactory::TYPE_JSON);
+        try {
+            $params = $this->getRequest()->getPost('payment');
             $this->checkoutSession->setData('PsPayment', $this->serializer->serialize($params));
-              
-            $result = array(
+
+            $result = [
                 'status'=> 'success',
-                'message' => __('Updated Payment Hashes')
-            );
+                'message' => __('Updated Payment Hashes')];
         }catch (\Exception $e) {
-            $result = array('status'=> 'error','message' => $e->getMessage());
+            $result = ['status' => 'error', 'message' => $e->getMessage()];
         }
 
-        $resultJson->setData($result);         
+        $resultJson->setData($result);
         return $resultJson;
     }
 }
