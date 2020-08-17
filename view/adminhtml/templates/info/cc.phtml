@@ -1,0 +1,12 @@
+<?php
+/** @var \RicardoMartins\PagSeguro\Block\Payment\InfoCc $block */
+$info = $block->getPaymentInfo();
+?>
+
+<p><strong><?= $block->escapeHtml($block->getMethod()->getTitle()) ?></strong></p>
+<?php if (isset($info['installment_quantity']) && isset($info['installment_value'])) : ?>
+    <p>Parcelas: <?php echo $info['installment_quantity']?> (R$ <?php echo number_format($info['installment_value'], 2, ',', '.')?>)</p>
+<?php endif?>
+<?php if (isset($info['transaction_id'])) : ?>
+    <p>Código da transação: <?php echo $info['transaction_id']?></p>
+<?php endif?>

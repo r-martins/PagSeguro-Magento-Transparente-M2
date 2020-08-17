@@ -57,12 +57,9 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
         var ccExpMoElm = jQuery('input[name="payment[ps_cc_exp_month]"]');
         var ccExpYrElm = jQuery('input[name="payment[ps_cc_exp_year]"]');
         var ccCvvElm = jQuery('input[name="payment[ps_cc_cid]"]');
-        var cpf = jQuery('input[name="payment[ps_cc_cpf]"]');
-        var tefcpf = jQuery('input[name="payment[pagseguro_tef_cpf]"]');
         var ccExpYrVisibileElm = jQuery('#rm_pagseguro_cc_cc_year_visible');
         var ccNumVisibleElm = jQuery('.cc_number_visible');
-        var billingCpf = jQuery('input[name="vat_id"]');
-
+        
         jQuery(ccNumElm).keyup(function( event ) {
             obj.updateCreditCardToken();
         });
@@ -114,16 +111,12 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
             jQuery(ccExpYrElm).val(ccExpYr);
         });
         
-        jQuery( "#pagseguro_cc_method .actions-toolbar .checkout" ).on("click", function() {
-            if(cpf.val() != '' || billingCpf.val() != '') {
-                obj.updateCreditCardToken();
-            }
+        jQuery( "#pagseguro_cc_method .actions-toolbar .checkout" ).on("click", function() {            
+                obj.updateCreditCardToken();            
         });
         
-        jQuery( "#pagseguro_tef_method .actions-toolbar .checkout" ).on("click", function() {
-            if(tefcpf.val()!=''){
-                obj.updatePaymentHashes();
-            }
+        jQuery( "#pagseguro_tef_method .actions-toolbar .checkout" ).on("click", function() {            
+                obj.updatePaymentHashes();            
         });
 
         jQuery("#rm_pagseguro_cc_cc_installments").change(function( event ) {
@@ -243,43 +236,21 @@ RMPagSeguro.prototype.updateBrand = function(){
 RMPagSeguro.prototype.updatePaymentHashes = function(){
     var self = this;
     var url = self.storeUrl +'pseguro/ajax/updatePaymentHashes';
-    var tefcpf = jQuery('input[name="payment[pagseguro_tef_cpf]"]').val();
-    var tefbank = jQuery('input[name="payment[pagseguropro_tef_bank]"]').val();
-    var cpf = jQuery('input[name="payment[ps_cc_cpf]"]').val();
-    var billingCpf = jQuery('input[name="vat_id"]').val();
-    if (cpf == '' || cpf == undefined) {
-        cpf = billingCpf;
-    }
-
-    if (tefcpf == '' || tefcpf == undefined) {
-        tefcpf = billingCpf;
-    }
-
+    
     var currnetSelectedPayment = jQuery('input[name="payment[method]"]:checked').attr('id');
 
-    if (tefcpf != '' && tefcpf != undefined && currnetSelectedPayment == 'rm_pagseguro_tef') {
+    if (currnetSelectedPayment == 'rm_pagseguro_tef' || currnetSelectedPayment == 'rm_pagseguro_boleto') {
         var paymentHashes = {
-            "payment[sender_hash]": this.senderHash,
-            "ownerdata[tef_cpf]": tefcpf,
-            "ownerdata[tef_bank]": tefbank,
+            "payment[sender_hash]": this.senderHash            
         };
     }
 
-    if (cpf != '' && cpf != undefined && currnetSelectedPayment == 'rm_pagseguro_cc') {
-        var ccOwner = jQuery('input[name="payment[ps_cc_owner]"]').val();
-        var ccOwnerBirthDay = jQuery('input[name="payment[ps_cc_owner_birthday_day]"]').val();
-        var ccOwnerBirthMonth = jQuery('input[name="payment[ps_cc_owner_birthday_month]"]').val();
-        var ccOwnerBirthYear = jQuery('input[name="payment[ps_cc_owner_birthday_year]"]').val();
+    if (currnetSelectedPayment == 'rm_pagseguro_cc') {
         var paymentHashes = {
             "payment[sender_hash]": this.senderHash,
             "payment[credit_card_token]": this.creditCardToken,
             "payment[cc_type]": (this.brand)?this.brand.name:'',
-            "payment[is_admin]": this.config.is_admin,
-            "ownerdata[credit_card_owner]": ccOwner,
-            "ownerdata[credit_card_birthday]":ccOwnerBirthDay,
-            "ownerdata[credit_card_birthmonth]":ccOwnerBirthMonth,
-            "ownerdata[credit_card_birthyear]":ccOwnerBirthYear,
-            "ownerdata[credit_card_cpf]": cpf,
+            "payment[is_admin]": this.config.is_admin            
         };
     }
 

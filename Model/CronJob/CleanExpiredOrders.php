@@ -2,6 +2,7 @@
 
 namespace RicardoMartins\PagSeguro\Model\CronJob;
 
+use Magento\Framework\App\ResourceConnection;
 use Magento\Sales\Api\OrderManagementInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
@@ -17,6 +18,22 @@ use Magento\Store\Model\StoresConfig;
  */
 class CleanExpiredOrders extends \Magento\Sales\Model\CronJob\CleanExpiredOrders
 {
+
+    /**
+     * @var Resource
+     */
+    protected $_resource;
+
+    public function __construct(
+        StoresConfig $storesConfig,
+        CollectionFactory $collectionFactory,
+        OrderManagementInterface $orderManagement = null,
+        ResourceConnection $resource
+    ) {
+        $this->_resource = $resource;
+        parent::__construct($storesConfig, $collectionFactory, $orderManagement);
+    }
+
     /**
      * @var StoresConfig
      */
@@ -35,6 +52,9 @@ class CleanExpiredOrders extends \Magento\Sales\Model\CronJob\CleanExpiredOrders
     /** @inheritDoc */
     public function execute()
     {
+        $connection  = $this->_resource->getConnection();
+        $salesOrderPaymentTableName   = $connection->getTableName('sales_order_payment');
+
         $lifetimes = $this->storesConfig->getStoresConfigByPath('sales/orders/delete_pending_after');
         foreach ($lifetimes as $storeId => $lifetime) {
             /** @var $orders \Magento\Sales\Model\ResourceModel\Order\Collection */
@@ -42,7 +62,7 @@ class CleanExpiredOrders extends \Magento\Sales\Model\CronJob\CleanExpiredOrders
             $orders->addFieldToFilter('store_id', $storeId);
             $orders->addFieldToFilter('status', Order::STATE_PENDING_PAYMENT);
             $orders->getSelect()->joinLeft(
-                ['payment' => 'sales_order_payment'],
+                ['payment' => $salesOrderPaymentTableName],
                 'payment.parent_id = main_table.entity_id',
                 ['payment_method' => 'payment.method']
             );

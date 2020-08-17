@@ -6,70 +6,72 @@
                data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()"/>
         <label data-bind="attr: {'for': getCode()}" class="label"><span data-bind="text: getTitle()"></span></label>
     </div>
-	<div class="payment-method-content" id="pagseguro_tef_method">
-		<form class="form" data-bind="attr: {'id': getCode() + '-form'}">
-			<fieldset data-bind="attr: {class: 'fieldset payment items tef ' + getCode(), id: 'payment_' + getCode()}">
-				<!-- ko if: (window.visibleCpf)-->
-				<div class="field number required">
-					<label data-bind="attr: {for: getCode() + '_cpf'}" class="label">
-						<span><!-- ko i18n: 'CPF '--><!-- /ko --></span>
-					</label>
-					<div class="control">
-						<input type="text" name="payment[pagseguro_tef_cpf]" class="input-text" value=""
-							   data-bind="attr: {
-												autocomplete: off,
-												id: getCode() + '_cpf',
-												title: $t('CPF'),
-												'data-container': getCode() + '-cpf',
-												'data-validate': JSON.stringify({'required':true})}"
-												/>
-					</div>
-					<span id="card-cpf-msg"></span>
-				</div>
-				 <!-- /ko -->
-				<div class="field field-number required">
+    <div class="payment-method-content" id="pagseguro_tef_method">
+        <form class="form" data-bind="attr: {'id': getCode() + '-form'}">
+            <fieldset data-bind="attr: {class: 'fieldset payment items tef ' + getCode(), id: 'payment_' + getCode()}">
+                <!-- ko if: (window.visibleCpf)-->
+                <div class="field number required">
+                    <label data-bind="attr: {for: getCode() + '_cpf'}" class="label">
+                        <span><!-- ko i18n: 'CPF '--><!-- /ko --></span>
+                    </label>
                     <div class="control">
-					      <select id="pagseguropro_tef_bank"
-                               name="payment[payment_form_pagseguropro_tef]"
-                               data-validate="{required:true}"
-                               data-bind='attr: {title: $t("Pagseguropro Tef")},
-                                value: pagseguropro_tef_bank'>                           
+                        <input type="text" name="payment[pagseguro_tef_cpf]" class="input-text" value=""
+                               data-bind="attr: {
+                                                autocomplete: off,
+                                                id: getCode() + '_cpf',
+                                                title: $t('CPF'),
+                                                'data-container': getCode() + '-cpf',
+                                                'data-validate': JSON.stringify({'required':true})},
+                                    value: tefOwnerCpf,
+                                    valueUpdate: 'keyup'"
+                               />
+                    </div>
+                    <span id="card-cpf-msg"></span>
+                </div>
+                <!-- /ko -->
+                <div class="field field-number required">
+                    <div class="control">
+                        <select id="pagseguropro_tef_bank"
+                                name="payment[payment_form_pagseguropro_tef]"
+                                data-validate="{required:true}"
+                                data-bind='attr: {title: $t("Pagseguropro Tef")},
+                                value: tefOwnerBank'>
                         </select>
                     </div>
                 </div>
-				<input type="hidden" name="payment[pagseguropro_tef_bank]" class="tefbank" data-bind="textInput: 'BANCO_BRASIL',  value:'BANCO_BRASIL'" />								
-				<!-- ko foreach: getRegion('messages') -->
-				<!-- ko template: getTemplate() --><!-- /ko -->
-				<!--/ko-->
-				<div class="payment-method-billing-address">
-					<!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
-					<!-- ko template: getTemplate() --><!-- /ko -->
-					<!--/ko-->
-				</div>
-				
-				
-				<div class="checkout-agreements-block">
-					<!-- ko foreach: $parent.getRegion('before-place-order') -->
-					<!-- ko template: getTemplate() --><!-- /ko -->
-					<!--/ko-->
-				</div>
-				<div class="actions-toolbar">
-					<div class="primary">
-						<button class="action primary checkout"
-								type="submit"
-								data-bind="
+                <input type="hidden" name="payment[pagseguropro_tef_bank]" class="tefbank" data-bind="textInput: 'BANCO_BRASIL',  value:'BANCO_BRASIL'" />
+                <!-- ko foreach: getRegion('messages') -->
+                <!-- ko template: getTemplate() --><!-- /ko -->
+                <!--/ko-->
+                <div class="payment-method-billing-address">
+                    <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
+                    <!-- ko template: getTemplate() --><!-- /ko -->
+                    <!--/ko-->
+                </div>
+
+
+                <div class="checkout-agreements-block">
+                    <!-- ko foreach: $parent.getRegion('before-place-order') -->
+                    <!-- ko template: getTemplate() --><!-- /ko -->
+                    <!--/ko-->
+                </div>
+                <div class="actions-toolbar">
+                    <div class="primary">
+                        <button class="action primary checkout"
+                                type="submit"
+                                data-bind="
 								click: placeOrder,
 								attr: {title: $t('Place Order')},
 								css: {disabled: !isPlaceOrderActionAllowed()},
 								enable: (getCode() == isChecked())
-								"
-								disabled>
-							<span data-bind="text: $t('Place Order')"></span>
-						</button>
-					</div>
-				</div>
-			</fieldset>
-		</form>	
+                                "
+                                disabled>
+                            <span data-bind="text: $t('Place Order')"></span>
+                        </button>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
     </div>
 </div>
 <div data-bind="afterRender: preparePagSeguro()"></div>
