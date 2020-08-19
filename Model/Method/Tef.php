@@ -120,6 +120,11 @@ class Tef extends \Magento\Payment\Model\Method\AbstractMethod
             $this->pagSeguroHelper->writeLog('tef_cpf' . $data['additional_data']['tef_cpf']);
             $info->setAdditionalInformation($this->getCode() . '_cpf', $data['additional_data']['tef_cpf']);
         }
+        
+        //Sandbox Mode
+        if ($this->pagSeguroHelper->isSandbox()) {
+            $info->setAdditionalInformation('is_sandbox', '1');
+        }
 
         return $this;
     }

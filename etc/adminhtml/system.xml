@@ -17,43 +17,50 @@
                     <label>Public Key</label>
                     <comment><![CDATA[Get your public key for free when <a href="//r-martins.github.io/PagSeguro-Magento-Transparente/pro/app.html" target="_blank">enabling your account</a>.]]></comment>
                 </field>
-                <!-- <field id="sandbox" translate="label comment" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Test environment?</label>
-                    <comment><![CDATA[In test mode, the data is sent to the sandbox of PagSeguro. Enable Sandbox access <a href="http://sandbox.pagseguro.uol.com.br/" target="_blank">here</a><br/>
-                    Note: The Sandbox mode still does not work in the application template.]]></comment>
+                <field id="sandbox" translate="label comment" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Enable Sandbox</label>
+                    <comment><![CDATA[In Sandbox mode, the data is sent to the sandbox of PagSeguro. Enable Sandbox access <a href="http://sandbox.pagseguro.uol.com.br/" target="_blank">here</a>.]]></comment>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                </field> -->
-                 <field id="debug" translate="label comment" type="select" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="0">
+                </field>
+                <field id="sandbox_merchant_email" translate="label comment" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Sandbox Email</label>
+                    <comment><![CDATA[Sandbox Email]]></comment>
+                </field>
+                <field id="sandbox_key" translate="label comment" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Sandbox Public Key</label>
+                    <comment><![CDATA[Get your public key for free when <a href="//r-martins.github.io/PagSeguro-Magento-Transparente/pro/app.html" target="_blank">enabling your account</a>.]]></comment>
+                </field>
+                 <field id="debug" translate="label comment" type="select" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Debug</label>
                     <comment><![CDATA[See the log output in var/log/pagseguro.log. It is recommended that you enable logging for information about any issues.]]></comment>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="send_invoice_email" translate="label comment" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="0">
+                <field id="send_invoice_email" translate="label comment" type="select" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Send invoice email?</label>
                     <comment><![CDATA[Shoot the invoice email from the store upon receipt of payment confirmation from PagSeguro.]]></comment>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="customer_cpf_attribute" translate="label comment" type="select" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="0">
+                <field id="customer_cpf_attribute" translate="label comment" type="select" sortOrder="8" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Customer CPF</label>
                     <comment><![CDATA[If your store uses a custom attribute for the customer's CPF, select here. Otherwise choose "Request along with the other payment details".]]></comment>
                    <source_model>RicardoMartins\PagSeguro\Model\System\Config\Source\Cpf</source_model>
                 </field>
-               <field id="address_street_attribute" translate="label comment" type="select" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="0">
+               <field id="address_street_attribute" translate="label comment" type="select" sortOrder="9" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Attribute Delivery Street</label>
                     <comment><![CDATA[If your store uses a custom attribute for Delivery Street, select here.]]></comment>
                    <source_model>RicardoMartins\PagSeguro\Model\System\Config\Source\Attributes</source_model>
                 </field>
-                <field id="address_number_attribute" translate="label comment" type="select" sortOrder="8" showInDefault="1" showInWebsite="1" showInStore="0">
+                <field id="address_number_attribute" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Attribute Number</label>
                     <comment><![CDATA[If your store uses a custom attribute for the 'Number' field, select here.]]></comment>
                    <source_model>RicardoMartins\PagSeguro\Model\System\Config\Source\Attributes</source_model>
                 </field>
-                <field id="address_complement_attribute" translate="label comment" type="select" sortOrder="9" showInDefault="1" showInWebsite="1" showInStore="0">
+                <field id="address_complement_attribute" translate="label comment" type="select" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Attribute Complement</label>
                     <comment><![CDATA[If your store uses a custom attribute for the 'Complement' field of delivery, select here. You can omit this information from PagSeguro.]]></comment>
                    <source_model>RicardoMartins\PagSeguro\Model\System\Config\Source\Attributes\Optional</source_model>
                 </field>
-                <field id="address_neighborhood_attribute" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                <field id="address_neighborhood_attribute" translate="label comment" type="select" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Neighborhood Attribute</label>
                     <comment><![CDATA[If your store uses a custom attribute for the Delivery Neighborhood field, select here.]]></comment>
                    <source_model>RicardoMartins\PagSeguro\Model\System\Config\Source\Attributes</source_model>

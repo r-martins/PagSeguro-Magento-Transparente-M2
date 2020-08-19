@@ -266,6 +266,12 @@ class Cc extends \Magento\Payment\Model\Method\Cc
                 $info->setAdditionalInformation('installment_value', $installments[1]);
             }
         }
+        
+        //Sandbox Mode
+        if ($this->pagSeguroHelper->isSandbox()) {
+            $info->setAdditionalInformation('is_sandbox', '1');
+        }
+        
         return $this;
     }
 

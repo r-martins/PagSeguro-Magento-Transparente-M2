@@ -109,6 +109,11 @@ class Boleto extends \Magento\Payment\Model\Method\AbstractMethod
 
             $info->setAdditionalInformation($this->getCode() . '_cpf', $data['additional_data']['boleto_cpf']);
         }
+        
+        //Sandbox Mode
+        if ($this->pagSeguroHelper->isSandbox()) {
+            $info->setAdditionalInformation('is_sandbox', '1');
+        }
 
         return $this;
     }

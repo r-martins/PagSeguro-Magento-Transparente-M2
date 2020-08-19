@@ -167,4 +167,29 @@ class Redirect extends AbstractMethod
 
         return $isAvailable;
     }
+    
+    /**
+     * Assign data to info model instance
+     *
+     * @param mixed $data
+     *
+     * @return  object
+     * @throws \Magento\Framework\Validator\Exception
+     */
+    public function assignData(\Magento\Framework\DataObject $data)
+    {
+        if (!$data instanceof \Magento\Framework\DataObject) {
+            $data = new \Magento\Framework\DataObject($data);
+        }
+
+        $info = $this->getInfoInstance();
+        
+        //Sandbox Mode
+        if ($this->pagSeguroHelper->isSandbox()) {
+            $info->setAdditionalInformation('is_sandbox', '1');
+        }
+        
+        return $this;
+    }
+    
 }
