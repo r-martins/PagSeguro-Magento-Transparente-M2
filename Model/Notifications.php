@@ -258,7 +258,11 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
     public function getNotificationStatus($notificationCode)
     {
         //@TODO Remove hard coded URL
-        $url = "https://ws.pagseguro.uol.com.br/v2/transactions/notifications/" . $notificationCode;
+        if($this->pagSeguroHelper->isSandbox()) {
+            $url = "https://ws.sandbox.pagseguro.uol.com.br/v2/transactions/notifications/" . $notificationCode;
+        } else {
+            $url = "https://ws.pagseguro.uol.com.br/v2/transactions/notifications/" . $notificationCode;
+        }
 
         $params = ['token' => $this->pagSeguroHelper->getToken(),
                    'email' => $this->pagSeguroHelper->getMerchantEmail()];

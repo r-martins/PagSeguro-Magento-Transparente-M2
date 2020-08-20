@@ -25,10 +25,12 @@
                 <field id="sandbox_merchant_email" translate="label comment" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Sandbox Email</label>
                     <comment><![CDATA[Sandbox Email]]></comment>
+                    <depends><field id="sandbox">1</field></depends>
                 </field>
                 <field id="sandbox_key" translate="label comment" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Sandbox Public Key</label>
                     <comment><![CDATA[Get your public key for free when <a href="//r-martins.github.io/PagSeguro-Magento-Transparente/pro/app.html" target="_blank">enabling your account</a>.]]></comment>
+                    <depends><field id="sandbox">1</field></depends>
                 </field>
                  <field id="debug" translate="label comment" type="select" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Debug</label>
