@@ -266,6 +266,11 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
 
         $params = ['token' => $this->pagSeguroHelper->getToken(),
                    'email' => $this->pagSeguroHelper->getMerchantEmail()];
+        //Sandbox mode
+        if($this->pagSeguroHelper->isSandbox()) {
+            $params['isSandbox'] = 1;
+        }
+        
         $url .= '?' . http_build_query($params);
 
         //@TODO Add ext-curl to composer

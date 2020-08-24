@@ -2,7 +2,7 @@
 /** @var \RicardoMartins\PagSeguro\Block\Payment\Info $block */
 ?>
 <?php $paymentInfo = $block->getPaymentInfo(); ?>
-<p><strong><?= $block->escapeHtml($block->getMethod()->getTitle()) ?><?php if($paymentInfo['is_sandbox']) { echo __(' - Ambiente de Testes'); } ?></strong></p>
+<p><strong><?= $block->escapeHtml($block->getMethod()->getTitle()) ?><?php if(isset($paymentInfo['is_sandbox']) && $paymentInfo['is_sandbox'] == '1') { echo __(' - Ambiente de Testes'); } ?></strong></p>
 <?php if($paymentInfo): ?>
 <p>
     <a href="<?php echo $paymentInfo['url'];?>" target="_blank"><?php echo $paymentInfo['texto'];?></a>
