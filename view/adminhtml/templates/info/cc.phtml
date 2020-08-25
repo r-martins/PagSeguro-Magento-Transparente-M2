@@ -3,7 +3,7 @@
 $info = $block->getPaymentInfo();
 ?>
 
-<p><strong><?= $block->escapeHtml($block->getMethod()->getTitle()) ?></strong></p>
+<p><strong><?= $block->escapeHtml($block->getMethod()->getTitle()) ?><?php if(isset($info['is_sandbox']) && $info['is_sandbox'] == '1') { echo __(' - Ambiente de Testes'); } ?></strong></p>
 <?php if (isset($info['installment_quantity']) && isset($info['installment_value'])) : ?>
     <p>Parcelas: <?php echo $info['installment_quantity']?> (R$ <?php echo number_format($info['installment_value'], 2, ',', '.')?>)</p>
 <?php endif?>

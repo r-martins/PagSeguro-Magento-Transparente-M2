@@ -4,7 +4,8 @@ define(
         'jquery',
         'Magento_Checkout/js/action/place-order',
         'Magento_Checkout/js/model/full-screen-loader',
-        'Magento_Checkout/js/model/payment/additional-validators'
+        'Magento_Checkout/js/model/payment/additional-validators',
+        'PagseguroDirectMethod'
     ],
     function (Component, $) {
         'use strict';

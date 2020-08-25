@@ -5,12 +5,7 @@
             <block class="Magento\Framework\View\Element\Template" name="ajax.message.placeholder" template="Magento_Theme::html/messages.phtml"/>
             <block class="Magento\Framework\View\Element\Messages" name="messages" as="messages" template="Magento_Theme::messages.phtml"/>
         </referenceContainer>
-        <referenceContainer name="after.body.start">
-            <block class="Magento\Framework\View\Element\Text" name="pagseguro.directpayment">
-                <arguments>
-                    <argument name="text" xsi:type="string"><![CDATA[<script type="text/javascript" src="https://stc.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.directpayment.js"></script>]]></argument>
-                </arguments>
-            </block>
+        <referenceContainer name="after.body.start">            
             <block class="Magento\Framework\View\Element\Template" name="beforebody" template="RicardoMartins_PagSeguro::preparePagSeguro.phtml"/>
         </referenceContainer>
         <referenceBlock name="checkout.root">

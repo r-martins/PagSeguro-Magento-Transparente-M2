@@ -6,7 +6,8 @@ define(
         'Magento_Checkout/js/model/quote',
         'Magento_Checkout/js/model/payment/additional-validators',
         'Magento_Checkout/js/action/redirect-on-success',
-        'mage/url'
+        'mage/url',
+        'PagseguroDirectMethod'
     ],
     function (ko, $, Component, quote, additionalValidators, redirectOnSuccessAction, urlBuilder) {
         'use strict';

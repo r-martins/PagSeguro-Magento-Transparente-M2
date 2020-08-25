@@ -132,10 +132,15 @@ class Redirect extends AbstractMethod
 
             if (isset($returnXml->code)) {
                 $code = (string)$returnXml->code;
-                $redirUrl = 'https://pagseguro.uol.com.br/v2/checkout/payment.html?code=' . $code;
-                $payment->setAdditionalInformation(array('redirectUrl' => $redirUrl));
+                if($this->pagSeguroHelper->isSandbox()) {
+                    $redirectUrl = 'https://sandbox.pagseguro.uol.com.br/v2/checkout/payment.html?code=' . $code;
+                    $payment->setAdditionalInformation(array('is_sandbox' => '1'));
+                } else {
+                    $redirectUrl = 'https://pagseguro.uol.com.br/v2/checkout/payment.html?code=' . $code;
+                }
+                $payment->setAdditionalInformation(array('redirectUrl' => $redirectUrl));
                 //$order->queueNewOrderEmail();
-                $this->setRedirectUrl($redirUrl);
+                $this->setRedirectUrl($redirectUrl);
                 $order->setStatus($this->getConfigData('order_status'));
                 $order->setState(Order::STATE_NEW);
             }
@@ -167,4 +172,29 @@ class Redirect extends AbstractMethod
 
         return $isAvailable;
     }
+    
+    /**
+     * Assign data to info model instance
+     *
+     * @param mixed $data
+     *
+     * @return  object
+     * @throws \Magento\Framework\Validator\Exception
+     */
+    public function assignData(\Magento\Framework\DataObject $data)
+    {
+        if (!$data instanceof \Magento\Framework\DataObject) {
+            $data = new \Magento\Framework\DataObject($data);
+        }
+
+        $info = $this->getInfoInstance();
+        
+        //Sandbox Mode
+        if ($this->pagSeguroHelper->isSandbox()) {
+            $info->setAdditionalInformation('is_sandbox', '1');
+        }
+        
+        return $this;
+    }
+    
 }
