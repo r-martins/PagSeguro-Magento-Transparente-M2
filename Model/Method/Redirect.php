@@ -134,11 +134,15 @@ class Redirect extends AbstractMethod
                 $code = (string)$returnXml->code;
                 if($this->pagSeguroHelper->isSandbox()) {
                     $redirectUrl = 'https://sandbox.pagseguro.uol.com.br/v2/checkout/payment.html?code=' . $code;
-                    $payment->setAdditionalInformation(array('is_sandbox' => '1'));
                 } else {
                     $redirectUrl = 'https://pagseguro.uol.com.br/v2/checkout/payment.html?code=' . $code;
                 }
-                $payment->setAdditionalInformation(array('redirectUrl' => $redirectUrl));
+                
+                $additionalData = ['redirectUrl' => $redirectUrl];
+                if($this->pagSeguroHelper->isSandbox()) {
+                    $additionalData['is_sandbox'] = 1;
+                }
+                $payment->setAdditionalInformation($additionalData);
                 //$order->queueNewOrderEmail();
                 $this->setRedirectUrl($redirectUrl);
                 $order->setStatus($this->getConfigData('order_status'));
