@@ -259,16 +259,17 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
     {
         //@TODO Remove hard coded URL
         if($this->pagSeguroHelper->isSandbox()) {
-            $url = "https://ws.sandbox.pagseguro.uol.com.br/v2/transactions/notifications/" . $notificationCode;
+            $url = "https://ws.ricardomartins.net.br/pspro/v7/wspagseguro/v2/transactions/notifications/" . $notificationCode;
         } else {
             $url = "https://ws.pagseguro.uol.com.br/v2/transactions/notifications/" . $notificationCode;
         }
 
-        $params = ['token' => $this->pagSeguroHelper->getToken(),
-                   'email' => $this->pagSeguroHelper->getMerchantEmail()];
-        //Sandbox mode
-        if($this->pagSeguroHelper->isSandbox()) {
-            $params['isSandbox'] = 1;
+        if($this->pagSeguroHelper->isSandbox()) { //Sandbox mode
+            $params = ['public_key' => $this->pagSeguroHelper->getPagSeguroPubKey(),
+                        'isSandbox' => 1];
+        } else { //Production mode
+            $params = ['token' => $this->pagSeguroHelper->getToken(),
+                        'email' => $this->pagSeguroHelper->getMerchantEmail()];
         }
         
         $url .= '?' . http_build_query($params);
