@@ -18,11 +18,11 @@ class Info extends \Magento\Payment\Block\Info
     ) {
 		parent::__construct($context, $data);
         $this->_checkoutSession = $checkoutSession;
-        $this->_orderFactory = $orderFactory;     
+        $this->_orderFactory = $orderFactory;
     }
 
 
-    // Use this method to get ID    
+    // Use this method to get ID
     public function getRealOrderId()
     {
         $lastorderId = $this->_checkoutSession->getLastOrderId();
@@ -39,13 +39,13 @@ class Info extends \Magento\Payment\Block\Info
         }
         return false;
     }
-	
+
 	public function getPaymentMethod()
     {
-		$payment = $this->_checkoutSession->getLastRealOrder()->getPayment();        
+		$payment = $this->_checkoutSession->getLastRealOrder()->getPayment();
 		return $payment->getMethod();
 	}
-	
+
     public function getPaymentInfo()
     {
         $order = $this->getOrder();
@@ -58,6 +58,7 @@ class Info extends \Magento\Payment\Block\Info
 						'tipo' => 'Boleto',
 						'url' => $payment->getAdditionalInformation('boletoUrl'),
 						'texto' => 'Clique aqui para imprimir seu boleto',
+                        'is_sandbox' => $payment->getAdditionalInformation('is_sandbox'),
 					);
 					break;
 				case 'rm_pagseguro_tef':
@@ -65,6 +66,7 @@ class Info extends \Magento\Payment\Block\Info
 						'tipo' => 'Débito Online (TEF)',
 						'url' => $payment->getAdditionalInformation('tefUrl'),
 						'texto' => 'Clique aqui para realizar o pagamento',
+                        'is_sandbox' => $payment->getAdditionalInformation('is_sandbox'),
 					);
 				break;
                 case 'rm_pagseguro_pagar_no_pagseguro':
@@ -72,6 +74,7 @@ class Info extends \Magento\Payment\Block\Info
                         'tipo' => 'Redirect',
                         'url' => $payment->getAdditionalInformation('redirectUrl'),
                         'texto' => 'Clique aqui para pagar no PagSeguro',
+                        'is_sandbox' => $payment->getAdditionalInformation('is_sandbox'),
                     );
                 break;
 			}

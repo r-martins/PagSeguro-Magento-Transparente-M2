@@ -121,6 +121,11 @@ class Tef extends \Magento\Payment\Model\Method\AbstractMethod
             $info->setAdditionalInformation($this->getCode() . '_cpf', $data['additional_data']['tef_cpf']);
         }
 
+        //Sandbox Mode
+        if ($this->pagSeguroHelper->isSandbox()) {
+            $info->setAdditionalInformation('is_sandbox', '1');
+        }
+
         return $this;
     }
 
@@ -168,11 +173,17 @@ class Tef extends \Magento\Payment\Model\Method\AbstractMethod
             if (isset($returnXml->code)) {
 
                 $additional = ['transaction_id' => (string) $returnXml->code];
+                //Sandbox Mode
+                if ($this->pagSeguroHelper->isSandbox()) {
+                    $additional['is_sandbox'] = '1';
+                }
+
                 if ($existing = $payment->getAdditionalInformation()) {
                     if (is_array($existing)) {
                         $additional = array_merge($additional, $existing);
                     }
                 }
+
                 $payment->setAdditionalInformation($additional);
 
                 if (isset($returnXml->paymentMethod->type) && (int) $returnXml->paymentMethod->type == 3) {

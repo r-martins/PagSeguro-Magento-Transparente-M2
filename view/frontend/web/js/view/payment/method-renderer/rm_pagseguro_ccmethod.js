@@ -5,7 +5,8 @@ define(
         'Magento_Checkout/js/action/place-order',
         'Magento_Checkout/js/model/full-screen-loader',
         'Magento_Checkout/js/model/payment/additional-validators',
-        'Magento_Payment/js/model/credit-card-validation/validator'
+        'Magento_Payment/js/model/credit-card-validation/validator',
+        'PagseguroDirectMethod'
     ],
     function (Component, $) {
         'use strict';
@@ -20,7 +21,7 @@ define(
                 creditCardOwnerCpf: '',
                 creditCardInstallments: ''
             },
-            
+
             initObservable: function () {
                 this._super()
                     .observe([
@@ -38,7 +39,7 @@ define(
             getCode: function() {
                 return 'rm_pagseguro_cc';
             },
-            
+
             getData: function () {
             return {
                     'method': this.item.method,

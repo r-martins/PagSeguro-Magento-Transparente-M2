@@ -4,7 +4,8 @@ define(
         'jquery',
         'Magento_Checkout/js/action/place-order',
         'Magento_Checkout/js/model/full-screen-loader',
-        'Magento_Checkout/js/model/payment/additional-validators'
+        'Magento_Checkout/js/model/payment/additional-validators',
+        'PagseguroDirectMethod'
     ],
     function (Component, $) {
         'use strict';
@@ -15,7 +16,7 @@ define(
                 tefOwnerCpf: '',
                 tefOwnerBank: ''
             },
-            
+
             initObservable: function () {
                 this._super()
                     .observe([
@@ -25,7 +26,7 @@ define(
 
                 return this;
             },
-            
+
             getData: function () {
             return {
                     'method': this.item.method,
@@ -42,7 +43,7 @@ define(
 
             isActive: function() {
                 return true;
-            }            
+            }
         });
     }
 );

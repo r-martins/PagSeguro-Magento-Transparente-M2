@@ -97,7 +97,7 @@ class Boleto extends \Magento\Payment\Model\Method\AbstractMethod
         if (!$data instanceof \Magento\Framework\DataObject) {
             $data = new \Magento\Framework\DataObject($data);
         }
-        
+
         $info = $this->getInfoInstance();
         $info->setAdditionalInformation('sender_hash', $this->pagSeguroHelper->getPaymentHash('sender_hash'));
 
@@ -108,6 +108,11 @@ class Boleto extends \Magento\Payment\Model\Method\AbstractMethod
             $this->pagSeguroHelper->writeLog('boletocpf_cpf' . $data['additional_data']['boleto_cpf']);
 
             $info->setAdditionalInformation($this->getCode() . '_cpf', $data['additional_data']['boleto_cpf']);
+        }
+
+        //Sandbox Mode
+        if ($this->pagSeguroHelper->isSandbox()) {
+            $info->setAdditionalInformation('is_sandbox', '1');
         }
 
         return $this;
@@ -158,11 +163,17 @@ class Boleto extends \Magento\Payment\Model\Method\AbstractMethod
             if (isset($returnXml->code)) {
 
                 $additional = ['transaction_id' => (string) $returnXml->code];
+                //Sandbox Mode
+                if ($this->pagSeguroHelper->isSandbox()) {
+                    $additional['is_sandbox'] = '1';
+                }
+
                 if ($existing = $payment->getAdditionalInformation()) {
                     if (is_array($existing)) {
                         $additional = array_merge($additional, $existing);
                     }
                 }
+
                 $payment->setAdditionalInformation($additional);
 
                 if (isset($returnXml->paymentMethod->type) && (int) $returnXml->paymentMethod->type == 2) {

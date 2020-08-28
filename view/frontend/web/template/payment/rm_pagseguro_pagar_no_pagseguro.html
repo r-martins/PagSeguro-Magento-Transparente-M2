@@ -22,6 +22,9 @@
             <!--/ko-->
         </div>
         <div class="actions-toolbar">
+            <!-- ko if: (window.isSandbox)-->
+            <p style="text-align: right;">&#9888; <!-- ko i18n: 'Transação de Teste - Sandbox Ativo'--><!-- /ko --></p>
+            <!-- /ko -->
             <div class="primary">
                 <button class="action primary checkout"
                         type="submit"
@@ -37,4 +40,3 @@
         </div>
     </div>
 </div>
-        

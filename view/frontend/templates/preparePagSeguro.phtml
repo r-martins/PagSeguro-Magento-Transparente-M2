@@ -7,13 +7,14 @@ $installments = $helper->getInstallmentQty();
 $visibleCpf = $helper->isCpfVisible() ? '1':'0';
 $visibleDob = $helper->isDobVisible() ? '1':'0';
 $ccPlaceholderImage = $this->getViewFileUrl('RicardoMartins_PagSeguro::images/cc-placeholder.png');
+$isSandbox = $helper->isSandbox();
 ?>
 
 <script src="<?php echo $viewJsPath;?>"></script>
 <script type="text/javascript">
      //<![CDATA[
     function preparePagSeguro(){
-        
+
         if(typeof RMPagSeguroObj != "undefined"){
             <?php if ($helper->isDebugActive()): ?>
             console.info('PagSeguro was already started.');
@@ -35,7 +36,17 @@ $ccPlaceholderImage = $this->getViewFileUrl('RicardoMartins_PagSeguro::images/cc
     }
     window.visibleCpf = <?php echo $visibleCpf ?>;
     window.visibleDob = <?php echo $visibleDob ?>;
+    window.isSandbox = <?php echo $isSandbox ?>;
     //preparePagSeguro();
 
     //]]>
+</script>
+<script>
+   require.config({
+       map: {
+           '*': {
+               'PagseguroDirectMethod':  '<?php echo $helper->getJsUrl(); ?>'
+           }
+       }
+   });
 </script>

@@ -20,14 +20,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_PATH_PAYMENT_PAGSEGURO_DEBUG              = 'payment/rm_pagseguro/debug';
     const XML_PATH_PAUMENT_PAGSEGURO_SANDBOX            = 'payment/rm_pagseguro/sandbox';
     const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_EMAIL      = 'payment/rm_pagseguro/sandbox_merchant_email';
-    const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_TOKEN      = 'payment/rm_pagseguro/sandbox_token';
+    const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_KEY      = 'payment/rm_pagseguro/sandbox_key';
     //@TODO Remove hardcoded value in constant and move to config.xml defaults
     const XML_PATH_PAYMENT_PAGSEGURO_WS_URL             = 'https://ws.ricardomartins.net.br/pspro/v6/wspagseguro/v2/';
     const XML_PATH_PAYMENT_PAGSEGURO_WS_URL_APP         = 'payment/rm_pagseguro/ws_url_app';
-    const XML_PATH_PAYMENT_PAGSEGURO_JS_URL             = 'payment/rm_pagseguro/js_url';
-    const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_WS_URL     = 'payment/rm_pagseguro/sandbox_ws_url';
+    const XML_PATH_PAYMENT_PAGSEGURO_JS_URL             = 'https://stc.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.directpayment.js';
+    const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_WS_URL     = 'https://ws.ricardomartins.net.br/pspro/v7/wspagseguro/v2/';
     const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_WS_URL_APP = 'payment/rm_pagseguro/sandbox_ws_url_app';
-    const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_JS_URL     = 'payment/rm_pagseguro/sandbox_js_url';
+    const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_JS_URL     = 'https://stc.sandbox.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.directpayment.js';
     const XML_PATH_PAYMENT_PAGSEGURO_CC_ACTIVE          = 'payment/rm_pagseguro_cc/active';
     const XML_PATH_PAYMENT_PAGSEGURO_CC_FLAG            = 'payment/rm_pagseguro_cc/flag';
     const XML_PATH_PAYMENT_PAGSEGURO_CC_INFO_BRL        = 'payment/rm_pagseguro_cc/info_brl';
@@ -114,6 +114,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $params['token'] = $this->getToken();
         $params['public_key'] = $this->getPagSeguroPubKey();
 
+        if($this->isSandbox()) {
+            $params['isSandbox'] = true;
+        }
+
         //@TODO Replace curl
         curl_setopt_array(
             $ch,
@@ -167,6 +171,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getMerchantEmail()
     {
+        if($this->isSandbox()) {
+            return $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_EMAIL, ScopeInterface::SCOPE_WEBSITE);
+        }
+
+        //Production mode
         return $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_EMAIL, ScopeInterface::SCOPE_WEBSITE);
     }
 
@@ -185,6 +194,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
       */
     public function getPagSeguroPubKey()
     {
+        if($this->isSandbox()) {
+            return $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_KEY, ScopeInterface::SCOPE_WEBSITE);
+        }
+
+        //Production mode
         return $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_KEY, ScopeInterface::SCOPE_WEBSITE);
     }
 
@@ -205,7 +219,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getToken()
     {
-        $token = $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_TOKEN, ScopeInterface::SCOPE_WEBSITE);
+        if(!$this->isSandbox()) {
+            $token = $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_TOKEN, ScopeInterface::SCOPE_WEBSITE);
+        }
+
         if (empty($token)) {
             return false;
         }
@@ -359,6 +376,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function callApi($params, $payment, $type = 'transactions')
     {
         $params['public_key'] = $this->getPagSeguroPubKey();
+        if($this->isSandbox()) {
+            $params['isSandbox'] = true;
+        }
         $params = $this->convertEncoding($params);
         $paramsObj = new \Magento\Framework\DataObject(['params' =>$params]);
 
@@ -1010,6 +1030,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getWsUrl($amend = '', $useApp = false)
     {
+        if($this->isSandbox()) {
+            return self::XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_WS_URL . $amend;
+        }
+
+        //Production mode
         return self::XML_PATH_PAYMENT_PAGSEGURO_WS_URL.$amend;
     }
 
@@ -1055,7 +1080,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             return 'Public Key is empty.';
         }
 
-        $url = 'http://ws.ricardomartins.net.br/pspro/v6/auth/' . $pubKey;
+        $url = 'http://ws.ricardomartins.net.br/pspro/v7/auth/' . $pubKey;
+        if ($this->isSandbox()) {
+            $url .= '?isSandbox=1';
+        }
         $this->_curl->get($url);
 
         return $this->_curl->getBody();
@@ -1214,5 +1242,29 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             }
         }
         return $items;
+    }
+
+    /**
+     * Check if Sandbox mode is active
+     * @return bool
+     */
+    public function isSandbox()
+    {
+        return $this->scopeConfig->getValue(self::XML_PATH_PAUMENT_PAGSEGURO_SANDBOX, ScopeInterface::SCOPE_WEBSITE);
+    }
+
+    /**
+     * Returns PagseguroDirectMethod JS URL based on selected environment (prod or sandbox)
+     *
+     * @return string
+     */
+    public function getJsUrl()
+    {
+        if($this->isSandbox()) {
+            return self::XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_JS_URL;
+        }
+
+        //Production mode
+        return self::XML_PATH_PAYMENT_PAGSEGURO_JS_URL;
     }
 }
