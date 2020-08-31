@@ -48,21 +48,21 @@ class Redirect extends AbstractMethod
      * PagSeguro Helper
      *
      * @var RicardoMartins\PagSeguro\Helper\Data;
-     */ 
+     */
     protected $pagSeguroHelper;
 
     /**
      * PagSeguro Abstract Model
      *
      * @var RicardoMartins\PagSeguro\Model\Notifications
-     */ 
+     */
     protected $pagSeguroAbModel;
 
     /**
      * Backend Auth Session
      *
      * @var Magento\Backend\Model\Auth\Session $adminSession
-     */ 
+     */
     protected $adminSession;
 
     /** @var \Magento\Framework\Message\ManagerInterface */
@@ -73,12 +73,12 @@ class Redirect extends AbstractMethod
         \Magento\Framework\Registry $registry,
         \Magento\Framework\Api\ExtensionAttributesFactory $extensionFactory,
         \Magento\Framework\Api\AttributeValueFactory $customAttributeFactory,
-        \Magento\Payment\Helper\Data $paymentData,        
+        \Magento\Payment\Helper\Data $paymentData,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Payment\Model\Method\Logger $logger,
         \RicardoMartins\PagSeguro\Helper\Data $pagSeguroHelper,
         \RicardoMartins\PagSeguro\Model\Notifications $pagSeguroAbModel,
-        \Magento\Backend\Model\Auth\Session $adminSession,       
+        \Magento\Backend\Model\Auth\Session $adminSession,
         array $data = array()
     ) {
         parent::__construct(
@@ -94,11 +94,11 @@ class Redirect extends AbstractMethod
             $data
         );
 
-        $this->pagSeguroHelper = $pagSeguroHelper;  
-        $this->pagSeguroAbModel = $pagSeguroAbModel; 
+        $this->pagSeguroHelper = $pagSeguroHelper;
+        $this->pagSeguroAbModel = $pagSeguroAbModel;
         $this->adminSession = $adminSession;
     }
-    
+
     public function order(InfoInterface $payment, $amount)
     {
         /*@var \Magento\Sales\Model\Order $order */
@@ -148,7 +148,7 @@ class Redirect extends AbstractMethod
                 $order->setStatus($this->getConfigData('order_status'));
                 $order->setState(Order::STATE_NEW);
             }
-            
+
         } catch (\Exception $e) {
 
             throw new LocalizedException(__($e->getMessage()));
@@ -197,8 +197,8 @@ class Redirect extends AbstractMethod
         if ($this->pagSeguroHelper->isSandbox()) {
             $info->setAdditionalInformation('is_sandbox', '1');
         }
-        
+
         return $this;
     }
-    
+
 }

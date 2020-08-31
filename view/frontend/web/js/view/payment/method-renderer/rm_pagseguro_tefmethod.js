@@ -16,7 +16,7 @@ define(
                 tefOwnerCpf: '',
                 tefOwnerBank: ''
             },
-            
+
             initObservable: function () {
                 this._super()
                     .observe([
@@ -26,7 +26,7 @@ define(
 
                 return this;
             },
-            
+
             getData: function () {
             return {
                     'method': this.item.method,
@@ -43,7 +43,7 @@ define(
 
             isActive: function() {
                 return true;
-            }            
+            }
         });
     }
 );

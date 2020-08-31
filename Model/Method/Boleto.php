@@ -97,7 +97,7 @@ class Boleto extends \Magento\Payment\Model\Method\AbstractMethod
         if (!$data instanceof \Magento\Framework\DataObject) {
             $data = new \Magento\Framework\DataObject($data);
         }
-        
+
         $info = $this->getInfoInstance();
         $info->setAdditionalInformation('sender_hash', $this->pagSeguroHelper->getPaymentHash('sender_hash'));
 
@@ -172,6 +172,7 @@ class Boleto extends \Magento\Payment\Model\Method\AbstractMethod
                         $additional = array_merge($additional, $existing);
                     }
                 }
+
                 $payment->setAdditionalInformation($additional);
 
                 if (isset($returnXml->paymentMethod->type) && (int) $returnXml->paymentMethod->type == 2) {

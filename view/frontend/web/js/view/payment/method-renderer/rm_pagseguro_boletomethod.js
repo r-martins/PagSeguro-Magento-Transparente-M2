@@ -20,11 +20,11 @@ define(
                 template: 'RicardoMartins_PagSeguro/payment/rm_pagseguro_boleto',
                 boletoOwnerCpf: ''
             },
-            
+
             initObservable: function () {
                 this._super()
                     .observe([
-                        'boletoOwnerCpf'                        
+                        'boletoOwnerCpf'
                     ]);
 
                 return this;
@@ -33,7 +33,7 @@ define(
             getCode: function() {
                 return 'rm_pagseguro_boleto';
             },
-            
+
             getData: function () {
             return {
                     'method': this.item.method,

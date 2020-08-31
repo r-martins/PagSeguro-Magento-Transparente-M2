@@ -154,6 +154,7 @@ class Cc extends \Magento\Payment\Model\Method\Cc
                 if ($this->pagSeguroHelper->isSandbox()) {
                     $additional['is_sandbox'] = '1';
                 }
+                
                 if ($existing = $payment->getAdditionalInformation()) {
                     if (is_array($existing)) {
                         $additional = array_merge($additional, $existing);

@@ -21,7 +21,8 @@ class Info extends \Magento\Payment\Block\Info
         $this->_orderFactory = $orderFactory;
     }
 
-    // Use this method to get ID    
+
+    // Use this method to get ID
     public function getRealOrderId()
     {
         $lastorderId = $this->_checkoutSession->getLastOrderId();
@@ -41,33 +42,33 @@ class Info extends \Magento\Payment\Block\Info
 
     public function getPaymentMethod()
     {
-        $payment = $this->_checkoutSession->getLastRealOrder()->getPayment();
-        return $payment->getMethod();
-    }
+		$payment = $this->_checkoutSession->getLastRealOrder()->getPayment();
+		return $payment->getMethod();
+	}
 
     public function getPaymentInfo()
     {
         $order = $this->getOrder();
         if ($payment = $order->getPayment()) {
-            $paymentMethod = $payment->getMethod();
-            switch($paymentMethod)
-            {
-                case 'rm_pagseguro_boleto':
-                    return array(
-                        'tipo' => 'Boleto',
-                        'url' => $payment->getAdditionalInformation('boletoUrl'),
-                        'texto' => 'Clique aqui para imprimir seu boleto',
+			$paymentMethod = $payment->getMethod();
+			switch($paymentMethod)
+			{
+				case 'rm_pagseguro_boleto':
+					return array(
+						'tipo' => 'Boleto',
+						'url' => $payment->getAdditionalInformation('boletoUrl'),
+						'texto' => 'Clique aqui para imprimir seu boleto',
                         'is_sandbox' => $payment->getAdditionalInformation('is_sandbox'),
-                    );
-                    break;
-                case 'rm_pagseguro_tef':
-                    return array(
-                        'tipo' => 'Débito Online (TEF)',
-                        'url' => $payment->getAdditionalInformation('tefUrl'),
-                        'texto' => 'Clique aqui para realizar o pagamento',
+					);
+					break;
+				case 'rm_pagseguro_tef':
+					return array(
+						'tipo' => 'Débito Online (TEF)',
+						'url' => $payment->getAdditionalInformation('tefUrl'),
+						'texto' => 'Clique aqui para realizar o pagamento',
                         'is_sandbox' => $payment->getAdditionalInformation('is_sandbox'),
-                    );
-                    break;
+					);
+				break;
                 case 'rm_pagseguro_pagar_no_pagseguro':
                     return array(
                         'tipo' => 'Redirect',

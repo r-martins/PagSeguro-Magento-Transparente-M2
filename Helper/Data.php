@@ -219,12 +219,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getToken()
     {
-        if($this->isSandbox()) {
-            $token = null;
-        } else {
+        if(!$this->isSandbox()) {
             $token = $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_TOKEN, ScopeInterface::SCOPE_WEBSITE);
         }
-        
+
         if (empty($token)) {
             return false;
         }
@@ -378,7 +376,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function callApi($params, $payment, $type = 'transactions')
     {
         $params['public_key'] = $this->getPagSeguroPubKey();
-        if($this->isSandbox()){
+        if($this->isSandbox()) {
             $params['isSandbox'] = true;
         }
         $params = $this->convertEncoding($params);
@@ -1033,9 +1031,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getWsUrl($amend = '', $useApp = false)
     {
         if($this->isSandbox()) {
-            return self::XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_WS_URL.$amend;
+            return self::XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_WS_URL . $amend;
         }
-        
+
         //Production mode
         return self::XML_PATH_PAYMENT_PAGSEGURO_WS_URL.$amend;
     }
@@ -1082,7 +1080,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             return 'Public Key is empty.';
         }
 
-        $url = 'http://ws.ricardomartins.net.br/pspro/v6/auth/' . $pubKey;
+        $url = 'http://ws.ricardomartins.net.br/pspro/v7/auth/' . $pubKey;
+        if ($this->isSandbox()) {
+            $url .= '?isSandbox=1';
+        }
         $this->_curl->get($url);
 
         return $this->_curl->getBody();

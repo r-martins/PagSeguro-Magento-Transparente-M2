@@ -21,7 +21,7 @@ define(
                 creditCardOwnerCpf: '',
                 creditCardInstallments: ''
             },
-            
+
             initObservable: function () {
                 this._super()
                     .observe([
@@ -39,7 +39,7 @@ define(
             getCode: function() {
                 return 'rm_pagseguro_cc';
             },
-            
+
             getData: function () {
             return {
                     'method': this.item.method,

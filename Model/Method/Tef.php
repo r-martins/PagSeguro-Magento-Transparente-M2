@@ -177,11 +177,13 @@ class Tef extends \Magento\Payment\Model\Method\AbstractMethod
                 if ($this->pagSeguroHelper->isSandbox()) {
                     $additional['is_sandbox'] = '1';
                 }
+                
                 if ($existing = $payment->getAdditionalInformation()) {
                     if (is_array($existing)) {
                         $additional = array_merge($additional, $existing);
                     }
                 }
+
                 $payment->setAdditionalInformation($additional);
 
                 if (isset($returnXml->paymentMethod->type) && (int) $returnXml->paymentMethod->type == 3) {

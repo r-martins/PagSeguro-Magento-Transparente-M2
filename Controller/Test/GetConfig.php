@@ -52,9 +52,14 @@ class GetConfig extends \Magento\Framework\App\Action\Action
                 'debug'     => (boolean)$this->_helper->isDebugActive()
             ),
             'configJs'      => json_decode($this->_helper->getConfigJs()),
+            'sandbox_active' => $this->_helper->isSandbox(),
             'key_validate'  => $this->_helper->validateKey(),
             'token_consistency' => ($tokenLen == 32 || $tokenLen == 100) ? "Good" : "Token does not consist 32 or 100 characters"
         );
+
+        if ($this->_helper->isSandbox()) {
+            unset($info['token_consistency']);
+        }
 
         $resultJson->setData($info);
         return $resultJson;

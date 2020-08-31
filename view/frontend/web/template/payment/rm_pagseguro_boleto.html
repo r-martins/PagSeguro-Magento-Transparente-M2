@@ -7,7 +7,7 @@
         <label data-bind="attr: {'for': getCode()}" class="label"><span data-bind="text: getTitle()"></span></label>
     </div>
     <div class="payment-method-content" id="pagseguro_boleto_method">
-        <form class="form" data-bind="attr: {'id': getCode() + '-form'}">	
+        <form class="form" data-bind="attr: {'id': getCode() + '-form'}">
             <fieldset data-bind="attr: {class: 'fieldset payment items boleto ' + getCode(), id: 'payment_' + getCode()}">
 
                 <!-- ko foreach: getRegion('messages') -->
