@@ -230,13 +230,13 @@ class Cc extends \Magento\Payment\Model\Method\Cc
         }
 
         $info = $this->getInfoInstance();
-        $info->setAdditionalInformation('sender_hash', $this->pagSeguroHelper->getPaymentHash('sender_hash') ?? null)
+        $info->setAdditionalInformation('sender_hash', $data['additional_data']['sender_hash'] ?? null)
             ->setAdditionalInformation(
                 'credit_card_token',
-                $this->pagSeguroHelper->getPaymentHash('credit_card_token') ?? null
+                $data['additional_data']['credit_card_token'] ?? null
             )
             ->setAdditionalInformation('credit_card_owner', $data['additional_data']['cc_owner_name'] ?? null)
-            ->setCcType($this->pagSeguroHelper->getPaymentHash('cc_type') ?? null)
+            ->setCcType($data['additional_data']['cc_type'] ?? null)
             ->setCcLast4(substr($data['additional_data']['cc_number'] ?? null, -4))
             ->setCcExpYear($data['additional_data']['cc_exp_year'] ?? null)
             ->setCcExpMonth($data['additional_data']['cc_exp_month'] ?? null);
@@ -332,8 +332,10 @@ class Cc extends \Magento\Payment\Model\Method\Cc
     {
         $this->pagSeguroHelper->writeLog(__('CC validate method'));
 
-        $senderHash = $this->pagSeguroHelper->getPaymentHash('sender_hash');
-        $creditCardToken = $this->pagSeguroHelper->getPaymentHash('credit_card_token');
+        $info = $this->getInfoInstance();
+        
+        $senderHash = $info->getAdditionalInformation('sender_hash');
+        $creditCardToken = $info->getAdditionalInformation('credit_card_token');
 
         if (!$creditCardToken || !$senderHash) {
             $missingInfo = sprintf('Token do cartão: %s', var_export($creditCardToken, true));

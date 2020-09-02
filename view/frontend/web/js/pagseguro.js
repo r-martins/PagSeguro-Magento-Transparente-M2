@@ -233,45 +233,29 @@ RMPagSeguro.prototype.updateBrand = function(){
     }
 }
 
-RMPagSeguro.prototype.updatePaymentHashes = function(){
-    var self = this;
-    var url = self.storeUrl +'pseguro/ajax/updatePaymentHashes';
+RMPagSeguro.prototype.updatePaymentHashes = function(){    
+    var currentSelectedPayment = jQuery('input[name="payment[method]"]:checked').attr('id');
+
+    if (currentSelectedPayment == 'rm_pagseguro_tef') {
+        var inputTefSenderHash = jQuery('input[name="payment[pagseguropro_tef_senderhash]"]');
+            inputTefSenderHash.val(this.senderHash);        
+    }
     
-    var currnetSelectedPayment = jQuery('input[name="payment[method]"]:checked').attr('id');
-
-    if (currnetSelectedPayment == 'rm_pagseguro_tef' || currnetSelectedPayment == 'rm_pagseguro_boleto') {
-        var paymentHashes = {
-            "payment[sender_hash]": this.senderHash            
-        };
+    if (currentSelectedPayment == 'rm_pagseguro_boleto') {
+        var inputBoletoSenderHash = jQuery('input[name="payment[pagseguro_boleto_senderhash]"]');
+            inputBoletoSenderHash.val(this.senderHash);        
     }
 
-    if (currnetSelectedPayment == 'rm_pagseguro_cc') {
-        var paymentHashes = {
-            "payment[sender_hash]": this.senderHash,
-            "payment[credit_card_token]": this.creditCardToken,
-            "payment[cc_type]": (this.brand)?this.brand.name:'',
-            "payment[is_admin]": this.config.is_admin            
-        };
+    if (currentSelectedPayment == 'rm_pagseguro_cc') {
+        var inputCcSenderHash = jQuery('input[name="payment[pagseguropro_cc_senderhash]"]');
+            inputCcSenderHash.val(this.senderHash);
+        var inputCcToken = jQuery('input[name="payment[pagseguropro_cc_cctoken]"]');
+            inputCcToken.val(this.creditCardToken);
+        var inputCcType = jQuery('input[name="payment[pagseguropro_cc_cctype]"]');
+            inputCcType.val((this.brand)?this.brand.name:'');
+        var inputCcIsadmin = jQuery('input[name="payment[pagseguropro_cc_isadmin]"]');
+            inputCcIsadmin.val(this.config.is_admin);        
     }
-
-    jQuery.ajax({
-        url: url,
-        type: 'POST',
-        data: paymentHashes,
-        success: function(response){
-            if(self.config.debug){
-                console.debug('Hashes updated successfully.');
-                console.debug(paymentHashes);
-            }
-        },
-        error: function(response){
-            if(self.config.debug){
-                console.error('Failed to update session hashes.');
-                console.error(response);
-            }
-            return false;
-        }
-    });
 }
 
 RMPagSeguro.prototype.setStoreUrl = function(storeUrl){

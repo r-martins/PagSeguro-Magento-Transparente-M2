@@ -39,7 +39,9 @@
                     <span id="card-cpf-msg"></span>
                 </div>
                 <!-- /ko -->
-
+                
+                <input type="hidden" name="payment[pagseguro_boleto_senderhash]" class="input-hidden" value="" />
+                
                 <div class="checkout-agreements-block">
                     <!-- ko foreach: $parent.getRegion('before-place-order') -->
                     <!-- ko template: getTemplate() --><!-- /ko -->

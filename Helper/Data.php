@@ -293,15 +293,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param string
      * @return bool|string
      */
-    public function getPaymentHash($param = null)
+    public function getPaymentHash($payment, $param = null)
     {
-        $psPayment = $this->checkoutSession->getData('PsPayment');
+        $psPayment = $payment->getAdditionalInformation();
 
-        if (null == $psPayment) {
+        if (empty($psPayment)) {
             return false;
         }
 
-        $psPayment = $this->serializer->unserialize($psPayment);
         if ($param === null) {
             return $psPayment;
         }
@@ -606,11 +605,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $cpf = $this->getCustomerCpfValue($order, $payment);
 
         $phone = $this->extractPhone($order->getBillingAddress()->getTelephone());
-
+        
         $return = [
             'senderName'    => $this->getSenderName($order),
             'senderEmail'   => trim($order->getCustomerEmail()),
-            'senderHash'    => $this->getPaymentHash('sender_hash'),
+            'senderHash'    => $this->getPaymentHash($payment, 'sender_hash'),
             'senderCPF'     => $digits->filter($cpf),
             'senderAreaCode'=> $phone['area'],
             'senderPhone'   => $phone['number'],
@@ -622,7 +621,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         return $return;
     }
-
+    
     /**
      * Returns an array with credit card's owner (Customer) to be used on API
      * @param Magento\Sales\Model\Order $order

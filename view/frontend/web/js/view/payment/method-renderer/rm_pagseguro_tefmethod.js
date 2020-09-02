@@ -32,7 +32,8 @@ define(
                     'method': this.item.method,
                     'additional_data': {
                         'tef_cpf' : this.tefOwnerCpf(),
-                        'tef_bank' : this.tefOwnerBank()
+                        'tef_bank' : this.tefOwnerBank(),
+                        'sender_hash' : $('input[name="payment[pagseguropro_tef_senderhash]"]').val()
                     }
                 };
             },

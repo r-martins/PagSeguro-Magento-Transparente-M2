@@ -58,6 +58,10 @@ define(
                         'cc_owner_birthday_year' : this.creditCardOwnerBirthYear(),
                         'cc_owner_cpf' : this.creditCardOwnerCpf(),
                         'cc_installments' : this.creditCardInstallments(),
+                        'sender_hash' : $('input[name="payment[pagseguropro_cc_senderhash]"]').val(),
+                        'credit_card_token' : $('input[name="payment[pagseguropro_cc_cctoken]"]').val(),
+                        'cc_type' : $('input[name="payment[pagseguropro_cc_cctype]"]').val(),
+                        'is_admin' : $('input[name="payment[pagseguropro_cc_isadmin]"]').val(),
                     }
                 };
             },

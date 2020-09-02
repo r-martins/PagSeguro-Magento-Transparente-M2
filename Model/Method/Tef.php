@@ -104,7 +104,7 @@ class Tef extends \Magento\Payment\Model\Method\AbstractMethod
         }
 
         $info = $this->getInfoInstance();
-        $info->setAdditionalInformation('sender_hash', $this->pagSeguroHelper->getPaymentHash('sender_hash'));
+        $info->setAdditionalInformation('sender_hash', $data['additional_data']['sender_hash']);
 
         if (!isset($data['additional_data']['tef_bank'])) {
             throw new \Magento\Framework\Exception\LocalizedException(__('Please select a bank to continue.'));

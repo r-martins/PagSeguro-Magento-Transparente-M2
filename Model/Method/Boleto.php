@@ -98,10 +98,10 @@ class Boleto extends \Magento\Payment\Model\Method\AbstractMethod
             $data = new \Magento\Framework\DataObject($data);
         }
 
+        $this->pagSeguroHelper->writeLog('getData Order'. print_r($data->getData(),true));
         $info = $this->getInfoInstance();
-        $info->setAdditionalInformation('sender_hash', $this->pagSeguroHelper->getPaymentHash('sender_hash'));
-
-        //$this->pagSeguroHelper->writeLog('getData Order'. print_r($data->getData()));
+        $info->setAdditionalInformation('sender_hash', $data['additional_data']['sender_hash']);
+        
         // set cpf
         if ($this->pagSeguroHelper->isCpfVisible()) {
 

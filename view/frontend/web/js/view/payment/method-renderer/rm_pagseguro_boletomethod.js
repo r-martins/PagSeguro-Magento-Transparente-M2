@@ -38,7 +38,8 @@ define(
             return {
                     'method': this.item.method,
                     'additional_data': {
-                        'boleto_cpf' : this.boletoOwnerCpf()
+                        'boleto_cpf' : this.boletoOwnerCpf(),
+                        'sender_hash' : $('input[name="payment[pagseguro_boleto_senderhash]"]').val()
                     }
                 };
             },
@@ -97,40 +98,10 @@ define(
                 return false;
             },
             updatePaymentHashes: function(senderHash){
-                var url = urlBuilder.build('pseguro/ajax/updatePaymentHashes');
-                var boletocpf = $('input[name="payment[pagseguro_boleto_cpf]"]').val();
-                var billingCpf = $('input[name="vat_id"]').val();
-
-                if (boletocpf == '' || boletocpf == undefined) {
-                    boletocpf = billingCpf;
-                }
-
-                var currnetSelectedPayment = $('input[name="payment[method]"]:checked').attr('id');
-
-                if (boletocpf != '' && typeof(boletocpf) !== undefined && currnetSelectedPayment == 'rm_pagseguro_boleto') {
-                    var paymentHashes = {
-                        "payment[sender_hash]": senderHash,
-                        "ownerdata[boleto_cpf]": boletocpf,
-                    };
-                }
-
-                $.ajax({
-                    url: url,
-                    type: 'POST',
-                    data: paymentHashes,
-                    success: function(response){
-                        console.debug('Hashes updated successfully.');
-                        console.debug(paymentHashes);
-
-                        return true;
-                    },
-                    error: function(response){
-                        console.error('Failed to update session hashes.');
-                        console.error(response);
-
-                        return false;
-                    }
-                });
+                var inputBoletoSenderHash = $('input[name="payment[pagseguro_boleto_senderhash]"]');
+                inputBoletoSenderHash.val(senderHash);
+                
+                return true;                 
             }
         });
     }
