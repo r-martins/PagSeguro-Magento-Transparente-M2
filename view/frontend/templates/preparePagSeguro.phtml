@@ -7,7 +7,7 @@ $installments = $helper->getInstallmentQty();
 $visibleCpf = $helper->isCpfVisible() ? '1':'0';
 $visibleDob = $helper->isDobVisible() ? '1':'0';
 $ccPlaceholderImage = $this->getViewFileUrl('RicardoMartins_PagSeguro::images/cc-placeholder.png');
-$isSandbox = $helper->isSandbox();
+$isSandbox = $helper->isSandbox() ? 1 : 0;
 ?>
 
 <script src="<?php echo $viewJsPath;?>"></script>
