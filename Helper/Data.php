@@ -64,6 +64,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     /** @var \Magento\Framework\Serialize\SerializerInterface  */
     protected $serializer;
+    /**
+     * @var \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress
+     */
+    private $remoteAddress;
 
     /**
      * @param \Magento\Store\Model\StoreManagerInterface       $storeManager
@@ -86,7 +90,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Framework\App\ProductMetadataInterface $productMetadata,
         \Magento\Framework\Module\ModuleListInterface $moduleList,
         \Magento\Framework\HTTP\Client\Curl $curl,
-        \Magento\Framework\Serialize\SerializerInterface $serializer
+        \Magento\Framework\Serialize\SerializerInterface $serializer,
+        \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress
     ) {
         $this->storeManager = $storeManager;
         $this->checkoutSession = $checkoutSession;
@@ -96,6 +101,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->moduleList = $moduleList;
         $this->_curl = $curl;
         $this->serializer = $serializer;
+        $this->remoteAddress = $remoteAddress;
 
         parent::__construct($context);
     }
@@ -614,6 +620,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'senderAreaCode'=> $phone['area'],
             'senderPhone'   => $phone['number'],
             ];
+
+        if ($senderIp = $this->getSenderIp()) {
+            $return['senderIp'] = $senderIp;
+        }
+
         if (strlen($return['senderCPF']) > 11) {
             $return['senderCNPJ'] = $return['senderCPF'];
             unset($return['senderCPF']);
@@ -1265,5 +1276,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         
         //Production mode
         return self::XML_PATH_PAYMENT_PAGSEGURO_JS_URL;
+    }
+
+    public function getSenderIp()
+    {
+        $senderIp = $this->remoteAddress->getRemoteAddress();
+
+        if (isset($_SERVER['HTTP_CF_CONNECTING_IP'])) { //Cloudflare
+            $senderIp = $_SERVER['HTTP_CF_CONNECTING_IP'];
+        }
+        if (false === filter_var($senderIp, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4))
+            return false;
+
+        return $senderIp;
     }
 }
