@@ -119,7 +119,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $params['email'] = $this->getMerchantEmail();
         $params['token'] = $this->getToken();
         $params['public_key'] = $this->getPagSeguroPubKey();
-        
+
         if($this->isSandbox()) {
             $params['isSandbox'] = true;
         }
@@ -180,7 +180,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if($this->isSandbox()) {
             return $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_EMAIL, ScopeInterface::SCOPE_WEBSITE);
         }
-        
+
         //Production mode
         return $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_EMAIL, ScopeInterface::SCOPE_WEBSITE);
     }
@@ -203,7 +203,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if($this->isSandbox()) {
             return $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_KEY, ScopeInterface::SCOPE_WEBSITE);
         }
-        
+
         //Production mode
         return $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_KEY, ScopeInterface::SCOPE_WEBSITE);
     }
@@ -611,7 +611,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $cpf = $this->getCustomerCpfValue($order, $payment);
 
         $phone = $this->extractPhone($order->getBillingAddress()->getTelephone());
-        
+
         $return = [
             'senderName'    => $this->getSenderName($order),
             'senderEmail'   => trim($order->getCustomerEmail()),
@@ -632,7 +632,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         return $return;
     }
-    
+
     /**
      * Returns an array with credit card's owner (Customer) to be used on API
      * @param Magento\Sales\Model\Order $order
@@ -1253,7 +1253,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return $items;
     }
-    
+
     /**
      * Check if Sandbox mode is active
      * @return bool
@@ -1262,7 +1262,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->scopeConfig->getValue(self::XML_PATH_PAUMENT_PAGSEGURO_SANDBOX, ScopeInterface::SCOPE_WEBSITE);
     }
-    
+
     /**
      * Returns PagseguroDirectMethod JS URL based on selected environment (prod or sandbox)
      *
@@ -1273,7 +1273,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if($this->isSandbox()) {
             return self::XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_JS_URL;
         }
-        
+
         //Production mode
         return self::XML_PATH_PAYMENT_PAGSEGURO_JS_URL;
     }

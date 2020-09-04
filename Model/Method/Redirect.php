@@ -137,7 +137,7 @@ class Redirect extends AbstractMethod
                 } else {
                     $redirectUrl = 'https://pagseguro.uol.com.br/v2/checkout/payment.html?code=' . $code;
                 }
-                
+
                 $additionalData = ['redirectUrl' => $redirectUrl];
                 if($this->pagSeguroHelper->isSandbox()) {
                     $additionalData['is_sandbox'] = 1;
@@ -176,7 +176,7 @@ class Redirect extends AbstractMethod
 
         return $isAvailable;
     }
-    
+
     /**
      * Assign data to info model instance
      *
@@ -192,7 +192,7 @@ class Redirect extends AbstractMethod
         }
 
         $info = $this->getInfoInstance();
-        
+
         //Sandbox Mode
         if ($this->pagSeguroHelper->isSandbox()) {
             $info->setAdditionalInformation('is_sandbox', '1');

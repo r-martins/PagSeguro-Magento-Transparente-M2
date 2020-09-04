@@ -101,7 +101,7 @@ class Boleto extends \Magento\Payment\Model\Method\AbstractMethod
         $this->pagSeguroHelper->writeLog('getData Order'. print_r($data->getData(),true));
         $info = $this->getInfoInstance();
         $info->setAdditionalInformation('sender_hash', $data['additional_data']['sender_hash']);
-        
+
         // set cpf
         if ($this->pagSeguroHelper->isCpfVisible()) {
 
@@ -109,7 +109,7 @@ class Boleto extends \Magento\Payment\Model\Method\AbstractMethod
 
             $info->setAdditionalInformation($this->getCode() . '_cpf', $data['additional_data']['boleto_cpf']);
         }
-        
+
         //Sandbox Mode
         if ($this->pagSeguroHelper->isSandbox()) {
             $info->setAdditionalInformation('is_sandbox', '1');
@@ -167,6 +167,7 @@ class Boleto extends \Magento\Payment\Model\Method\AbstractMethod
                 if ($this->pagSeguroHelper->isSandbox()) {
                     $additional['is_sandbox'] = '1';
                 }
+
                 if ($existing = $payment->getAdditionalInformation()) {
                     if (is_array($existing)) {
                         $additional = array_merge($additional, $existing);

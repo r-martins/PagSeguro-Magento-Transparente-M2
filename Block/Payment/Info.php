@@ -2,21 +2,21 @@
 
 namespace RicardoMartins\PagSeguro\Block\Payment;
 
-class Info extends \Magento\Payment\Block\Info 
+class Info extends \Magento\Payment\Block\Info
 {
-    protected $_checkoutSession;
+	protected $_checkoutSession;
     protected $_orderFactory;
     protected $_scopeConfig;
 
     protected $_template = 'RicardoMartins_PagSeguro::info/info.phtml';
 
     public function __construct(
-            \Magento\Framework\View\Element\Template\Context $context,
-            \Magento\Checkout\Model\Session $checkoutSession,
-            \Magento\Sales\Model\OrderFactory $orderFactory,
-            array $data = []
+        \Magento\Framework\View\Element\Template\Context $context,
+        \Magento\Checkout\Model\Session $checkoutSession,
+        \Magento\Sales\Model\OrderFactory $orderFactory,
+        array $data = []
     ) {
-        parent::__construct($context, $data);
+		parent::__construct($context, $data);
         $this->_checkoutSession = $checkoutSession;
         $this->_orderFactory = $orderFactory;
     }
@@ -40,7 +40,7 @@ class Info extends \Magento\Payment\Block\Info
         return false;
     }
 
-    public function getPaymentMethod()
+	public function getPaymentMethod()
     {
 		$payment = $this->_checkoutSession->getLastRealOrder()->getPayment();
 		return $payment->getMethod();
@@ -76,10 +76,9 @@ class Info extends \Magento\Payment\Block\Info
                         'texto' => 'Clique aqui para pagar no PagSeguro',
                         'is_sandbox' => $payment->getAdditionalInformation('is_sandbox'),
                     );
-                    break;
-            }
-        }
+                break;
+			}
+		}
         return false;
     }
-
 }

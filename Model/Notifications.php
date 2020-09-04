@@ -258,9 +258,9 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
     public function getNotificationStatus($notificationCode)
     {
         //@TODO Remove hard coded URL
-        $url = "https://ws.pagseguro.uol.com.br/v2/transactions/notifications/" . $notificationCode;
+        $url = "https://ws.pagseguro.uol.com.br/v3/transactions/notifications/" . $notificationCode;
         if($this->pagSeguroHelper->isSandbox()) {
-            $url = "https://ws.ricardomartins.net.br/pspro/v7/wspagseguro/v2/transactions/notifications/" . $notificationCode;
+            $url = "https://ws.ricardomartins.net.br/pspro/v7/wspagseguro/v3/transactions/notifications/" . $notificationCode;
         }
 
         $params = ['token' => $this->pagSeguroHelper->getToken(),
@@ -372,6 +372,16 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                 break;
             case '7':
                 $return->setState(\Magento\Sales\Model\Order::STATE_CANCELED);
+                $return->setIsCustomerNotified(true);
+                $return->setMessage(__('Canceled: The transaction was canceled without being finalized.'));
+                break;
+            case '8':
+                $return->setState(\Magento\Sales\Model\Order::STATE_CANCELED);
+                $return->setIsCustomerNotified(true);
+                $return->setMessage(__('Debited: The transaction amount was returned to the buyer.'));
+                break;
+            case '9':
+                $return->setState(\Magento\Sales\Model\Order::STATE);
                 $return->setIsCustomerNotified(true);
                 $return->setMessage(__('Canceled: The transaction was canceled without being finalized.'));
                 break;
