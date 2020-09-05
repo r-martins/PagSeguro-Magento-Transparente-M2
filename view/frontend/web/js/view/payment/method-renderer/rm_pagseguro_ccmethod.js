@@ -22,6 +22,10 @@ define(
                 creditCardInstallments: ''
             },
 
+            getPagSeguroCcImagesHtml: function () {
+                return document.getElementById('pagSeguroCcImagesHtml').innerHTML;
+            },
+
             initObservable: function () {
                 this._super()
                     .observe([
