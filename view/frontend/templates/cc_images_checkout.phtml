@@ -4,12 +4,12 @@ $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
 $assetRepo = $objectManager->get('Magento\Framework\View\Asset\Repository');
 $images_url = $assetRepo->getUrl("RicardoMartins_PagSeguro::images");
 
-$html = "<img src='".$images_url."/visa-large.png' height='35'>\r\n";
-$html .= "<img src='".$images_url."/mastercard-large.png' height='35'>\r\n";
-$html .= "<img src='".$images_url."/american-express-large.png' height='35'><br>\r\n";
-$html .= "<img src='".$images_url."/elo-large.png' height='35'>\r\n";
-$html .= "<img src='".$images_url."/diners-club-large.png' height='35'>\r\n";
-$html .= "<img src='".$images_url."/hipercard-large.png' height='35'>\r\n";
+$html = "<img style='padding-left:27px;' src='".$images_url."/visa-small.png' height='35'>\r\n";
+$html .= " <img src='".$images_url."/mastercard-small.png' height='35'>\r\n";
+$html .= " <img src='".$images_url."/american-express-small.png' height='35'>\r\n";
+$html .= " <img src='".$images_url."/hipercard-small.png' height='35'>\r\n<br>";
+$html .= "<img style='padding-left:27px;' src='".$images_url."/elo-small.png' height='35'>\r\n";
+$html .= " <img src='".$images_url."/diners-club-small.png' height='35'>\r\n";
 $html .= "</div>\r\n";
 
 ?>
