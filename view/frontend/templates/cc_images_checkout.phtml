@@ -1,0 +1,19 @@
+<?php
+
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+$assetRepo = $objectManager->get('Magento\Framework\View\Asset\Repository');
+$images_url = $assetRepo->getUrl("RicardoMartins_PagSeguro::images");
+$enable_cc_images = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface')->getValue('payment/rm_pagseguro_cc/enable_cc_images');
+$html = "";
+if($enable_cc_images) {
+    $html = "<img style='padding-left:27px;' src='" . $images_url . "/visa-small.png' height='35'>\r\n";
+    $html .= " <img src='" . $images_url . "/mastercard-small.png' height='35'>\r\n";
+    $html .= " <img src='" . $images_url . "/american-express-small.png' height='35'>\r\n";
+    $html .= " <img src='" . $images_url . "/hipercard-small.png' height='35'>\r\n<br>";
+    $html .= "<img style='padding-left:27px;' src='" . $images_url . "/elo-small.png' height='35'>\r\n";
+    $html .= " <img src='" . $images_url . "/diners-club-small.png' height='35'>\r\n";
+    $html .= "</div>\r\n";
+}
+
+?>
+<div id="pagSeguroCcImagesHtml" style="display: none;"><?php echo $html; ?></div>

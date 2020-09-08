@@ -8,6 +8,9 @@
         <referenceContainer name="after.body.start">
             <block class="Magento\Framework\View\Element\Template" name="beforebody" template="RicardoMartins_PagSeguro::preparePagSeguro.phtml"/>
         </referenceContainer>
+        <referenceContainer name="content">
+            <block class="Magento\Framework\View\Element\Template" name="checkout_images_pagseg" template="RicardoMartins_PagSeguro::cc_images_checkout.phtml" after="-" />
+        </referenceContainer>
         <referenceBlock name="checkout.root">
             <arguments>
                 <argument name="jsLayout" xsi:type="array">

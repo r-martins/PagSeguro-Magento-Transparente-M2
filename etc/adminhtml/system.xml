@@ -82,6 +82,10 @@
                     <label>New Order Status</label>
                     <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
                 </field>
+                <field id="enable_cc_images" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Exibir imagens dos cartões de crédito no checkout</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
                  <field id="flag" translate="label comment" type="select" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Card Brand Size</label>
                     <comment><![CDATA[Exemplos: <br/><img src="//stc.pagseguro.uol.com.br/public/img/payment-methods-flags/42x20/visa.png" title="42x20"/><img src="//stc.pagseguro.uol.com.br/public/img/payment-methods-flags/68x30/visa.png" title="68x30"/>]]></comment>
@@ -210,6 +214,7 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Ao ativar esta opção este método ficará disponível apenas no admin</comment>
                 </field>
+
                 <field id="sort_order" translate="label comment" type="text" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Sort Order</label>
                     <frontend_class>validate-number</frontend_class>
