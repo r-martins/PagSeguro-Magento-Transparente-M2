@@ -8,6 +8,7 @@
                 <model>RicardoMartins\PagSeguro\Model\Method\Cc</model>
                 <title>Cartão de Crédito via PagSeguro UOL</title>
                 <order_status>pending</order_status>
+                <enable_cc_images>1</enable_cc_images>
                 <flag>42x20</flag>
                 <send_neworder_email>0</send_neworder_email>
                 <group_restriction>0</group_restriction>
