@@ -13,7 +13,7 @@ use Magento\Directory\Helper\Data as DirectoryHelper;
  * @license   https://www.gnu.org/licenses/gpl-3.0.pt-br.html GNU GPL, version 3
  */
 
-class AbstractExtension extends \Magento\Payment\Model\Method\AbstractMethod
+class AbstractMethodExtension extends \Magento\Payment\Model\Method\AbstractMethod
 {
     protected $pagSeguroHelper;
     protected $logger;
