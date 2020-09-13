@@ -10,7 +10,7 @@ namespace RicardoMartins\PagSeguro\Model\Method;
  * @copyright 2018-2020 Ricardo Martins
  * @license   https://www.gnu.org/licenses/gpl-3.0.pt-br.html GNU GPL, version 3
  */
-class Boleto extends \Magento\Payment\Model\Method\AbstractMethod
+class Boleto extends \RicardoMartins\PagSeguro\Model\AbstractExtension
 {
 
     /**
