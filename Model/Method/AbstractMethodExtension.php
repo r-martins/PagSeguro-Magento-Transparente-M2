@@ -1,6 +1,6 @@
 <?php
 
-namespace RicardoMartins\PagSeguro\Model;
+namespace RicardoMartins\PagSeguro\Model\Method;
 
 use Magento\Directory\Helper\Data as DirectoryHelper;
 
@@ -17,6 +17,13 @@ class AbstractMethodExtension extends \Magento\Payment\Model\Method\AbstractMeth
 {
     protected $pagSeguroHelper;
     protected $logger;
+/*
+\RicardoMartins\PagSeguro\Helper\Data $pagSeguroHelper,
+\RicardoMartins\PagSeguro\Helper\Logger $pagSegurologger
+) {
+$this->pagSeguroHelper = $pagSeguroHelper;
+$this->logger = $pagSegurologger;
+  */
 
     public function __construct(
         \Magento\Framework\Model\Context $context,
@@ -25,7 +32,7 @@ class AbstractMethodExtension extends \Magento\Payment\Model\Method\AbstractMeth
         \Magento\Framework\Api\AttributeValueFactory $customAttributeFactory,
         \Magento\Payment\Helper\Data $paymentData,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        Logger $logger,
+        \Magento\Payment\Model\Method\Logger $logger,
         \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = [],
@@ -33,10 +40,10 @@ class AbstractMethodExtension extends \Magento\Payment\Model\Method\AbstractMeth
         \RicardoMartins\PagSeguro\Helper\Data $pagSeguroHelper,
         \RicardoMartins\PagSeguro\Helper\Logger $pagSegurologger
     ) {
-        $this->pagSeguroHelper = $pagSeguroHelper;
-        $this->logger = $pagSegurologger;
         parent::__construct($context, $registry, $extensionFactory, $customAttributeFactory, $paymentData, $scopeConfig,
             $logger, $resource, $resourceCollection, $data, $directory);
+        $this->pagSeguroHelper = $pagSeguroHelper;
+        $this->logger = $pagSegurologger;
     }
 
     public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount)
@@ -66,7 +73,7 @@ class AbstractMethodExtension extends \Magento\Payment\Model\Method\AbstractMeth
             }
         } catch (\Exception $e) {
             $this->debugData(['transaction_id' => $transactionId, 'exception' => $e->getMessage()]);
-            $this->logger->writeLog(__('Payment refunding error.'));
+            $this->pagSeguroHelper->writeLog(__('Payment refunding error.'));
             throw new \Magento\Framework\Validator\Exception(__('Payment refunding error.'));
         }
 
