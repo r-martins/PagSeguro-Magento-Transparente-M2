@@ -133,10 +133,16 @@ class Redirect extends \RicardoMartins\PagSeguro\Model\Method\AbstractMethodExte
                 }
 
                 $additionalData = ['redirectUrl' => $redirectUrl];
+                $additionalData['transaction_id'] = $code;
                 if($this->pagSeguroHelper->isSandbox()) {
                     $additionalData['is_sandbox'] = 1;
                 }
                 $payment->setAdditionalInformation($additionalData);
+                $invoices = $order->getInvoiceCollection();
+                foreach($invoices as $invoice){
+                    $invoice->setTransactionId((string)$returnXml->code);
+                    $invoice->save();
+                }
                 //$order->queueNewOrderEmail();
                 $this->setRedirectUrl($redirectUrl);
                 $order->setStatus($this->getConfigData('order_status'));

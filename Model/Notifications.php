@@ -221,6 +221,9 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                     // salva o transaction id na invoice
                     if (isset($resultXML->code)) {
                         $invoice->setTransactionId((string)$resultXML->code)->save();
+                        $paymentAdditionalInformation = $payment->getAdditionalInformation();
+                        $paymentAdditionalInformation['transaction_id'] = (string)$resultXML->code;
+                        $payment->setAdditionalInformation($paymentAdditionalInformation)->save();
                     }
 
                     $this->transactionFactory->addObject($invoice)

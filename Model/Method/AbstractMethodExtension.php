@@ -72,7 +72,7 @@ $this->logger = $pagSegurologger;
                 throw new \Magento\Framework\Validator\Exception($errorMsg);
             }
         } catch (\Exception $e) {
-            $this->debugData(['transaction_id' => $transactionId, 'exception' => $e->getMessage()]);
+//            $this->debugData(['transaction_id' => $transactionId, 'exception' => $e->getMessage()]);
             $this->pagSeguroHelper->writeLog(__('Payment refunding error.'));
             throw new \Magento\Framework\Validator\Exception(__('Payment refunding error.'));
         }
