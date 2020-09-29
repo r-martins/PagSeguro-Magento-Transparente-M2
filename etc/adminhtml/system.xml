@@ -85,6 +85,7 @@
                 <field id="enable_cc_images" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Exibir imagens dos cartões de crédito no checkout</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[As imagens dos principais cartões aceitos e o logo do PagSeguro serão exibidos junto ao nome do meio de pagamento.  <a href="//pagsegurotransparente.zendesk.com/hc/pt-br/articles/360048798192" target="_blank">Saiba mais</a>]]></comment>
                 </field>
                  <field id="flag" translate="label comment" type="select" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Card Brand Size</label>
