@@ -6,12 +6,14 @@ $images_url = $assetRepo->getUrl("RicardoMartins_PagSeguro::images");
 $enable_cc_images = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface')->getValue('payment/rm_pagseguro_cc/enable_cc_images');
 $html = "";
 if($enable_cc_images) {
-    $html = "<img style='padding-left:27px;' src='" . $images_url . "/visa-small.png' height='35'>\r\n";
-    $html .= " <img src='" . $images_url . "/mastercard-small.png' height='35'>\r\n";
-    $html .= " <img src='" . $images_url . "/american-express-small.png' height='35'>\r\n";
-    $html .= " <img src='" . $images_url . "/hipercard-small.png' height='35'>\r\n<br>";
-    $html .= "<img style='padding-left:27px;' src='" . $images_url . "/elo-small.png' height='35'>\r\n";
-    $html .= " <img src='" . $images_url . "/diners-club-small.png' height='35'>\r\n";
+    $html .= "<img style=\"margin-left:27px; height: 35px;\" src=\"" . $images_url . "/visa.png\">\r\n";
+    $html .= " <img style='height: 35px;' src=\"" . $images_url . "/mastercard.png\">\r\n";
+    $html .= " <img style='height: 35px;' src=\"" . $images_url . "/elo.png\">\r\n";
+    $html .= " <img style='height: 35px;' src=\"" . $images_url . "/amex.png\">\r\n";
+    $html .= " <img style='height: 35px;' src=\"" . $images_url . "/diners.png\">\r\n";
+    $html .= " <img style='height: 35px;' src=\"" . $images_url . "/hipercard.png\">\r\n";
+    $html .= "<img style=\"height: 35px;\" src=\"" . $images_url . "/outros.png\">\r\n";
+    $html .= " <img style='height: 35px;' src=\"" . $images_url . "/pslogo.png\">\r\n";
     $html .= "</div>\r\n";
 }
 
