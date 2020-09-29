@@ -71,14 +71,15 @@ class Boleto extends \RicardoMartins\PagSeguro\Model\Method\AbstractMethodExtens
         DirectoryHelper $directory = null,
         \RicardoMartins\PagSeguro\Helper\Data $pagSeguroHelper,
         \RicardoMartins\PagSeguro\Helper\Logger $pagSegurologger,
-        \Magento\Backend\Model\Auth\Session $adminSession
+        \Magento\Backend\Model\Auth\Session $adminSession,
+        \RicardoMartins\PagSeguro\Model\Notifications $pagSeguroAbModel
     ) {
         parent::__construct($context, $registry, $extensionFactory, $customAttributeFactory, $paymentData, $scopeConfig,
             $logger, $resource, $resourceCollection, $data, $directory, $pagSeguroHelper, $pagSegurologger);
 
         $this->pagSeguroHelper = $pagSeguroHelper;
         $this->adminSession = $adminSession;
- //       $this->pagSeguroAbModel =
+        $this->pagSeguroAbModel = $pagSeguroAbModel;
     }
 
     /**
