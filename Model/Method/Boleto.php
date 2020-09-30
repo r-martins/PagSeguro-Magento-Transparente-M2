@@ -94,12 +94,15 @@ class Boleto extends \RicardoMartins\PagSeguro\Model\Method\AbstractMethodExtens
             $data = new \Magento\Framework\DataObject($data);
         }
 
-        $this->pagSeguroHelper->writeLog('getData Order'. print_r($data->getData(),true));
+        $this->pagSeguroHelper->writeLog('getData Order'. print_r($data->getData(), true));
         $info = $this->getInfoInstance();
-        $info->setAdditionalInformation('sender_hash', $data['additional_data']['sender_hash']);
+
+        if (isset($data['additional_data']['sender_hash'])) {
+            $info->setAdditionalInformation('sender_hash', $data['additional_data']['sender_hash']);
+        }
 
         // set cpf
-        if ($this->pagSeguroHelper->isCpfVisible()) {
+        if ($this->pagSeguroHelper->isCpfVisible() && isset($data['additional_data']['boleto_cpf'])) {
 
             $this->pagSeguroHelper->writeLog('boletocpf_cpf' . $data['additional_data']['boleto_cpf']);
 

@@ -99,19 +99,24 @@ class Tef extends \RicardoMartins\PagSeguro\Model\Method\AbstractMethodExtension
         }
 
         $info = $this->getInfoInstance();
-        $info->setAdditionalInformation('sender_hash', $data['additional_data']['sender_hash']);
 
-        if (!isset($data['additional_data']['tef_bank'])) {
+        if (isset($data['additional_data']['sender_hash'])) {
+            $info->setAdditionalInformation('sender_hash', $data['additional_data']['sender_hash']);
+        }
+
+        /*if (!isset($data['additional_data']['tef_bank'])) {
             throw new \Magento\Framework\Exception\LocalizedException(__('Please select a bank to continue.'));
 //            throw new \Exception('Por favor selecione um banco.');
+        }*/
+        if (isset($data['additional_data']['tef_bank'])) {
+            $info->setAdditionalInformation('tef_bank', $data['additional_data']['tef_bank']);
         }
-        $info->setAdditionalInformation('tef_bank', $data['additional_data']['tef_bank']);
 
         //$this->pagSeguroHelper->writeLog('getData Order: ' . var_export($data, true));
 
         // $this->pagSeguroHelper->writeLog('getData Order'. print_r($data->getPagseguroproTefBank()));
         // set cpf
-        if ($this->pagSeguroHelper->isCpfVisible()) {
+        if ($this->pagSeguroHelper->isCpfVisible() && isset($data['additional_data']['tef_cpf'])) {
             $this->pagSeguroHelper->writeLog('tef_cpf' . $data['additional_data']['tef_cpf']);
             $info->setAdditionalInformation($this->getCode() . '_cpf', $data['additional_data']['tef_cpf']);
         }

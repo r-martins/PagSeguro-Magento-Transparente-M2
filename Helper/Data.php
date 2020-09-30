@@ -1125,7 +1125,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $params = $this->getBoletoApiCallParams($order, $payment);
         $params['paymentMethod'] = 'eft';
-        $params['bankName'] = $payment['additional_information']['tef_bank'];
+        $params['bankName'] = $payment['additional_information']['tef_bank'] ?? '';
         return $params;
     }
 
