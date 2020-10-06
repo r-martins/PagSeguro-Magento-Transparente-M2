@@ -2,6 +2,7 @@
 
 namespace RicardoMartins\PagSeguro\Model\CronJob;
 
+use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Sales\Api\OrderManagementInterface;
 use Magento\Sales\Model\Order;
@@ -28,10 +29,14 @@ class CleanExpiredOrders extends \Magento\Sales\Model\CronJob\CleanExpiredOrders
         StoresConfig $storesConfig,
         CollectionFactory $collectionFactory,
         OrderManagementInterface $orderManagement = null,
-        ResourceConnection $resource
+        ResourceConnection $resource,
+        ProductMetadataInterface $productMetadata
     ) {
         $this->_resource = $resource;
-        parent::__construct($storesConfig, $collectionFactory, $orderManagement);
+        if (version_compare($productMetadata->getVersion(), '2.3.0', '<=')) {
+            return parent::__construct($storesConfig, $collectionFactory);
+        }
+        return parent::__construct($storesConfig, $collectionFactory, $orderManagement);
     }
 
     /**
