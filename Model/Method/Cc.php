@@ -338,8 +338,8 @@ class Cc extends \Magento\Payment\Model\Method\Cc
     public function validate()
     {
         $this->pagSeguroHelper->writeLog(__('CC validate method'));
-
         $info = $this->getInfoInstance();
+        if(!$info->getData('cc_last_4')) return $this;
 
         $senderHash = $info->getAdditionalInformation('sender_hash');
         $creditCardToken = $info->getAdditionalInformation('credit_card_token');
