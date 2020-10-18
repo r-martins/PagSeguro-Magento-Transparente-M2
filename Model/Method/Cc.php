@@ -55,6 +55,8 @@ class Cc extends \Magento\Payment\Model\Method\Cc
     /** @var \Magento\Framework\Message\ManagerInterface */
     protected $messageManager;
 
+    protected $request;
+
     public function __construct(
         \Magento\Framework\Model\Context $context,
         \Magento\Framework\Registry $registry,
@@ -70,7 +72,8 @@ class Cc extends \Magento\Payment\Model\Method\Cc
         \RicardoMartins\PagSeguro\Model\Notifications $pagSeguroAbModel,
         \Magento\Backend\Model\Auth\Session $adminSession,
         \Magento\Framework\Message\ManagerInterface $messageManager,
-        array $data = []
+        array $data = [],
+        \Magento\Framework\App\Request\Http $request
     ) {
         parent::__construct(
             $context,
@@ -93,6 +96,7 @@ class Cc extends \Magento\Payment\Model\Method\Cc
         $this->pagSeguroAbModel = $pagSeguroAbModel;
         $this->adminSession = $adminSession;
         $this->messageManager = $messageManager;
+        $this->request = $request;
     }
 
 
@@ -338,8 +342,9 @@ class Cc extends \Magento\Payment\Model\Method\Cc
     public function validate()
     {
         $this->pagSeguroHelper->writeLog(__('CC validate method'));
+        if(stristr($this->request->getUriString(),"/set-payment-information"))
+            return $this;
         $info = $this->getInfoInstance();
-        if(!$info->getData('cc_last_4')) return $this;
 
         $senderHash = $info->getAdditionalInformation('sender_hash');
         $creditCardToken = $info->getAdditionalInformation('credit_card_token');
