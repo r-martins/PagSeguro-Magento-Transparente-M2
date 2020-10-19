@@ -341,7 +341,6 @@ class Cc extends \Magento\Payment\Model\Method\Cc
      */
     public function validate()
     {
-        $this->pagSeguroHelper->writeLog(__('CC validate method'));
         if(stristr($this->request->getUriString(),"/set-payment-information"))
             return $this;
         $info = $this->getInfoInstance();
