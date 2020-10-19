@@ -15,6 +15,9 @@
                    ">
         </div>
     </div>
+    <!-- ko if:(window.isCreditCardUx)-->
+    <div class='card-wrapper'></div>
+    <!-- /ko -->
      <div class="field number required">
         <label data-bind="attr: {for: getCode() + '_cc_owner'}" class="label">
             <span><!-- ko i18n: 'Credit Card Owner Name'--><!-- /ko --></span>

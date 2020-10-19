@@ -6,7 +6,8 @@ define(
         'Magento_Checkout/js/model/full-screen-loader',
         'Magento_Checkout/js/model/payment/additional-validators',
         'Magento_Payment/js/model/credit-card-validation/validator',
-        'PagseguroDirectMethod'
+        'PagseguroDirectMethod',
+        'cardjs'
     ],
     function (Component, $) {
         'use strict';
