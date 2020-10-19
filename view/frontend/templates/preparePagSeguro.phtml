@@ -8,6 +8,7 @@ $visibleCpf = $helper->isCpfVisible() ? '1':'0';
 $visibleDob = $helper->isDobVisible() ? '1':'0';
 $ccPlaceholderImage = $this->getViewFileUrl('RicardoMartins_PagSeguro::images/cc-placeholder.png');
 $isSandbox = $helper->isSandbox() ? 1 : 0;
+$isCreditCardUx = $helper->isCreditCardUx() ? 1 : 0;
 ?>
 
 <script src="<?php echo $viewJsPath;?>"></script>
@@ -33,10 +34,21 @@ $isSandbox = $helper->isSandbox() ? 1 : 0;
             RMPagSeguroObj.getGrandTotal();
             RMPagSeguroObj.removeUnavailableBanks();
             RMPagSeguroObj.setCardPlaceHolderImage("<?php echo $ccPlaceholderImage ?>");
+            
+            setTimeout(function(){ jQuery('#rm_pagseguro_cc-form').card({    
+                container: '.card-wrapper',
+                 formSelectors: {
+                    numberInput: 'input#rm_pagseguro_cc_cc_number_visible', // optional — default input[name="number"]
+                    expiryInput: 'input#rm_pagseguro_cc_expiration, input#rm_pagseguro_cc_cc_year_visible', // optional — default input[name="expiry"]
+                    cvcInput: 'input#rm_pagseguro_cc_cc_cid', // optional — default input[name="cvc"]
+                    nameInput: 'input#rm_pagseguro_cc_cc_owner' // optional - defaults input[name="name"]
+                } 
+            })}, 3000);
     }
     window.visibleCpf = <?php echo $visibleCpf ?>;
     window.visibleDob = <?php echo $visibleDob ?>;
     window.isSandbox = <?php echo $isSandbox ?>;
+    window.isCreditCardUx = <?php echo $isCreditCardUx ?>;
     //preparePagSeguro();
 
     //]]>

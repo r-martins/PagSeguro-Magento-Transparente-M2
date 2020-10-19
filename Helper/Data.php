@@ -19,6 +19,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_PATH_PAYMENT_PAGSEGURO_TOKEN              = 'payment/rm_pagseguro/token';
     const XML_PATH_PAYMENT_PAGSEGURO_DEBUG              = 'payment/rm_pagseguro/debug';
     const XML_PATH_PAUMENT_PAGSEGURO_SANDBOX            = 'payment/rm_pagseguro/sandbox';
+    const XML_PATH_PAUMENT_PAGSEGURO_CREDITCARDUX            = 'payment/rm_pagseguro/creditcard_ux';
     const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_EMAIL      = 'payment/rm_pagseguro/sandbox_merchant_email';
     const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_KEY      = 'payment/rm_pagseguro/sandbox_key';
     //@TODO Remove hardcoded value in constant and move to config.xml defaults
@@ -1262,6 +1263,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->scopeConfig->getValue(self::XML_PATH_PAUMENT_PAGSEGURO_SANDBOX, ScopeInterface::SCOPE_WEBSITE);
     }
+
+    /**
+     * Check if Improve Creditcard Ux mode is active
+     * @return bool
+     */
+    public function isCreditCardUx()
+    {
+        return $this->scopeConfig->getValue(self::XML_PATH_PAUMENT_PAGSEGURO_CREDITCARDUX, ScopeInterface::SCOPE_WEBSITE);
+    }
+
 
     /**
      * Returns PagseguroDirectMethod JS URL based on selected environment (prod or sandbox)
