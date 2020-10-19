@@ -33,6 +33,10 @@
                     <comment><![CDATA[Remember to <a href="//pagseguro.ricardomartins.net.br/sandbox.html" target="_blank">authorize your sandbox</a> account before using this feature.]]></comment>
                     <depends><field id="sandbox">1</field></depends>
                 </field>
+                <field id="creditcard_ux" translate="label comment" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Enable Improve CreditCard UX</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
                  <field id="debug" translate="label comment" type="select" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Debug</label>
                     <comment><![CDATA[See the log output in var/log/pagseguro.log. It is recommended that you enable logging for information about any issues.]]></comment>
