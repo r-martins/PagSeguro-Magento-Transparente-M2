@@ -70,15 +70,16 @@ class Redirect extends \Magento\Framework\App\Action\Action
             $result = $this->result->create(ResultFactory::TYPE_REDIRECT);
             return $result->setUrl($this->_redirect->getRefererUrl());
         }
-        if($this->pagSeguroHelper->isRedirectToSuccessPageEnabled()) {
+
+        $url = $order->getPayment()->getAdditionalInformation('redirectUrl');
+        $result = $this->result->create(ResultFactory::TYPE_REDIRECT);
+        $result->setUrl($url);
+
+        if ($this->pagSeguroHelper->isRedirectToSuccessPageEnabled()) {
             $result = $this->result->create(ResultFactory::TYPE_RAW);
             $result->setHeader('Content-Type', 'text/plain')->setContents('false');
         }
-        else {
-            $url = $order->getPayment()->getAdditionalInformation('redirectUrl');
-            $result = $this->result->create(ResultFactory::TYPE_REDIRECT);
-            $result->setUrl($url);
-        }
+
         return $result;
     }
 }

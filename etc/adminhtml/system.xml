@@ -181,17 +181,28 @@
                     <label>Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="title" translate="label" type="text" sortOrder="25" showInDefault="2" showInWebsite="1" showInStore="1">
-                    <label>Title</label>
+                <field id="disable_frontend" translate="label" type="select" sortOrder="22" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Desabilitar no front end</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Ao ativar esta opção este método ficará disponível apenas no admin</comment>
                 </field>
-                <field id="redirectURL" translate="label" type="text" sortOrder="20" showInDefault="2" showInWebsite="1" showInStore="1">
+                <field id="redirectURL" translate="label" type="text" sortOrder="23" showInDefault="2" showInWebsite="1" showInStore="1">
                     <label>Success URL</label>
                     <comment><![CDATA[
-                            URL para redirecionar o cliente após o checkout. Deixe em branco se estiver em dúvida ou <a target="_blank" href="//pagsegurotransparente.zendesk.com/hc/pt-br/articles/360022866052-Configurando-o-recurso-de-Pagar-no-PagSeguro">clique aqui</a> para mais detalhes.
+                            URL para redirecionar o cliente após retornar do PagSeguro. Deixe em branco se estiver em dúvida ou <a target="_blank" href="//pagsegurotransparente.zendesk.com/hc/pt-br/articles/360022866052-Configurando-o-recurso-de-Pagar-no-PagSeguro">clique aqui</a> para mais detalhes.
                             ]]></comment>
                     <tooltip><![CDATA[
-                            Não informe uma URL completa.<br/>O sistema usará o DirectoryList para obter o url a partir do valor informado aqui.
+                            Não informe uma URL completa.<br/>O sistema usará o conversor interno do Magento para obter o url a partir do valor informado aqui.
                             ]]></tooltip>
+                </field>
+                <field id="redirect_to_success_page" translate="label" type="select" sortOrder="24" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Redirect to success page</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Quando ativado, o cliente irá para a página de sucesso do Magento onde há um link para pagar no PagSeguro ao invés de ser redirecionado para o PagSeguro. Útil para mensurar conversões na página de sucesso do Magento.
+                    </comment>
+                </field>
+                <field id="title" translate="label" type="text" sortOrder="25" showInDefault="2" showInWebsite="1" showInStore="1">
+                    <label>Title</label>
                 </field>
                 <field id="description" translate="label" type="textarea" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Description</label>
@@ -209,17 +220,6 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Obs: Caso a conta PagSeguro estiver com a opção recuperação de carrinho desabilitada, não será possível habilitá-la por aqui.
                     </comment>
-                </field>
-                <field id="redirect_to_success_page" translate="label" type="select" sortOrder="65" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Redirect to success page</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>Obs: Com esta opção marcada o cliente após o checkout o cliente irá para a success page onde há um link para pagar no PagSeguro.
-                    </comment>
-                </field>
-                <field id="disable_frontend" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Desabilitar no front end</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>Ao ativar esta opção este método ficará disponível apenas no admin</comment>
                 </field>
                 <field id="sort_order" translate="label comment" type="text" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Sort Order</label>
