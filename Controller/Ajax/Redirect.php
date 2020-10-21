@@ -18,7 +18,7 @@ class Redirect extends \Magento\Framework\App\Action\Action
      * Checkout Session
      *
      * @var \Magento\Checkout\Model\Session
-     */ 
+     */
     protected $checkoutSession;
 
     /** @var \Magento\Framework\Serialize\SerializerInterface  */
@@ -29,6 +29,9 @@ class Redirect extends \Magento\Framework\App\Action\Action
     /** @var \Magento\Framework\Message\Manager  */
     protected $messageManager;
 
+    /** @var \RicardoMartins\PagSeguro\Helper\Data */
+    protected $pagSeguroHelper;
+
     /**
      * @param \Magento\Checkout\Model\Session                  $checkoutSession
      * @param \Magento\Framework\App\Action\Context            $context
@@ -36,6 +39,7 @@ class Redirect extends \Magento\Framework\App\Action\Action
      * @param ResultFactory                                    $result
      * @param \Magento\Sales\Api\Data\OrderInterfaceFactory    $orderFactory
      * @param \Magento\Framework\Message\Manager               $messageManager
+     * @param \RicardoMartins\PagSeguro\Helper\Data            $pagSeguroHelper
      */
     public function __construct(
         \Magento\Checkout\Model\Session $checkoutSession,
@@ -43,17 +47,17 @@ class Redirect extends \Magento\Framework\App\Action\Action
         \Magento\Framework\Serialize\SerializerInterface $serializer,
         \Magento\Framework\Controller\ResultFactory $result,
         \Magento\Sales\Api\Data\OrderInterfaceFactory $orderFactory,
-        \Magento\Framework\Message\Manager $messageManager
- 
-    ) {
+        \Magento\Framework\Message\Manager $messageManager,
+        \RicardoMartins\PagSeguro\Helper\Data $pagSeguroHelper
+     ) {
         $this->checkoutSession = $checkoutSession;
         $this->result = $result;
         $this->serializer = $serializer;
         $this->orderFactory = $orderFactory;
         $this->messageManager = $messageManager;
+        $this->pagSeguroHelper = $pagSeguroHelper;
         parent::__construct($context);
     }
-
 
     public function execute()
     {
@@ -63,14 +67,18 @@ class Redirect extends \Magento\Framework\App\Action\Action
             $this->messageManager->addErrorMessage(
                 new Phrase('Something went wrong when placing the order with PagSeguro. Please try again.')
             );
-            $resultRedirect = $this->result->create(ResultFactory::TYPE_REDIRECT);
-            return $resultRedirect->setUrl($this->_redirect->getRefererUrl());
+            $result = $this->result->create(ResultFactory::TYPE_REDIRECT);
+            return $result->setUrl($this->_redirect->getRefererUrl());
         }
-        $url = $order->getPayment()->getAdditionalInformation('redirectUrl');
-
-        $resultRedirect = $this->result->create(ResultFactory::TYPE_REDIRECT);
-        $resultRedirect->setUrl($url);
-
-        return $resultRedirect;
+        if($this->pagSeguroHelper->isRedirectToSuccessPageEnabled()) {
+            $result = $this->result->create(ResultFactory::TYPE_RAW);
+            $result->setHeader('Content-Type', 'text/plain')->setContents('false');
+        }
+        else {
+            $url = $order->getPayment()->getAdditionalInformation('redirectUrl');
+            $result = $this->result->create(ResultFactory::TYPE_REDIRECT);
+            $result->setUrl($url);
+        }
+        return $result;
     }
 }

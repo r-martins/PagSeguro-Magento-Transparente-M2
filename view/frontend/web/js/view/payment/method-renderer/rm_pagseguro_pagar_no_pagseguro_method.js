@@ -4,9 +4,10 @@ define(
         'mage/url',
         'Magento_Checkout/js/action/place-order',
         'Magento_Checkout/js/model/payment-service',
-        'PagseguroDirectMethod'
+        'PagseguroDirectMethod',
+        'jquery'
     ],
-    function (Component,url,placeOrder,paymentService) {
+    function (Component,url,placeOrder,paymentService,pagseguroDirectMethod,$) {
         'use strict';
 
         return Component.extend({
@@ -26,6 +27,14 @@ define(
             },
 
             afterPlaceOrder: function () {
+
+                $.ajax({
+                    url: url.build('pseguro/ajax/redirect'),
+                }).done(function(result) {
+                    if(result === 'false'){
+                        window.location.replace(url.build(window.checkoutConfig.defaultSuccessPageUrl));
+                    }
+                });
                 window.location.replace(url.build('pseguro/ajax/redirect'));
             },
 

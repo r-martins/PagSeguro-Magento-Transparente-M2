@@ -210,12 +210,17 @@
                     <comment>Obs: Caso a conta PagSeguro estiver com a opção recuperação de carrinho desabilitada, não será possível habilitá-la por aqui.
                     </comment>
                 </field>
+                <field id="redirect_to_success_page" translate="label" type="select" sortOrder="65" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Redirect to success page</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Obs: Com esta opção marcada o cliente após o checkout o cliente irá para a success page onde há um link para pagar no PagSeguro.
+                    </comment>
+                </field>
                 <field id="disable_frontend" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Desabilitar no front end</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Ao ativar esta opção este método ficará disponível apenas no admin</comment>
                 </field>
-
                 <field id="sort_order" translate="label comment" type="text" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Sort Order</label>
                     <frontend_class>validate-number</frontend_class>
