@@ -144,7 +144,9 @@ class Redirect extends \RicardoMartins\PagSeguro\Model\Method\AbstractMethodExte
                     $invoice->save();
                 }
                 //$order->queueNewOrderEmail();
-                $this->setRedirectUrl($redirectUrl);
+                if(!$this->pagSeguroHelper->isRedirectToSuccessPageEnabled()) {
+                    $this->setRedirectUrl($redirectUrl);
+                }
                 $order->setStatus($this->getConfigData('order_status'));
                 $order->setState(Order::STATE_NEW);
             }

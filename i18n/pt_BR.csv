@@ -250,3 +250,4 @@
 "Debited: The transaction amount was returned to the buyer.","Debitado: o valor da transação foi devolvido ao comprador."
 "Temporary Retention: The buyer has opened a dispute with the credit card operator and the transaction is now being analysed.","Retenção temporária: O comprador abriu uma solicitação de chargeback junto à operadora do cartão de crédito e agora está em análise."
 "sender cpf or sender cnpj is required. / sender cpf or sender cnpj is required.","CPF ou CNPJ do comprador é obrigatório."
+"Redirect to success page","Redirecionar para página de sucesso"
