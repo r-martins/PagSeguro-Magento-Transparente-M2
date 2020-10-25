@@ -22,7 +22,7 @@
                     <comment><![CDATA[In Sandbox mode, the data is sent to the sandbox of PagSeguro. Enable Sandbox access <a href="http://sandbox.pagseguro.uol.com.br/" target="_blank">here</a> and create a test seller.]]></comment>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <tooltip><![CDATA[Remember you must use a buyer email @sandbox.pagseguro.com.br when placing orders in sandbox.]]></tooltip>
-                </field>
+                </field>                
                 <field id="sandbox_merchant_email" translate="label comment" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Sandbox Seller Email</label>
                     <comment><![CDATA[Create a test seller <a href="https://sandbox.pagseguro.uol.com.br/aplicacao/configuracoes.html" target="_blank">here</a> or use an existing one.]]></comment>
@@ -32,11 +32,7 @@
                     <label>Sandbox Public Key</label>
                     <comment><![CDATA[Remember to <a href="//pagseguro.ricardomartins.net.br/sandbox.html" target="_blank">authorize your sandbox</a> account before using this feature.]]></comment>
                     <depends><field id="sandbox">1</field></depends>
-                </field>
-                <field id="creditcard_ux" translate="label comment" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Enable Improve CreditCard UX</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                </field>
+                </field>                
                  <field id="debug" translate="label comment" type="select" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Debug</label>
                     <comment><![CDATA[See the log output in var/log/pagseguro.log. It is recommended that you enable logging for information about any issues.]]></comment>
@@ -85,6 +81,10 @@
                 <field id="order_status" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>New Order Status</label>
                     <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
+                </field>
+                <field id="creditcard_ux" translate="label comment" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Enable Improve CreditCard UX</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
                 <field id="enable_cc_images" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Exibir imagens dos cartões de crédito no checkout</label>

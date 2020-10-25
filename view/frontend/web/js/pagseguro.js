@@ -197,6 +197,10 @@ RMPagSeguro.prototype.updateCreditCardToken = function(){
    
 }
 
+RMPagSeguro.prototype.updateBrandName = function(brand){
+    this.brand = brand;
+}
+
 RMPagSeguro.prototype.updateBrand = function(){
     var ccNum ='';
     if(jQuery('input[name="payment[ps_cc_number]"]').val()){
