@@ -32,7 +32,7 @@ function RMPagSeguro(config) {
                     console.error('Unable to get sender_hash after multiple attempts.');
                 }
             }, 3000 );
-        } 
+        }
 
         var parcelsDrop = jQuery('#rm_pagseguro_cc_cc_installments');
         //Please enter credit card data to calculate
@@ -51,7 +51,7 @@ RMPagSeguro.prototype.updateSenderHash = function(){
     return false;
 }
 
-RMPagSeguro.prototype.addCardFieldsObserver = function(obj){ 
+RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
     try {
         var ccNumElm = jQuery('input[name="payment[ps_cc_number]"]');
         var ccExpMoElm = jQuery('input[name="payment[ps_cc_exp_month]"]');
@@ -59,7 +59,7 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
         var ccCvvElm = jQuery('input[name="payment[ps_cc_cid]"]');
         var ccExpYrVisibileElm = jQuery('#rm_pagseguro_cc_cc_year_visible');
         var ccNumVisibleElm = jQuery('.cc_number_visible');
-        
+
         jQuery(ccNumElm).keyup(function( event ) {
             obj.updateCreditCardToken();
         });
@@ -110,13 +110,13 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
             }
             jQuery(ccExpYrElm).val(ccExpYr);
         });
-        
-        jQuery( "#pagseguro_cc_method .actions-toolbar .checkout" ).on("click", function() {            
-                obj.updateCreditCardToken();            
+
+        jQuery( "#pagseguro_cc_method .actions-toolbar .checkout" ).on("click", function() {
+                obj.updateCreditCardToken();
         });
-        
-        jQuery( "#pagseguro_tef_method .actions-toolbar .checkout" ).on("click", function() {            
-                obj.updatePaymentHashes();            
+
+        jQuery( "#pagseguro_tef_method .actions-toolbar .checkout" ).on("click", function() {
+                obj.updatePaymentHashes();
         });
 
         jQuery("#rm_pagseguro_cc_cc_installments").change(function( event ) {
@@ -151,7 +151,7 @@ RMPagSeguro.prototype.updateCreditCardToken = function(){
             brandName = this.brand.name;
         }
     }
-  
+
     if(ccNum.length > 6 && ccExpMo != "" && ccExpYr != "" && ccCvv.length >= 3)
     {
         PagSeguroDirectPayment.createCardToken({
@@ -190,11 +190,11 @@ RMPagSeguro.prototype.updateCreditCardToken = function(){
             },
             complete: function(psresponse){
                  console.info('Card token updated successfully.');
-                
+
             }
         });
     }
-   
+
 }
 
 RMPagSeguro.prototype.updateBrand = function(){
@@ -214,7 +214,7 @@ RMPagSeguro.prototype.updateBrand = function(){
             }
             return;
         }
-        this.cardBin = ccNum.substring(0, 6); 
+        this.cardBin = ccNum.substring(0, 6);
         PagSeguroDirectPayment.getBrand({
             cardBin: currentBin,
             success: function(psresponse){
@@ -233,17 +233,17 @@ RMPagSeguro.prototype.updateBrand = function(){
     }
 }
 
-RMPagSeguro.prototype.updatePaymentHashes = function(){    
+RMPagSeguro.prototype.updatePaymentHashes = function(){
     var currentSelectedPayment = jQuery('input[name="payment[method]"]:checked').attr('id');
 
     if (currentSelectedPayment == 'rm_pagseguro_tef') {
         var inputTefSenderHash = jQuery('input[name="payment[pagseguropro_tef_senderhash]"]');
-            inputTefSenderHash.val(this.senderHash);        
+            inputTefSenderHash.val(this.senderHash);
     }
-    
+
     if (currentSelectedPayment == 'rm_pagseguro_boleto') {
         var inputBoletoSenderHash = jQuery('input[name="payment[pagseguro_boleto_senderhash]"]');
-            inputBoletoSenderHash.val(this.senderHash);        
+            inputBoletoSenderHash.val(this.senderHash);
     }
 
     if (currentSelectedPayment == 'rm_pagseguro_cc') {
@@ -254,7 +254,7 @@ RMPagSeguro.prototype.updatePaymentHashes = function(){
         var inputCcType = jQuery('input[name="payment[pagseguropro_cc_cctype]"]');
             inputCcType.val((this.brand)?this.brand.name:'');
         var inputCcIsadmin = jQuery('input[name="payment[pagseguropro_cc_isadmin]"]');
-            inputCcIsadmin.val(this.config.is_admin);        
+            inputCcIsadmin.val(this.config.is_admin);
     }
 }
 
@@ -271,7 +271,7 @@ RMPagSeguro.prototype.setGrandTotal = function(total){
 }
 
 RMPagSeguro.prototype.getGrandTotal = function(){
- 
+
     var url = this.storeUrl + 'pseguro/ajax/getGrandTotal';
     var self = this;
     jQuery.ajax({
@@ -302,7 +302,6 @@ RMPagSeguro.prototype.updateSessionId = function(){
 RMPagSeguro.prototype.getInstallments = function(grandTotal, selectedInstallment){
     var brandName = "";
     var self = this;
-
     if(typeof this.brand == "undefined"){
         return;
     }
@@ -321,7 +320,7 @@ RMPagSeguro.prototype.getInstallments = function(grandTotal, selectedInstallment
             parcelsDrop.empty();
 
             if(self.config.force_installments_selection == 1){
-                parcelsDrop.append('<option value="">Selecione a quantidade de parcelas</option>');
+                parcelsDrop.append('<option value="" selected="selected">Selecione a quantidade de parcelas</option>');
             }
 
             for(var x=0; x < b.length; x++){
@@ -333,11 +332,19 @@ RMPagSeguro.prototype.getInstallments = function(grandTotal, selectedInstallment
                     optionText += " (total R$" + (b[x].installmentAmount*b[x].quantity).toFixed(2).toString().replace('.', ',') + ")";
                 }
                 optionVal = b[x].quantity + "|" + b[x].installmentAmount;
-                if(b[x].quantity == selectedInstallment){
-                    parcelsDrop.append('<option value="'+optionVal+'" selected>'+optionText+'</option>');
-                }else{
+                // if(b[x].quantity == selectedInstallment){
+                //     parcelsDrop.append('<option value="'+optionVal+'" selected>'+optionText+'</option>');
+                // }else{
                     parcelsDrop.append('<option value="'+optionVal+'">'+optionText+'</option>');
-                }
+                // }
+            }
+            if(self.config.force_installments_selection != 1){
+                $('#rm_pagseguro_cc_cc_installments option[selected="selected"]').each(
+                    function() {
+                        $(this).removeAttr('selected');
+                    }
+                );
+                parcelsDrop.prop("selectedIndex",0);
             }
              // updating installment value in checkout session
               self.updateInstallments();
