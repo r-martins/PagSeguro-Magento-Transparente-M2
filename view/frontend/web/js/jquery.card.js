@@ -279,6 +279,7 @@ var card = function(r) {
                     PagSeguroDirectPayment.getBrand({
                         cardBin: jQuery(this.$numberInput).val().substring(0,7).replace(" ",''),
                         success: function(response) {
+			    RMPagSeguro.prototype.updateBrandName(response['brand']);
                             if (t = response['brand']['name'], !n.hasClass(self.$card, t)) return n.removeClass(self.$card, "jp-card-unknown"), n.removeClass(self.$card, self.cardTypes.join(" ")), n.addClass(self.$card, "jp-card-" + t), n.toggleClass(self.$card, "jp-card-identified", "unknown" !== t), self.cardType = t
                         },
                         error: function(response) {
