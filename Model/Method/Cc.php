@@ -55,6 +55,8 @@ class Cc extends \Magento\Payment\Model\Method\Cc
     /** @var \Magento\Framework\Message\ManagerInterface */
     protected $messageManager;
 
+    protected $request;
+
     public function __construct(
         \Magento\Framework\Model\Context $context,
         \Magento\Framework\Registry $registry,
@@ -70,7 +72,8 @@ class Cc extends \Magento\Payment\Model\Method\Cc
         \RicardoMartins\PagSeguro\Model\Notifications $pagSeguroAbModel,
         \Magento\Backend\Model\Auth\Session $adminSession,
         \Magento\Framework\Message\ManagerInterface $messageManager,
-        array $data = []
+        array $data = [],
+        \Magento\Framework\App\Request\Http $request
     ) {
         parent::__construct(
             $context,
@@ -93,6 +96,7 @@ class Cc extends \Magento\Payment\Model\Method\Cc
         $this->pagSeguroAbModel = $pagSeguroAbModel;
         $this->adminSession = $adminSession;
         $this->messageManager = $messageManager;
+        $this->request = $request;
     }
 
 
@@ -161,7 +165,11 @@ class Cc extends \Magento\Payment\Model\Method\Cc
                     }
                 }
                 $payment->setAdditionalInformation($additional);
-
+                $invoices = $order->getInvoiceCollection();
+                foreach($invoices as $invoice){
+                    $invoice->setTransactionId((string)$returnXml->code);
+                    $invoice->save();
+                }
             }
 
             $this->pagSeguroAbModel->proccessNotificatonResult($returnXml, $payment);
@@ -182,9 +190,12 @@ class Cc extends \Magento\Payment\Model\Method\Cc
      */
     public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
+        if (!$this->canRefund()) {
+            throw new \Magento\Framework\Exception\LocalizedException(__('The refund action is not available.'));
+        }
         // recupera a informação adicional do PagSeguro
         $info           = $this->getInfoInstance();
-        $transactionId = $info->getAdditionalInformation('transaction_id');
+        $transactionId = $payment->getAdditionalInformation('transaction_id');
 
         $params = [
             'transactionCode'   => $transactionId,
@@ -195,7 +206,7 @@ class Cc extends \Magento\Payment\Model\Method\Cc
         $params['email'] = $this->pagSeguroHelper->getMerchantEmail();
 
         try {
-           // call API - refund
+            // call API - refund
             $returnXml  = $this->pagSeguroHelper->callApi($params, $payment, 'transactions/refunds');
 
             if ($returnXml === null) {
@@ -204,7 +215,7 @@ class Cc extends \Magento\Payment\Model\Method\Cc
             }
         } catch (\Exception $e) {
             $this->debugData(['transaction_id' => $transactionId, 'exception' => $e->getMessage()]);
-            $this->logger->error(__('Payment refunding error.'));
+            $this->pagSeguroHelper->writeLog(__('Payment refunding error.'));
             throw new \Magento\Framework\Validator\Exception(__('Payment refunding error.'));
         }
 
@@ -330,8 +341,8 @@ class Cc extends \Magento\Payment\Model\Method\Cc
      */
     public function validate()
     {
-        $this->pagSeguroHelper->writeLog(__('CC validate method'));
-
+        if(stristr($this->request->getUriString(),"/set-payment-information"))
+            return $this;
         $info = $this->getInfoInstance();
 
         $senderHash = $info->getAdditionalInformation('sender_hash');

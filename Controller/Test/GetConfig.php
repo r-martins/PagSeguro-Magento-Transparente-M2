@@ -1,6 +1,9 @@
 <?php
 namespace RicardoMartins\PagSeguro\Controller\Test;
 
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Store\Model\ScopeInterface;
+
 /**
  * Class GetConfig
  *
@@ -19,6 +22,10 @@ class GetConfig extends \Magento\Framework\App\Action\Action
     protected $resultPageFactory;
 
     protected $resultJsonFactory;
+    /**
+     * @var ScopeConfigInterface
+     */
+    private $scopeConfig;
 
     /**
      * GetConfig constructor.
@@ -28,11 +35,13 @@ class GetConfig extends \Magento\Framework\App\Action\Action
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \RicardoMartins\PagSeguro\Helper\Data $helper,
-        \Magento\Framework\Controller\Result\JsonFactory $jsonFactory
+        \Magento\Framework\Controller\Result\JsonFactory $jsonFactory,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
     )
     {
         $this->_helper = $helper;
         $this->resultJsonFactory = $jsonFactory;
+        $this->scopeConfig = $scopeConfig;
         return parent::__construct($context);
     }
 
@@ -45,6 +54,10 @@ class GetConfig extends \Magento\Framework\App\Action\Action
         $resultJson = $this->resultJsonFactory->create();
 
         $tokenLen = strlen($this->_helper->getToken());
+        $redirectMethod = $this->scopeConfig->getValue(
+            \RicardoMartins\PagSeguro\Helper\Data::XML_PATH_PAYMENT_PAGSEGURO_TEF_ACTIVE, ScopeInterface::SCOPE_STORE
+        );
+
         $info = array(
             'Magento Version' => substr($this->_helper->getMagentoVersion(), 0, 1),
             'RicardoMartins_PagSeguro' => array(
@@ -52,6 +65,7 @@ class GetConfig extends \Magento\Framework\App\Action\Action
                 'debug'     => (boolean)$this->_helper->isDebugActive()
             ),
             'configJs'      => json_decode($this->_helper->getConfigJs()),
+            'redirect'         => $redirectMethod,
             'sandbox_active' => $this->_helper->isSandbox(),
             'key_validate'  => $this->_helper->validateKey(),
             'token_consistency' => ($tokenLen == 32 || $tokenLen == 100) ? "Good" : "Token does not consist 32 or 100 characters"

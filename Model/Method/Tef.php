@@ -2,6 +2,8 @@
 
 namespace RicardoMartins\PagSeguro\Model\Method;
 
+use Magento\Directory\Helper\Data as DirectoryHelper;
+
 /**
  * Class Tef - Pagamento com Cartão de Débito
  *
@@ -10,7 +12,7 @@ namespace RicardoMartins\PagSeguro\Model\Method;
  * @copyright 2018-2019 Ricardo Martins
  * @license   https://www.gnu.org/licenses/gpl-3.0.pt-br.html GNU GPL, version 3
  */
-class Tef extends \Magento\Payment\Model\Method\AbstractMethod
+class Tef extends \RicardoMartins\PagSeguro\Model\Method\AbstractMethodExtension
 {
 
     /**
@@ -63,33 +65,26 @@ class Tef extends \Magento\Payment\Model\Method\AbstractMethod
         \Magento\Payment\Helper\Data $paymentData,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Payment\Model\Method\Logger $logger,
+        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
+        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+        array $data = [],
+        DirectoryHelper $directory = null,
         \RicardoMartins\PagSeguro\Helper\Data $pagSeguroHelper,
-        \RicardoMartins\PagSeguro\Model\Notifications $pagSeguroAbModel,
+        \RicardoMartins\PagSeguro\Helper\Logger $pagSegurologger,
         \Magento\Backend\Model\Auth\Session $adminSession,
-        array $data = []
+        \RicardoMartins\PagSeguro\Model\Notifications $pagSeguroAbModel
     ) {
-        parent::__construct(
-            $context,
-            $registry,
-            $extensionFactory,
-            $customAttributeFactory,
-            $paymentData,
-            $scopeConfig,
-            $logger,
-            null,
-            null,
-            $data
-        );
-
+        parent::__construct($context, $registry, $extensionFactory, $customAttributeFactory, $paymentData, $scopeConfig,
+            $logger, $resource, $resourceCollection, $data, $directory, $pagSeguroHelper, $pagSegurologger);
         //@TODO Remove
         // $this->_minAmount = 1;
         // $this->_maxAmount = 999999999;
         $this->pagSeguroHelper = $pagSeguroHelper;
         $this->pagSeguroAbModel = $pagSeguroAbModel;
         $this->adminSession = $adminSession;
-    }
 
-    /**
+    }
+     /**
      * Assign data to info model instance
      *
      * @param mixed $data
@@ -104,19 +99,24 @@ class Tef extends \Magento\Payment\Model\Method\AbstractMethod
         }
 
         $info = $this->getInfoInstance();
-        $info->setAdditionalInformation('sender_hash', $data['additional_data']['sender_hash']);
 
-        if (!isset($data['additional_data']['tef_bank'])) {
+        if (isset($data['additional_data']['sender_hash'])) {
+            $info->setAdditionalInformation('sender_hash', $data['additional_data']['sender_hash']);
+        }
+
+        /*if (!isset($data['additional_data']['tef_bank'])) {
             throw new \Magento\Framework\Exception\LocalizedException(__('Please select a bank to continue.'));
 //            throw new \Exception('Por favor selecione um banco.');
+        }*/
+        if (isset($data['additional_data']['tef_bank'])) {
+            $info->setAdditionalInformation('tef_bank', $data['additional_data']['tef_bank']);
         }
-        $info->setAdditionalInformation('tef_bank', $data['additional_data']['tef_bank']);
 
         //$this->pagSeguroHelper->writeLog('getData Order: ' . var_export($data, true));
 
         // $this->pagSeguroHelper->writeLog('getData Order'. print_r($data->getPagseguroproTefBank()));
         // set cpf
-        if ($this->pagSeguroHelper->isCpfVisible()) {
+        if ($this->pagSeguroHelper->isCpfVisible() && isset($data['additional_data']['tef_cpf'])) {
             $this->pagSeguroHelper->writeLog('tef_cpf' . $data['additional_data']['tef_cpf']);
             $info->setAdditionalInformation($this->getCode() . '_cpf', $data['additional_data']['tef_cpf']);
         }

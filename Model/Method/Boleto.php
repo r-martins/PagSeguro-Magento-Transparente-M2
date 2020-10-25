@@ -2,6 +2,8 @@
 
 namespace RicardoMartins\PagSeguro\Model\Method;
 
+use Magento\Directory\Helper\Data as DirectoryHelper;
+
 /**
  * Boleto Payment Method for PagSeguro Payment
  *
@@ -10,7 +12,7 @@ namespace RicardoMartins\PagSeguro\Model\Method;
  * @copyright 2018-2020 Ricardo Martins
  * @license   https://www.gnu.org/licenses/gpl-3.0.pt-br.html GNU GPL, version 3
  */
-class Boleto extends \Magento\Payment\Model\Method\AbstractMethod
+class Boleto extends \RicardoMartins\PagSeguro\Model\Method\AbstractMethodExtension
 {
 
     /**
@@ -63,27 +65,21 @@ class Boleto extends \Magento\Payment\Model\Method\AbstractMethod
         \Magento\Payment\Helper\Data $paymentData,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Payment\Model\Method\Logger $logger,
+        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
+        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+        array $data = [],
+        DirectoryHelper $directory = null,
         \RicardoMartins\PagSeguro\Helper\Data $pagSeguroHelper,
-        \RicardoMartins\PagSeguro\Model\Notifications $pagSeguroAbModel,
+        \RicardoMartins\PagSeguro\Helper\Logger $pagSegurologger,
         \Magento\Backend\Model\Auth\Session $adminSession,
-        array $data = []
+        \RicardoMartins\PagSeguro\Model\Notifications $pagSeguroAbModel
     ) {
-        parent::__construct(
-            $context,
-            $registry,
-            $extensionFactory,
-            $customAttributeFactory,
-            $paymentData,
-            $scopeConfig,
-            $logger,
-            null,
-            null,
-            $data
-        );
+        parent::__construct($context, $registry, $extensionFactory, $customAttributeFactory, $paymentData, $scopeConfig,
+            $logger, $resource, $resourceCollection, $data, $directory, $pagSeguroHelper, $pagSegurologger);
 
         $this->pagSeguroHelper = $pagSeguroHelper;
-        $this->pagSeguroAbModel = $pagSeguroAbModel;
         $this->adminSession = $adminSession;
+        $this->pagSeguroAbModel = $pagSeguroAbModel;
     }
 
     /**
@@ -98,12 +94,15 @@ class Boleto extends \Magento\Payment\Model\Method\AbstractMethod
             $data = new \Magento\Framework\DataObject($data);
         }
 
-        $this->pagSeguroHelper->writeLog('getData Order'. print_r($data->getData(),true));
+        $this->pagSeguroHelper->writeLog('getData Order'. print_r($data->getData(), true));
         $info = $this->getInfoInstance();
-        $info->setAdditionalInformation('sender_hash', $data['additional_data']['sender_hash']);
+
+        if (isset($data['additional_data']['sender_hash'])) {
+            $info->setAdditionalInformation('sender_hash', $data['additional_data']['sender_hash']);
+        }
 
         // set cpf
-        if ($this->pagSeguroHelper->isCpfVisible()) {
+        if ($this->pagSeguroHelper->isCpfVisible() && isset($data['additional_data']['boleto_cpf'])) {
 
             $this->pagSeguroHelper->writeLog('boletocpf_cpf' . $data['additional_data']['boleto_cpf']);
 

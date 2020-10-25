@@ -37,6 +37,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_PATH_PAYMENT_PAGSEGURO_BOLETO_ACTIVE      = 'payment/rm_pagseguro_boleto/active';
     const XML_PATH_PAYMENT_PAGSEGURO_KEY                = 'payment/rm_pagseguro/key';
     const XML_PATH_PAYMENT_PAGSEGURO_CC_FORCE_INSTALLMENTS = 'payment/rm_pagseguro_cc/force_installments_selection';
+    const XML_PATH_PAYMENT_PAGSEGURO_REDIRECT_TO_SUCCESSPAGE = 'payment/rm_pagseguro_pagar_no_pagseguro/redirect_to_success_page';
 
      /**
       * Store Manager
@@ -170,6 +171,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getAuthResponse()
     {
         return $this->authResponse;
+    }
+
+    /**
+     * Pay on PagSeguro redirect method - check if should redirect to success page (true) or directly to PagSeguro (false)
+     * @return bool
+     */
+    public function isRedirectToSuccessPageEnabled()
+    {
+        return $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_REDIRECT_TO_SUCCESSPAGE, ScopeInterface::SCOPE_WEBSITE);
     }
 
     /**
@@ -1126,7 +1136,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $params = $this->getBoletoApiCallParams($order, $payment);
         $params['paymentMethod'] = 'eft';
-        $params['bankName'] = $payment['additional_information']['tef_bank'];
+        $params['bankName'] = $payment['additional_information']['tef_bank'] ?? '';
         return $params;
     }
 
