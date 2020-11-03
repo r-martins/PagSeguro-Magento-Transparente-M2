@@ -339,9 +339,9 @@ RMPagSeguro.prototype.getInstallments = function(grandTotal, selectedInstallment
                 // }
             }
             if(self.config.force_installments_selection != 1){
-                $('#rm_pagseguro_cc_cc_installments option[selected="selected"]').each(
+                jQuery('#rm_pagseguro_cc_cc_installments option[selected="selected"]').each(
                     function() {
-                        $(this).removeAttr('selected');
+                        jQuery(this).removeAttr('selected');
                     }
                 );
                 parcelsDrop.prop("selectedIndex",0);
