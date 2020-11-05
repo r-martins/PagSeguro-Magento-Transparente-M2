@@ -255,7 +255,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $activeMethods = [
             'cc' => $this->scopeConfig->getValue(
                 self::XML_PATH_PAYMENT_PAGSEGURO_CC_ACTIVE,
-                ScopeInterface::SCOPE_WEBSITE
+                ScopeInterface::SCOPE_STORE
             ),
             'boleto' => $this->scopeConfig->getValue(
                 self::XML_PATH_PAYMENT_PAGSEGURO_BOLETO_ACTIVE,
