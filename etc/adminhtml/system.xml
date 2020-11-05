@@ -2,83 +2,83 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
         <section id="payment">
-            <group id="rm_pagseguro" translate="label comment" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="rm_pagseguro" translate="label comment" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
                 <label>PagSeguro - General Settings - Ricardo Martins</label>
                 <comment><![CDATA[Need help? - <a href="https://pagseguro.ricardomartins.net.br/" target="_blank">Official site of the module</a> | <a href="//pagsegurotransparente.zendesk.com/hc/pt-br" target="_blank">Help Center</a>.<br/> To use this module you need to get your free unlimited public key <a href="https://pagseguro.ricardomartins.net.br/woocommerce/wizard.html" target="_blank"><strong>authorizing your PagSeguro account</strong></a> in the application model.]]></comment>
-                <field id="merchant_email" translate="label comment" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="merchant_email" translate="label comment" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Email</label>
                     <comment>Store email (seller account)</comment>
                 </field>
-                 <field id="token" translate="label comment" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                 <field id="token" translate="label comment" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Token</label>
                      <comment>The token is fetched from your PagSeguro account panel.</comment>
                 </field>
-                <field id="key" translate="label comment" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="key" translate="label comment" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Public Key</label>
                     <comment><![CDATA[Get your public key for free when <a href="//r-martins.github.io/PagSeguro-Magento-Transparente/pro/app.html" target="_blank">enabling your account</a>.]]></comment>
                 </field>
-                <field id="sandbox" translate="label comment" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="sandbox" translate="label comment" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Enable Sandbox</label>
                     <comment><![CDATA[In Sandbox mode, the data is sent to the sandbox of PagSeguro. Enable Sandbox access <a href="http://sandbox.pagseguro.uol.com.br/" target="_blank">here</a> and create a test seller.]]></comment>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <tooltip><![CDATA[Remember you must use a buyer email @sandbox.pagseguro.com.br when placing orders in sandbox.]]></tooltip>
                 </field>
-                <field id="sandbox_merchant_email" translate="label comment" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="sandbox_merchant_email" translate="label comment" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Sandbox Seller Email</label>
                     <comment><![CDATA[Create a test seller <a href="https://sandbox.pagseguro.uol.com.br/aplicacao/configuracoes.html" target="_blank">here</a> or use an existing one.]]></comment>
                     <depends><field id="sandbox">1</field></depends>
                 </field>
-                <field id="sandbox_key" translate="label comment" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="sandbox_key" translate="label comment" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Sandbox Public Key</label>
                     <comment><![CDATA[Remember to <a href="//pagseguro.ricardomartins.net.br/sandbox.html" target="_blank">authorize your sandbox</a> account before using this feature.]]></comment>
                     <depends><field id="sandbox">1</field></depends>
                 </field>
-                 <field id="debug" translate="label comment" type="select" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
+                 <field id="debug" translate="label comment" type="select" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Debug</label>
                     <comment><![CDATA[See the log output in var/log/pagseguro.log. It is recommended that you enable logging for information about any issues.]]></comment>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="send_invoice_email" translate="label comment" type="select" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="send_invoice_email" translate="label comment" type="select" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Send invoice email?</label>
                     <comment><![CDATA[Shoot the invoice email from the store upon receipt of payment confirmation from PagSeguro.]]></comment>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="customer_cpf_attribute" translate="label comment" type="select" sortOrder="8" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="customer_cpf_attribute" translate="label comment" type="select" sortOrder="8" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Customer CPF</label>
                     <comment><![CDATA[If your store uses a custom attribute for the customer's CPF, select here. Otherwise choose "Request along with the other payment details".]]></comment>
                    <source_model>RicardoMartins\PagSeguro\Model\System\Config\Source\Cpf</source_model>
                 </field>
-               <field id="address_street_attribute" translate="label comment" type="select" sortOrder="9" showInDefault="1" showInWebsite="1" showInStore="1">
+               <field id="address_street_attribute" translate="label comment" type="select" sortOrder="9" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Attribute Delivery Street</label>
                     <comment><![CDATA[If your store uses a custom attribute for Delivery Street, select here.]]></comment>
                    <source_model>RicardoMartins\PagSeguro\Model\System\Config\Source\Attributes</source_model>
                 </field>
-                <field id="address_number_attribute" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="address_number_attribute" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Attribute Number</label>
                     <comment><![CDATA[If your store uses a custom attribute for the 'Number' field, select here.]]></comment>
                    <source_model>RicardoMartins\PagSeguro\Model\System\Config\Source\Attributes</source_model>
                 </field>
-                <field id="address_complement_attribute" translate="label comment" type="select" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="address_complement_attribute" translate="label comment" type="select" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Attribute Complement</label>
                     <comment><![CDATA[If your store uses a custom attribute for the 'Complement' field of delivery, select here. You can omit this information from PagSeguro.]]></comment>
                    <source_model>RicardoMartins\PagSeguro\Model\System\Config\Source\Attributes\Optional</source_model>
                 </field>
-                <field id="address_neighborhood_attribute" translate="label comment" type="select" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="address_neighborhood_attribute" translate="label comment" type="select" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Neighborhood Attribute</label>
                     <comment><![CDATA[If your store uses a custom attribute for the Delivery Neighborhood field, select here.]]></comment>
                    <source_model>RicardoMartins\PagSeguro\Model\System\Config\Source\Attributes</source_model>
                 </field>
             </group>
-            <group id="rm_pagseguro_cc" translate="label" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="rm_pagseguro_cc" translate="label" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
                 <label>PagSeguro - Credit Card - Ricardo Martins</label>
-                <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                 <field id="title" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                 <field id="title" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Title</label>
                 </field>
-                <field id="order_status" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="order_status" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>New Order Status</label>
                     <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
                 </field>
@@ -87,41 +87,41 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment><![CDATA[As imagens dos principais cartões aceitos e o logo do PagSeguro serão exibidos junto ao nome do meio de pagamento.  <a href="//pagsegurotransparente.zendesk.com/hc/pt-br/articles/360048798192" target="_blank">Saiba mais</a>]]></comment>
                 </field>
-                 <field id="flag" translate="label comment" type="select" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                 <field id="flag" translate="label comment" type="select" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Card Brand Size</label>
                     <comment><![CDATA[Exemplos: <br/><img src="//stc.pagseguro.uol.com.br/public/img/payment-methods-flags/42x20/visa.png" title="42x20"/><img src="//stc.pagseguro.uol.com.br/public/img/payment-methods-flags/68x30/visa.png" title="68x30"/>]]></comment>
                     <source_model>RicardoMartins\PagSeguro\Model\System\Config\Source\Ccbrand</source_model>
                 </field>
-                <field id="info_brl" translate="label comment" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="info_brl" translate="label comment" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Show notice that the transaction is made in Brazil</label>
                     <comment><![CDATA[This information MUST contain on your checkout by Visa determination.]]></comment>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="owner_dob_attribute" translate="label comment" type="select" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="owner_dob_attribute" translate="label comment" type="select" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Date of birth</label>
                     <comment><![CDATA[Date of birth of the credit card owner is mandatory for PagSeguro.]]></comment>
                    <source_model>RicardoMartins\PagSeguro\Model\System\Config\Source\Customer\Dob</source_model>
                 </field>
-                <field id="sort_order" translate="label comment" type="text" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="sort_order" translate="label comment" type="text" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Sort Order</label>
                     <frontend_class>validate-number</frontend_class>
                 </field>
-                <field id="group_restriction" translate="label" type="select" sortOrder="8" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="group_restriction" translate="label" type="select" sortOrder="8" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Enable group restriction</label>
                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="customer_groups" translate="label comment" type="multiselect" sortOrder="9" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="customer_groups" translate="label comment" type="multiselect" sortOrder="9" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Customer Groups</label>
                     <comment><![CDATA[Client groups that can use this method.]]></comment>
                    <source_model>Magento\Customer\Model\Config\Source\Group\Multiselect</source_model>
                    <depends><field id="group_restriction">1</field></depends>
                 </field>
-                <field id="show_total" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="show_total" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Display total amount in the installment selector</label>
                     <comment><![CDATA[When enabled, the total order value is displayed along with the parceling information.]]></comment>
                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="force_installments_selection" translate="label comment" type="select" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="force_installments_selection" translate="label comment" type="select" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Force parcel selection</label>
                     <comment><![CDATA[When enabled, it will force the customer to select the installments amount instead of leaving payment to the pre-selected view.]]></comment>
                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
@@ -137,11 +137,11 @@
                 <field id="title" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Title</label>
                 </field>
-                <field id="order_status" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="order_status" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>New Order Status</label>
                     <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
                 </field>
-                <field id="sort_order" translate="label comment" type="text" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="sort_order" translate="label comment" type="text" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Sort Order</label>
                     <frontend_class>validate-number</frontend_class>
                 </field>
@@ -156,20 +156,20 @@
                 <field id="title" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Title</label>
                 </field>
-                <field id="order_status" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="order_status" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>New Order Status</label>
                     <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
                 </field>
-                <field id="allowspecific" translate="label" type="allowspecific" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                <field id="allowspecific" translate="label" type="allowspecific" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="0" canRestore="1">
                     <label>Payment from Applicable Countries</label>
                     <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
                 </field>
-                <field id="specificcountry" translate="label" type="multiselect" sortOrder="51" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="specificcountry" translate="label" type="multiselect" sortOrder="51" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Payment from Specific Countries</label>
                     <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
                     <can_be_empty>1</can_be_empty>
                 </field>
-                <field id="sort_order" translate="label comment" type="text" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="sort_order" translate="label comment" type="text" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Sort Order</label>
                     <frontend_class>validate-number</frontend_class>
                 </field>
@@ -181,26 +181,37 @@
                     <label>Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="title" translate="label" type="text" sortOrder="25" showInDefault="2" showInWebsite="1" showInStore="1">
-                    <label>Title</label>
+                <field id="disable_frontend" translate="label" type="select" sortOrder="22" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Desabilitar no front end</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Ao ativar esta opção este método ficará disponível apenas no admin</comment>
                 </field>
-                <field id="redirectURL" translate="label" type="text" sortOrder="20" showInDefault="2" showInWebsite="1" showInStore="1">
+                <field id="redirectURL" translate="label" type="text" sortOrder="23" showInDefault="2" showInWebsite="1" showInStore="1">
                     <label>Success URL</label>
                     <comment><![CDATA[
-                            URL para redirecionar o cliente após o checkout. Deixe em branco se estiver em dúvida ou <a target="_blank" href="//pagsegurotransparente.zendesk.com/hc/pt-br/articles/360022866052-Configurando-o-recurso-de-Pagar-no-PagSeguro">clique aqui</a> para mais detalhes.
+                            URL para redirecionar o cliente após retornar do PagSeguro. Deixe em branco se estiver em dúvida ou <a target="_blank" href="//pagsegurotransparente.zendesk.com/hc/pt-br/articles/360022866052-Configurando-o-recurso-de-Pagar-no-PagSeguro">clique aqui</a> para mais detalhes.
                             ]]></comment>
                     <tooltip><![CDATA[
-                            Não informe uma URL completa.<br/>O sistema usará o DirectoryList para obter o url a partir do valor informado aqui.
+                            Não informe uma URL completa.<br/>O sistema usará o conversor interno do Magento para obter o url a partir do valor informado aqui.
                             ]]></tooltip>
+                </field>
+                <field id="redirect_to_success_page" translate="label" type="select" sortOrder="24" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Redirect to success page</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Quando ativado, o cliente irá para a página de sucesso do Magento onde há um link para pagar no PagSeguro ao invés de ser redirecionado para o PagSeguro. Útil para mensurar conversões na página de sucesso do Magento.
+                    </comment>
+                </field>
+                <field id="title" translate="label" type="text" sortOrder="25" showInDefault="2" showInWebsite="1" showInStore="1">
+                    <label>Title</label>
                 </field>
                 <field id="description" translate="label" type="textarea" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Description</label>
                 </field>
-                <field id="order_status" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="order_status" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>New Order Status</label>
                     <source_model>Magento\Sales\Model\Config\Source\Order\Status\NewStatus</source_model>
                 </field>
-                <field id="accepted_groups" translate="label" type="multiselect" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="accepted_groups" translate="label" type="multiselect" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Pagamentos aceitos</label>
                     <source_model>RicardoMartins\PagSeguro\Model\System\Config\Source\Paymentgroups</source_model>
                 </field>
@@ -210,18 +221,7 @@
                     <comment>Obs: Caso a conta PagSeguro estiver com a opção recuperação de carrinho desabilitada, não será possível habilitá-la por aqui.
                     </comment>
                 </field>
-                <field id="redirect_to_success_page" translate="label" type="select" sortOrder="65" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Redirect to success page</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>Obs: Com esta opção marcada o cliente após o checkout o cliente irá para a success page onde há um link para pagar no PagSeguro.
-                    </comment>
-                </field>
-                <field id="disable_frontend" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Desabilitar no front end</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>Ao ativar esta opção este método ficará disponível apenas no admin</comment>
-                </field>
-                <field id="sort_order" translate="label comment" type="text" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="sort_order" translate="label comment" type="text" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Sort Order</label>
                     <frontend_class>validate-number</frontend_class>
                 </field>
