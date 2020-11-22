@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Cache/etc/cache.xsd">
     <type name="rm_pagseguro_interests_cache" translate="label,description" instance="RicardoMartins\PagSeguro\Model\Cache\Type\Interests">
-        <label>Ricardo Martins PagSeguro Interests Cache</label>
-        <description>Ricardo Martins PagSeguro Interests Cache</description>
+        <label>Parcelas PagSeguro</label>
+        <description>Armazena informações de parcelamento de cada produto</description>
     </type>
 </config>

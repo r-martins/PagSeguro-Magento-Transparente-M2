@@ -19,6 +19,10 @@ class Installments extends Template
     }
     public function getInstallmentsText()
     {
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $_scopeConfig = $objectManager->create('Magento\Framework\App\Config\ScopeConfigInterface');
+        if(!$_scopeConfig->getValue('payment/rm_pagseguro_cc/show_installments_product_page',
+            \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITE)) return;
         $product = $this->getProduct();
         if($product->getTypeId()=="configurable") return "";
         if($product->getTypeId()=="bundle") return "";
@@ -40,6 +44,7 @@ class Installments extends Template
                 $maximum = $installment_option['quantity'];
                 $value = $installment_option['installmentAmount'];
             }
+            if($maximum==1) return "";
             $text = "Em até ".$maximum."x de R$".number_format($value,2,",","")
                 . " com PagSeguro";
         }

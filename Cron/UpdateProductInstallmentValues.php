@@ -9,21 +9,28 @@ class UpdateProductInstallmentValues
     protected $_productFactory;
     protected $_stockFilter;
     protected $pagSeguroHelper;
+    protected $_scopeConfig;
+
 
     public function __construct(
         \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productFactory,
         \Magento\CatalogInventory\Helper\Stock $stockFilter,
-        \RicardoMartins\PagSeguro\Helper\Data $pagSeguroHelper
+        \RicardoMartins\PagSeguro\Helper\Data $pagSeguroHelper,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
     )
     {
         $this->_productFactory = $productFactory;
         $this->_stockFilter = $stockFilter;
         $this->pagSeguroHelper = $pagSeguroHelper;
+        $this->_scopeConfig = $scopeConfig;
     }
     public function execute()
     {
 //        echo "Iniciando...\n";
-        $collection = $this->_productFactory->create();
+        if(!$this->_scopeConfig->getValue('payment/rm_pagseguro_cc/show_installments_product_page',
+            \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITE)) return;
+
+            $collection = $this->_productFactory->create();
         $collection->addAttributeToSelect('*');
         $collection->addAttributeToFilter('rm_pagseguro_last_update',0);
         $collection->addAttributeToFilter('status',\Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED);
