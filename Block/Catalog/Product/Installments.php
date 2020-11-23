@@ -1,4 +1,11 @@
 <?php
+/*
+ * Installments on product page
+ *
+ * This block is reponsible for showing maximum installments details on products details page
+ *
+ * @author Gustavo Ulyssea <gustavo.ulyssea@gmail.com>
+ */
 
 namespace RicardoMartins\PagSeguro\Block\Catalog\Product;
 

@@ -1,4 +1,11 @@
 <?php
+/*
+ * Update product installments
+ *
+ * Update per product installments options from PagSeguro API
+ *
+ * @author Gustavo Ulyssea <gustavo.ulyssea@gmail.com>
+ */
 
 namespace RicardoMartins\PagSeguro\Cron;
 

@@ -1,4 +1,12 @@
 <?php
+/*
+ * Installments on product page
+ *
+ * This cache type was created to make it easy to update installments data on product details page
+ *
+ * @author Gustavo Ulyssea <gustavo.ulyssea@gmail.com>
+ */
+
 namespace RicardoMartins\PagSeguro\Model\Cache\Type;
 
 use Magento\Framework\App\Cache\Type\FrontendPool;
@@ -42,7 +50,6 @@ class Interests extends TagScope
             $productIds[] = $product->getId();
         }
         $productActionObject = $objectManager->create('Magento\Catalog\Model\Product\Action');
-        $productActionObject->updateAttributes($productIds, array('rm_pagseguro_no_interest_installments' => 0), 0);
         $productActionObject->updateAttributes($productIds, array('rm_interest_options' => ""), 0);
         $productActionObject->updateAttributes($productIds,array('rm_pagseguro_last_update' => 0),0);
     }
@@ -59,7 +66,6 @@ class Interests extends TagScope
             $productIds[] = $product->getId();
         }
         $productActionObject = $objectManager->create('Magento\Catalog\Model\Product\Action');
-        $productActionObject->updateAttributes($productIds, array('rm_pagseguro_no_interest_installments' => 0), 0);
         $productActionObject->updateAttributes($productIds, array('rm_interest_options' => ""), 0);
         $productActionObject->updateAttributes($productIds,array('rm_pagseguro_last_update' => 0),0);
     }
