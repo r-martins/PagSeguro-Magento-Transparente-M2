@@ -15,20 +15,23 @@ use Magento\Catalog\Helper\Data;
 class Installments extends Template
 {
     protected $helper;
+    protected $_scopeConfig;
 
     public function __construct(
         Template\Context $context,
         Data $helper,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         array $data = [])
     {
         $this->helper = $helper;
         parent::__construct($context, $data);
+        $this->_scopeConfig = $scopeConfig;
     }
     public function getInstallmentsText()
     {
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $_scopeConfig = $objectManager->create('Magento\Framework\App\Config\ScopeConfigInterface');
-        if(!$_scopeConfig->getValue('payment/rm_pagseguro_cc/show_installments_product_page',
+//        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+//        $_scopeConfig = $objectManager->create('Magento\Framework\App\Config\ScopeConfigInterface');
+        if(!$this->_scopeConfig->getValue('payment/rm_pagseguro_cc/show_installments_product_page',
             \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITE)) return;
         $product = $this->getProduct();
         if($product->getTypeId()=="configurable") return "";

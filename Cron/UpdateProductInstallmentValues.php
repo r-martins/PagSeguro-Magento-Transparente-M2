@@ -55,7 +55,7 @@ class UpdateProductInstallmentValues
                 $url = "https://ws.sandbox.pagseguro.uol.com.br/v2/installments.json";
             }
             else{
-                $url = "https://ws.pagseguro.uol.com.br/checkout/v2/installments";
+                $url = "https://ws.pagseguro.uol.com.br/checkout/v2/installments.json";
             }
             $url .= "?sessionId=".$params['sessionId']."&creditCardBrand=visa&amount=".$params['amount'];
 //            echo $url."\n";
