@@ -127,8 +127,9 @@
                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
                 <field id="show_installments_product_page" translate="label" type="select" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Exibir opções de parcelamento na página do produto</label>
+                    <label>Display installment options on product page</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Beta: this feature is in tests. You must enable your cronjob and the corresponding PagSeguro cache in the cache section to work properly. Currently available only for simple products.</comment>
                 </field>
             </group>
              <!--Boleto / Bank billet-->
