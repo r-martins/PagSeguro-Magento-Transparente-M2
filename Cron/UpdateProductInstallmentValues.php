@@ -33,11 +33,13 @@ class UpdateProductInstallmentValues
     }
     public function execute()
     {
-//        echo "Iniciando...\n";
-        if(!$this->_scopeConfig->getValue('payment/rm_pagseguro_cc/show_installments_product_page',
-            \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITE)) return;
+        if (!$this->_scopeConfig->getValue(
+            'payment/rm_pagseguro_cc/show_installments_product_page',
+            \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITE)) {
+            return;
+        }
 
-            $collection = $this->_productFactory->create();
+        $collection = $this->_productFactory->create();
         $collection->addAttributeToSelect('*');
         $collection->addAttributeToFilter('rm_pagseguro_last_update',0);
         $collection->addAttributeToFilter('status',\Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED);
@@ -45,20 +47,15 @@ class UpdateProductInstallmentValues
         if(!count($collection)) return;
         $params['sessionId'] = $this->pagSeguroHelper->getSessionId();
         foreach($collection as $product){
-//            echo "Produto: ".$product->getName()."\n";
             $price = $product->getFinalPrice();
-//            echo "Preco: ".$product->getFinalPrice()."\n";
-//            echo "rm_pagseguro_last_update: '".$product->getRmPagseguroLastUpdate()."'\n";
             $params['amount'] = number_format($price,2,".","");
+
+            $url = "https://ws.pagseguro.uol.com.br/checkout/v2/installments.json";
 
             if($this->pagSeguroHelper->isSandbox()) {
                 $url = "https://ws.sandbox.pagseguro.uol.com.br/v2/installments.json";
             }
-            else{
-                $url = "https://ws.pagseguro.uol.com.br/checkout/v2/installments.json";
-            }
             $url .= "?sessionId=".$params['sessionId']."&creditCardBrand=visa&amount=".$params['amount'];
-//            echo $url."\n";
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $url);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -73,17 +70,11 @@ class UpdateProductInstallmentValues
                     new Phrase('Communication failure with Pagseguro (' . $e->getMessage() . ')')
                 );
             }
-//            echo $result;
-//            echo "Status: ".curl_getinfo($ch,CURLINFO_HTTP_CODE)."\n";
-//            echo "Content: ".$result."\n";
-//            echo "==============================\n";
+
             $product->setRmPagseguroNoInterestInstallments(0);
             $product->setRmPagseguroNoInterestInstallments($this->getMaximumNoInterestInstallments($result));
             $product->setRmInterestOptions($result);
             $product->setRmPagseguroLastUpdate(time());
-//            echo "getRmPagseguroNoInterestInstallments: " . $product->getRmPagseguroNoInterestInstallments()."\n\n";
-//            echo "getRmInterestOptions: " . $product->getRmInterestOptions()."\n\n";
-//            echo "getRmPagseguroLastUpdate: " . $product->getRmPagseguroLastUpdate()."\n\n";
             $product->save();
         }
     }

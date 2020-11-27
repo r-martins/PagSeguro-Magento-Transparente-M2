@@ -251,3 +251,7 @@
 "Temporary Retention: The buyer has opened a dispute with the credit card operator and the transaction is now being analysed.","Retenção temporária: O comprador abriu uma solicitação de chargeback junto à operadora do cartão de crédito e agora está em análise."
 "sender cpf or sender cnpj is required. / sender cpf or sender cnpj is required.","CPF ou CNPJ do comprador é obrigatório."
 "Redirect to success page","Redirecionar para página de sucesso"
+"Display installment options on product page","Exibir opções de parcelamento na página do produto"
+"Beta: this feature is in tests. You must enable your cronjob and the corresponding PagSeguro cache in the cache section to work properly. Currently available only for simple products.","Beta: este recurso está em fase de testes. Você deve ter o cron configurado e também deve habilitar o cache de parcelas na página de gerenciamento de cache. Disponível apenas para produtos simples."
+"PagSeguro Installments","PagSeguro Parcelas"
+"Stores information about installments for each product","Armazena informações de parcelamento de cada produto"
