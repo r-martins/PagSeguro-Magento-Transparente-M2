@@ -1,5 +1,8 @@
 <?xml version="1.0" ?>
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="RicardoMartins_PagSeguro::css/pagseguro.css"/>
+    </head>
     <body>
         <referenceContainer name="product.info.price">
             <block class="RicardoMartins\PagSeguro\Block\Catalog\Product\Installments" name="custom.text" template="RicardoMartins_PagSeguro::catalog/product/installments.phtml" after="product.price.final"/>

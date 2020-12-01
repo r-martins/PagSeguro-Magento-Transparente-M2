@@ -1,4 +1,4 @@
-<div>
+<div id="installments_external">
 <?php
 /*
  @ \RicardoMartins\PagSeguro\Block\Catalog\Product\Installments $block
@@ -6,4 +6,21 @@
 echo $block->getInstallmentsText();
 ?>
 </div>
-<?php
+<script>
+requirejs(['jquery'],function($){
+    function psOpenCloseInstallments()
+    {
+        var installmentsList = $('#installments_list');
+        if(installmentsList.css('display')=="none"){
+            installmentsList.css('display','block');
+        }
+        else{
+            installmentsList.css('display','none');
+        }
+    }
+    document.getElementById("ps_installments_max").addEventListener("click", function(event){
+        event.preventDefault();
+        psOpenCloseInstallments();
+    });
+});
+</script>

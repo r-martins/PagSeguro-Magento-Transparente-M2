@@ -29,8 +29,6 @@ class Installments extends Template
     }
     public function getInstallmentsText()
     {
-//        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-//        $_scopeConfig = $objectManager->create('Magento\Framework\App\Config\ScopeConfigInterface');
         if(!$this->_scopeConfig->getValue('payment/rm_pagseguro_cc/show_installments_product_page',
             \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITE)) return;
         $product = $this->getProduct();
@@ -55,16 +53,35 @@ class Installments extends Template
                 $value = $installment_option['installmentAmount'];
             }
             if($maximum==1) return "";
-            $text = "Em até ".$maximum."x de R$".number_format($value,2,",","")
-                . " com PagSeguro";
+            $text = "<div class='ps_installments_external'><div id='ps_installments_max'>Em até ".$maximum."x de "
+                . "R$".number_format($value,2,",","") . " com PagSeguro</div>";
+            $text .= $this->getInstallmentsList($interest_options);
         }
         else{
-            $text = "Em até ".$maximum."x de ".number_format($value,2,",","")
-                . " sem juros";
+            $text = "<div class='ps_installments_external'><div id='ps_installments_max'>Em até ".$maximum."x de "
+                . "R$".number_format($value,2,",","") . " sem juros no Cartão</div>";
         }
+        $text .= "</div>";
         return $text;
     }
     public function getProduct(){
         return $this->helper->getProduct();
+    }
+    public function getInstallmentsList($interest_options)
+    {
+        $interest_array = json_decode($interest_options,true);
+        $text = "<div id='installments_list' style='display: none;'>";
+        foreach($interest_array['installments']['visa'] as $installment_option){
+            if($installment_option['interestFree']==true) {
+                $text .= "<div id='installments_option'>".$installment_option['quantity']."x de "
+                    . "R$".number_format($installment_option['installmentAmount'],2,",","") . " sem juros no Cartão</div>";
+            }
+            else{
+                $text .= "<div id='installments_option'>".$installment_option['quantity']."x de "
+                    . "R$".number_format($installment_option['installmentAmount'],2,",","") . " no Cartão</div>";
+            }
+        }
+        $text .= "</div>";
+        return $text;
     }
 }
