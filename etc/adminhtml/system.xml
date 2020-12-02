@@ -126,6 +126,11 @@
                     <comment><![CDATA[When enabled, it will force the customer to select the installments amount instead of leaving payment to the pre-selected view.]]></comment>
                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
+                <field id="show_installments_product_page" translate="label" type="select" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Display installment options on product page</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Beta: this feature is in tests. You must enable your cronjob and the corresponding PagSeguro cache in the cache section to work properly. Currently available only for simple products.</comment>
+                </field>
             </group>
              <!--Boleto / Bank billet-->
             <group id="rm_pagseguro_boleto" translate="label" sortOrder="21" showInDefault="1" showInWebsite="1" showInStore="1">

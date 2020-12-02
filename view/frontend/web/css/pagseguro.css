@@ -17,3 +17,13 @@
 	padding-left: 5px;
 	padding-right: 25px;
 }
+
+#ps_installments_max {
+    display: block;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.ps_installments_option .ps_installments_list .ps_installments_external {
+    display: block;
+}

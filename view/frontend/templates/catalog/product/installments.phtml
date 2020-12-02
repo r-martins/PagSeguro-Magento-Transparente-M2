@@ -1,0 +1,14 @@
+<div id="installments_external">
+<?php
+/** @var \RicardoMartins\PagSeguro\Block\Catalog\Product\Installments $block */
+echo $block->getInstallmentsText();
+?>
+</div>
+<script type="application/javascript">
+requirejs(['jquery'],function($){
+    document.getElementById("ps_installments_max").addEventListener("click", function(event){
+        event.preventDefault();
+        $('#installments_list').toggle({duration: 500});
+    });
+});
+</script>
