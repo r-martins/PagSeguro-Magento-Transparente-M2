@@ -39,7 +39,7 @@ class UpgradeData implements UpgradeDataInterface
                 'rm_interest_options',
                 [
                     'group' => 'General',
-                    'type' => 'int',
+                    'type' => 'text',
                     'backend' => '',
                     'frontend' => '',
                     'label' => 'PagSeguro Installments',
@@ -66,7 +66,7 @@ class UpgradeData implements UpgradeDataInterface
                 'rm_pagseguro_last_update',
                 [
                     'group' => 'General',
-                    'type' => 'datetime',
+                    'type' => 'int',
                     'backend' => '',
                     'frontend' => '',
                     'label' => 'PagSeguro Installments lastupdate',
@@ -78,7 +78,7 @@ class UpgradeData implements UpgradeDataInterface
                     'required' => false,
                     'sort_order' => 50,
                     'user_defined' => false,
-                    'default' => '',
+                    'default' => 0,
                     'searchable' => false,
                     'filterable' => false,
                     'comparable' => false,
@@ -90,7 +90,7 @@ class UpgradeData implements UpgradeDataInterface
             );
         }
         // 2.8.1
-        if (version_compare($context->getVersion(), '2.8.1', '<')) {
+        /*if (version_compare($context->getVersion(), '2.8.1', '<')) {
             $eavSetup->updateAttribute(
                 $eavSetup->getEntityTypeId('catalog_product'),
                 'rm_pagseguro_last_update','backend_type','int');
@@ -109,7 +109,7 @@ class UpgradeData implements UpgradeDataInterface
         }
         $eavSetup->updateAttribute(
             $eavSetup->getEntityTypeId('catalog_product'),
-            'rm_interest_options','backend_type','text');
+            'rm_interest_options','backend_type','text');*/
         $installer->endSetup();
     }
 }
