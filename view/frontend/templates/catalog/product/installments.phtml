@@ -1,26 +1,14 @@
 <div id="installments_external">
 <?php
-/*
- @ \RicardoMartins\PagSeguro\Block\Catalog\Product\Installments $block
- */
+/** @var \RicardoMartins\PagSeguro\Block\Catalog\Product\Installments $block */
 echo $block->getInstallmentsText();
 ?>
 </div>
-<script>
+<script type="application/javascript">
 requirejs(['jquery'],function($){
-    function psOpenCloseInstallments()
-    {
-        var installmentsList = $('#installments_list');
-        if(installmentsList.css('display')=="none"){
-            installmentsList.css('display','block');
-        }
-        else{
-            installmentsList.css('display','none');
-        }
-    }
     document.getElementById("ps_installments_max").addEventListener("click", function(event){
         event.preventDefault();
-        psOpenCloseInstallments();
+        $('#installments_list').toggle({duration: 500});
     });
 });
 </script>

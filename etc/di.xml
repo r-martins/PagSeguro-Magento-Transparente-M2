@@ -13,7 +13,7 @@
         </arguments>
     </type>
     <preference for="Magento\Sales\Model\CronJob\CleanExpiredOrders" type="RicardoMartins\PagSeguro\Model\CronJob\CleanExpiredOrders"/>
-    <type name="Magento\Catalog\Api\ProductRepositoryInterface">
-        <plugin name="rm_ps_single_cache" type="RicardoMartins\PagSeguro\Plugin\Api\ProductRepositoryInterface" />
+    <type name="Magento\Catalog\Model\ResourceModel\Product">
+        <plugin sortOrder="1" name="ricardoMartinsPagSeguroProduct" type="RicardoMartins\PagSeguro\Plugin\Model\ResourceModel\ProductPlugin"/>
     </type>
 </config>

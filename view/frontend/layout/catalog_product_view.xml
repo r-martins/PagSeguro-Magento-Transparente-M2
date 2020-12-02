@@ -5,7 +5,7 @@
     </head>
     <body>
         <referenceContainer name="product.info.price">
-            <block class="RicardoMartins\PagSeguro\Block\Catalog\Product\Installments" name="custom.text" template="RicardoMartins_PagSeguro::catalog/product/installments.phtml" after="product.price.final"/>
+            <block class="RicardoMartins\PagSeguro\Block\Catalog\Product\Installments" name="pagseguro.installments" template="RicardoMartins_PagSeguro::catalog/product/installments.phtml" after="product.price.final"/>
         </referenceContainer>
     </body>
 </page>

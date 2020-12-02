@@ -12,7 +12,6 @@ namespace RicardoMartins\PagSeguro\Setup;
 
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
-use Magento\Eav\Setup\EavSetup;
 use Magento\Eav\Setup\EavSetupFactory;
 use Magento\Framework\Setup\UpgradeDataInterface;
 
@@ -23,17 +22,18 @@ class UpgradeData implements UpgradeDataInterface
 
     public function __construct(EavSetupFactory $eavSetupFactory,
         \Magento\Catalog\Model\Product\Action $productActionObject
-        )
-    {
+        ) {
         $this->eavSetupFactory = $eavSetupFactory;
         $this->productActionObject = $productActionObject;
     }
-    public function upgrade( ModuleDataSetupInterface $setup, ModuleContextInterface $context ) {
+
+    public function upgrade(ModuleDataSetupInterface $setup, ModuleContextInterface $context )
+    {
         $installer = $setup;
         $installer->startSetup();
         $eavSetup = $this->eavSetupFactory->create(['setup' => $setup]);
         // 2.8.0
-        if(version_compare($context->getVersion(), '2.8.0', '<')) {
+        if (version_compare($context->getVersion(), '2.8.0', '<')) {
             $eavSetup->addAttribute(
                 \Magento\Catalog\Model\Product::ENTITY,
                 'rm_interest_options',
@@ -90,7 +90,7 @@ class UpgradeData implements UpgradeDataInterface
             );
         }
         // 2.8.1
-        if(version_compare($context->getVersion(), '2.8.1', '<')) {
+        if (version_compare($context->getVersion(), '2.8.1', '<')) {
             $eavSetup->updateAttribute(
                 $eavSetup->getEntityTypeId('catalog_product'),
                 'rm_pagseguro_last_update','backend_type','int');
@@ -101,7 +101,7 @@ class UpgradeData implements UpgradeDataInterface
             $collection = $productCollection->addAttributeToSelect('*')
                 ->load();
             $idArray = [];
-            foreach ($collection as $product){
+            foreach ($collection as $product) {
                 $idArray[] =$product->getId();
             }
             $value = 0;

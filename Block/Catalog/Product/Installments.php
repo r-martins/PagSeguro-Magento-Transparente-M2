@@ -9,9 +9,17 @@
 
 namespace RicardoMartins\PagSeguro\Block\Catalog\Product;
 
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\View\Element\Template;
 use Magento\Catalog\Helper\Data;
+use Magento\Store\Model\ScopeInterface;
 
+/**
+ * Class Installments - Block class displayed on the PDP
+ *
+ * @author    Gustavo Martins
+ * @copyright 2020 Magenteiro/Ricardo Martins
+ */
 class Installments extends Template
 {
     protected $helper;
@@ -20,66 +28,94 @@ class Installments extends Template
     public function __construct(
         Template\Context $context,
         Data $helper,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        array $data = [])
-    {
+        ScopeConfigInterface $scopeConfig,
+        array $data = []
+    ) {
         $this->helper = $helper;
         parent::__construct($context, $data);
         $this->_scopeConfig = $scopeConfig;
     }
+
+    /**
+     * @return string|void
+     */
     public function getInstallmentsText()
     {
-        if(!$this->_scopeConfig->getValue('payment/rm_pagseguro_cc/show_installments_product_page',
-            \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITE)) return;
+        if (!$this->_scopeConfig->getValue(
+            'payment/rm_pagseguro_cc/show_installments_product_page', ScopeInterface::SCOPE_WEBSITE
+        )) {
+            return;
+        }
         $product = $this->getProduct();
-        if($product->getTypeId()=="configurable") return "";
-        if($product->getTypeId()=="bundle") return "";
-        if($product->getTypeId()=="grouped") return "";
-        if(!$interest_options = $product->getRmInterestOptions()) return "";
-        $interest_array = json_decode($interest_options,true);
+        if (in_array($product->getTypeId(), ['configurable', 'bundle', 'grouped'])) {
+            return "";
+        }
+
+        if (!$interest_options = $product->getRmInterestOptions()) {
+            return "";
+        }
+
+        $interest_array = json_decode($interest_options, true);
         $maximum = 0;
         $value = 0;
-        foreach($interest_array['installments']['visa'] as $installment_option){
-            if($installment_option['interestFree']==true
-                &&$installment_option['quantity']>$maximum) {
+        foreach ($interest_array['installments']['visa'] as $installment_option) {
+            if ($installment_option['interestFree'] && $installment_option['quantity']>$maximum) {
                 $maximum = $installment_option['quantity'];
                 $value = $installment_option['installmentAmount'];
             }
         }
-        if(!$maximum) return "";
-        if($maximum==1){
-            foreach($interest_array['installments']['visa'] as $installment_option){
+
+        if (!$maximum) {
+            return "";
+        }
+
+        $text = "<div class='ps_installments_external'><div id='ps_installments_max'>Em até " . $maximum . "x de "
+            . "R$" . number_format($value, 2, ",", ".") . " sem juros no Cartão</div>";
+
+        if ($maximum==1) {
+            foreach ($interest_array['installments']['visa'] as $installment_option) {
                 $maximum = $installment_option['quantity'];
                 $value = $installment_option['installmentAmount'];
             }
-            if($maximum==1) return "";
-            $text = "<div class='ps_installments_external'><div id='ps_installments_max'>Em até ".$maximum."x de "
-                . "R$".number_format($value,2,",","") . " com PagSeguro</div>";
+
+            if ($maximum==1) {
+                return "";
+            }
+
+            $text = "<div class='ps_installments_external'><div id='ps_installments_max'>Em até " . $maximum. "x de "
+                . "R$".number_format($value, 2, ",", ".") . " com PagSeguro</div>";
             $text .= $this->getInstallmentsList($interest_options);
-        }
-        else{
-            $text = "<div class='ps_installments_external'><div id='ps_installments_max'>Em até ".$maximum."x de "
-                . "R$".number_format($value,2,",","") . " sem juros no Cartão</div>";
         }
         $text .= "</div>";
         return $text;
     }
-    public function getProduct(){
+
+    /**
+     * @return \Magento\Catalog\Model\Product|null
+     */
+    public function getProduct()
+    {
         return $this->helper->getProduct();
     }
+
+    /**
+     * @param $interest_options
+     *
+     * @return string
+     */
     public function getInstallmentsList($interest_options)
     {
-        $interest_array = json_decode($interest_options,true);
+        $interest_array = json_decode($interest_options, true);
         $text = "<div id='installments_list' style='display: none;'>";
-        foreach($interest_array['installments']['visa'] as $installment_option){
-            if($installment_option['interestFree']==true) {
-                $text .= "<div id='installments_option'>".$installment_option['quantity']."x de "
-                    . "R$".number_format($installment_option['installmentAmount'],2,",","") . " sem juros no Cartão</div>";
+        foreach ($interest_array['installments']['visa'] as $installment_option) {
+            if ($installment_option['interestFree']) {
+                $text .= "<div id='installments_option'>" . $installment_option['quantity']. "x de "
+                    . "R$".number_format($installment_option['installmentAmount'], 2, ",", ".") . " sem juros no Cartão</div>";
+                continue;
             }
-            else{
-                $text .= "<div id='installments_option'>".$installment_option['quantity']."x de "
-                    . "R$".number_format($installment_option['installmentAmount'],2,",","") . " no Cartão</div>";
-            }
+
+            $text .= "<div id='installments_option'>" . $installment_option['quantity'] . "x de "
+                    . "R$".number_format($installment_option['installmentAmount'], 2, ",", "") . " no Cartão</div>";
         }
         $text .= "</div>";
         return $text;

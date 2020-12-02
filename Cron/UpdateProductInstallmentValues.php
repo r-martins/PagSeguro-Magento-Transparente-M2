@@ -11,22 +11,28 @@ namespace RicardoMartins\PagSeguro\Cron;
 
 use Magento\Framework\Phrase;
 
+/**
+ * Class UpdateProductInstallmentValues
+ *
+ * @author    Gustavo Martins / Ricardo Martins
+ * @copyright 2020 Magenteiro/Ricardo Martins
+ */
 class UpdateProductInstallmentValues
 {
-    protected $_productFactory;
+    protected $_productCollectionFactory;
     protected $_stockFilter;
     protected $pagSeguroHelper;
     protected $_scopeConfig;
 
 
     public function __construct(
-        \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productFactory,
+        \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollectionFactory,
         \Magento\CatalogInventory\Helper\Stock $stockFilter,
         \RicardoMartins\PagSeguro\Helper\Data $pagSeguroHelper,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
     )
     {
-        $this->_productFactory = $productFactory;
+        $this->_productCollectionFactory = $productCollectionFactory;
         $this->_stockFilter = $stockFilter;
         $this->pagSeguroHelper = $pagSeguroHelper;
         $this->_scopeConfig = $scopeConfig;
@@ -39,16 +45,19 @@ class UpdateProductInstallmentValues
             return;
         }
 
-        $collection = $this->_productFactory->create();
+        $collection = $this->_productCollectionFactory->create();
         $collection->addAttributeToSelect('*');
         $collection->addAttributeToFilter('rm_pagseguro_last_update',0);
         $collection->addAttributeToFilter('status',\Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED);
-        $collection->setPageSize(15)->setCurPage(1)->load();
-        if(!count($collection)) return;
+        $collection->setPageSize(30)->setCurPage(1)->load();
+        if (!count($collection)) {
+            return;
+        }
+
         $params['sessionId'] = $this->pagSeguroHelper->getSessionId();
-        foreach($collection as $product){
+        foreach ($collection as $product) {
             $price = $product->getFinalPrice();
-            $params['amount'] = number_format($price,2,".","");
+            $params['amount'] = number_format($price, 2, ".", "");
 
             $url = "https://ws.pagseguro.uol.com.br/checkout/v2/installments.json";
 
@@ -72,20 +81,31 @@ class UpdateProductInstallmentValues
             }
 
             $product->setRmPagseguroNoInterestInstallments(0);
-            $product->setRmPagseguroNoInterestInstallments($this->getMaximumNoInterestInstallments($result));
             $product->setRmInterestOptions($result);
             $product->setRmPagseguroLastUpdate(time());
+            $product->setUpgradingInstallments(true);
             $product->save();
         }
     }
+
+    /**
+     * @param $json
+     *
+     * @return int|mixed
+     */
     private function getMaximumNoInterestInstallments($json){
         $json_array = json_decode($json,true);
         $maximum = 0;
-        if($json_array['error']) return 1;
-        foreach($json_array['installments']['visa'] as $installment_option){
-            if($installment_option['interestFree']==true
-                &&$installment_option['quantity']>$maximum) $maximum = $installment_option['quantity'];
+        if ($json_array['error']) {
+            return 1;
         }
+
+        foreach ($json_array['installments']['visa'] as $installment_option) {
+            if ($installment_option['interestFree'] && $installment_option['quantity']>$maximum) {
+                $maximum = $installment_option['quantity'];
+            }
+        }
+
         return $maximum;
     }
 }

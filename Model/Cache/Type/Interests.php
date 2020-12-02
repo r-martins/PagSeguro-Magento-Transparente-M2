@@ -9,8 +9,11 @@
 
 namespace RicardoMartins\PagSeguro\Model\Cache\Type;
 
+use Magento\Catalog\Model\Product;
+use Magento\Eav\Model\Config;
 use Magento\Framework\App\Cache\Type\FrontendPool;
 use Magento\Framework\Cache\Frontend\Decorator\TagScope;
+use Magento\Framework\Exception\LocalizedException;
 
 /**
  * System / Cache Management / Cache type "Your Cache Type Label"
@@ -26,19 +29,28 @@ class Interests extends TagScope
      * The tag name that limits the cache cleaning scope within a particular tag
      */
     const CACHE_TAG = 'RM_PAGSEGURO_INTERESTS_CACHE';
+    /**
+     * @var Config
+     */
+    private $eavConfig;
 
     /**
      * @param FrontendPool $cacheFrontendPool
      */
-    public function __construct(FrontendPool $cacheFrontendPool)
+    public function __construct(FrontendPool $cacheFrontendPool, Config $eavConfig)
     {
         parent::__construct(
             $cacheFrontendPool->get(self::TYPE_IDENTIFIER),
             self::CACHE_TAG
         );
+        $this->eavConfig = $eavConfig;
     }
     public function clean($mode = \Zend_Cache::CLEANING_MODE_ALL, array $tags = [])
     {
+        if (!$this->productAttributeExists('rm_interest_options')
+            || !$this->productAttributeExists('rm_pagseguro_last_update')) {
+            return;
+        }
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         /** @var \Magento\Catalog\Model\ResourceModel\Product\Collection $productCollection */
         $productCollection = $objectManager->create('Magento\Catalog\Model\ResourceModel\Product\Collection');
@@ -51,8 +63,9 @@ class Interests extends TagScope
         }
         $productActionObject = $objectManager->create('Magento\Catalog\Model\Product\Action');
         $productActionObject->updateAttributes($productIds, array('rm_interest_options' => ""), 0);
-        $productActionObject->updateAttributes($productIds,array('rm_pagseguro_last_update' => 0),0);
+        $productActionObject->updateAttributes($productIds,array('rm_pagseguro_last_update' => 0), 0);
     }
+
     public function flush($mode = \Zend_Cache::CLEANING_MODE_ALL, array $tags = [])
     {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
@@ -68,6 +81,20 @@ class Interests extends TagScope
         $productActionObject = $objectManager->create('Magento\Catalog\Model\Product\Action');
         $productActionObject->updateAttributes($productIds, array('rm_interest_options' => ""), 0);
         $productActionObject->updateAttributes($productIds,array('rm_pagseguro_last_update' => 0),0);
+    }
+
+    /**
+     * @param $attributeId
+     *
+     * @return bool
+     */
+    public function productAttributeExists($attributeId) {
+        try {
+            $attr = $this->eavConfig->getAttribute(Product::ENTITY, $attributeId);
+        } catch (LocalizedException $e) {
+            return false;
+        }
+        return ($attr && $attr->getId());
     }
 
 }
