@@ -47,9 +47,12 @@ class UpdateProductInstallmentValues
 
         $collection = $this->_productCollectionFactory->create();
         $collection->addAttributeToSelect('*');
-        $collection->addAttributeToFilter('rm_pagseguro_last_update',0);
+//        $collection->addAttributeToFilter('rm_pagseguro_last_update', 0);
+//        $collection->addAttributeToFilter('rm_pagseguro_last_update', null, 'left');
+        $collection->addAttributeToFilter('rm_pagseguro_last_update', [['eq'=>0], ['null'=>true]], 'left');
         $collection->addAttributeToFilter('status',\Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED);
         $collection->setPageSize(30)->setCurPage(1)->load();
+//        echo (string)$collection->getSelect();
         if (!count($collection)) {
             return;
         }
