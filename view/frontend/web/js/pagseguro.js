@@ -256,6 +256,17 @@ RMPagSeguro.prototype.updatePaymentHashes = function(){
         var inputCcIsadmin = jQuery('input[name="payment[pagseguropro_cc_isadmin]"]');
             inputCcIsadmin.val(this.config.is_admin);
     }
+
+    if (currentSelectedPayment == 'rm_pagseguro_twocc') {
+        var inputCcSenderHash = jQuery('input[name="payment[pagseguropro_cc_senderhash]"]');
+            inputCcSenderHash.val(this.senderHash);
+        var inputCcToken = jQuery('input[name="payment[pagseguropro_cc_cctoken]"]');
+            inputCcToken.val(this.creditCardToken);
+        var inputCcType = jQuery('input[name="payment[pagseguropro_cc_cctype]"]');
+            inputCcType.val((this.brand)?this.brand.name:'');
+        var inputCcIsadmin = jQuery('input[name="payment[pagseguropro_cc_isadmin]"]');
+            inputCcIsadmin.val(this.config.is_admin);
+    }
 }
 
 RMPagSeguro.prototype.setStoreUrl = function(storeUrl){

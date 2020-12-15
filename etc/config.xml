@@ -14,8 +14,17 @@
                 <group_restriction>0</group_restriction>
                 <info_brl>1</info_brl>
                 <show_total>0</show_total>
+                <sort_order>1</sort_order>
                 <force_installments_selection>0</force_installments_selection>
             </rm_pagseguro_cc>
+            <rm_pagseguro_twocc>
+                <active>1</active>
+                <payment_action>order</payment_action>
+                <model>RicardoMartins\PagSeguro\Model\Method\Twocc</model>
+                <title>Dois Cartões de Crédito via PagSeguro UOL</title>
+                <order_status>pending</order_status>
+                <sort_order>2</sort_order>
+            </rm_pagseguro_twocc>
             <rm_pagseguro>
                 <title>PagSeguro UOL</title>
                 <model>RicardoMartins\PagSeguro\Model\Payment</model>
@@ -30,7 +39,7 @@
                 <payment_action>order</payment_action>
                 <title>Boleto - via PagSeguro UOL</title>
                 <order_status>holded</order_status>
-                <sort_order>2</sort_order>
+                <sort_order>3</sort_order>
                 <model>RicardoMartins\PagSeguro\Model\Method\Boleto</model>
                 <allowspecific>0</allowspecific>
             </rm_pagseguro_boleto>
@@ -39,7 +48,7 @@
                 <payment_action>order</payment_action>
                 <title>PagSeguro - TEF - Ricardo Martins</title>
                 <order_status>holded</order_status>
-                <sort_order>3</sort_order>
+                <sort_order>4</sort_order>
                 <model>RicardoMartins\PagSeguro\Model\Method\Tef</model>
                 <allowspecific>0</allowspecific>
             </rm_pagseguro_tef>
@@ -50,7 +59,7 @@
                 <order_status>pending</order_status>
                 <description><![CDATA[Você será redirecionado para o PagSeguro onde poderá escolher a forma de pagamento desejada.]]></description>
                 <payment_action>order</payment_action>
-                <sort_order>4</sort_order>
+                <sort_order>5</sort_order>
                 <enable_recovery>1</enable_recovery>
                 <disable_frontend>0</disable_frontend>
                 <accepted_groups>CREDIT_CARD,BOLETO</accepted_groups>

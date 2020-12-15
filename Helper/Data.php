@@ -29,6 +29,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_WS_URL_APP = 'payment/rm_pagseguro/sandbox_ws_url_app';
     const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_JS_URL     = 'https://stc.sandbox.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.directpayment.js';
     const XML_PATH_PAYMENT_PAGSEGURO_CC_ACTIVE          = 'payment/rm_pagseguro_cc/active';
+    const XML_PATH_PAYMENT_PAGSEGURO_TWOCC_ACTIVE       = 'payment/rm_pagseguro_twocc/active';
     const XML_PATH_PAYMENT_PAGSEGURO_CC_FLAG            = 'payment/rm_pagseguro_cc/flag';
     const XML_PATH_PAYMENT_PAGSEGURO_CC_INFO_BRL        = 'payment/rm_pagseguro_cc/info_brl';
     const XML_PATH_PAYMENT_PAGSEGURO_CC_SHOW_TOTAL      = 'payment/rm_pagseguro_cc/show_total';
@@ -255,6 +256,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $activeMethods = [
             'cc' => $this->scopeConfig->getValue(
                 self::XML_PATH_PAYMENT_PAGSEGURO_CC_ACTIVE,
+                ScopeInterface::SCOPE_STORE
+            ),
+            'twocc' => $this->scopeConfig->getValue(
+                self::XML_PATH_PAYMENT_PAGSEGURO_TWOCC_ACTIVE,
                 ScopeInterface::SCOPE_STORE
             ),
             'boleto' => $this->scopeConfig->getValue(
