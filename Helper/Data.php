@@ -874,6 +874,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
+     * Tests if $string is a valid json
+     * @param $string
+     *
+     * @return bool
+     */
+    public function isJson($string): bool
+    {
+        json_decode($string);
+        return (json_last_error() == JSON_ERROR_NONE);
+    }
+
+    /**
      * Should split shipping? If grand total is equal to discount total.
      * PagSeguro needs to receive product values > R$0,00, even if you need to invoice only shipping
      * and would like to give producs for free.
@@ -1050,7 +1062,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getWsUrl($amend = '', $useApp = false)
     {
-        if($this->isSandbox()) {
+        if ($this->isSandbox()) {
             return self::XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_WS_URL . $amend;
         }
 

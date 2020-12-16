@@ -37,20 +37,26 @@ class UpdateProductInstallmentValues
         $this->pagSeguroHelper = $pagSeguroHelper;
         $this->_scopeConfig = $scopeConfig;
     }
+
+    /**
+     * @throws \Magento\Framework\Validator\Exception
+     */
     public function execute()
     {
         if (!$this->_scopeConfig->getValue(
             'payment/rm_pagseguro_cc/show_installments_product_page',
-            \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITE)) {
+            \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITE
+        )) {
             return;
         }
 
         $collection = $this->_productCollectionFactory->create();
         $collection->addAttributeToSelect('*');
-//        $collection->addAttributeToFilter('rm_pagseguro_last_update', 0);
-//        $collection->addAttributeToFilter('rm_pagseguro_last_update', null, 'left');
         $collection->addAttributeToFilter('rm_pagseguro_last_update', [['eq'=>0], ['null'=>true]], 'left');
-        $collection->addAttributeToFilter('status',\Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED);
+        $collection->addAttributeToFilter(
+            'status',
+            \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED
+        );
         $collection->setPageSize(30)->setCurPage(1)->load();
 //        echo (string)$collection->getSelect();
         if (!count($collection)) {
@@ -62,11 +68,12 @@ class UpdateProductInstallmentValues
             $price = $product->getFinalPrice();
             $params['amount'] = number_format($price, 2, ".", "");
 
-            $url = "https://ws.pagseguro.uol.com.br/checkout/v2/installments.json";
+            $url = "https://pagseguro.uol.com.br/checkout/v2/installments.json";
 
-            if($this->pagSeguroHelper->isSandbox()) {
+            if ($this->pagSeguroHelper->isSandbox()) {
                 $url = "https://ws.sandbox.pagseguro.uol.com.br/v2/installments.json";
             }
+
             $url .= "?sessionId=".$params['sessionId']."&creditCardBrand=visa&amount=".$params['amount'];
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $url);
@@ -79,8 +86,12 @@ class UpdateProductInstallmentValues
                 $result = curl_exec($ch);
             } catch (\Exception $e) {
                 throw new \Magento\Framework\Validator\Exception(
-                    new Phrase('Communication failure with Pagseguro (' . $e->getMessage() . ')')
+                    new Phrase('Communication failure with PagSeguro (' . $e->getMessage() . ')')
                 );
+            }
+
+            if (!$this->pagSeguroHelper->isJson($result)) {
+                continue;
             }
 
             $product->setRmPagseguroNoInterestInstallments(0);
@@ -89,26 +100,5 @@ class UpdateProductInstallmentValues
             $product->setUpgradingInstallments(true);
             $product->save();
         }
-    }
-
-    /**
-     * @param $json
-     *
-     * @return int|mixed
-     */
-    private function getMaximumNoInterestInstallments($json){
-        $json_array = json_decode($json,true);
-        $maximum = 0;
-        if ($json_array['error']) {
-            return 1;
-        }
-
-        foreach ($json_array['installments']['visa'] as $installment_option) {
-            if ($installment_option['interestFree'] && $installment_option['quantity']>$maximum) {
-                $maximum = $installment_option['quantity'];
-            }
-        }
-
-        return $maximum;
     }
 }
