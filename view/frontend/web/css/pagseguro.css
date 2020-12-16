@@ -1,6 +1,9 @@
 .checkout-payment-method .input-text.ps_cc_birthdate, .checkout-payment-method .input-text.cc-exp-date {
 	width: 50px !important;
 }
+.checkout-payment-method .input-text.ps_cc_birthdate_year {
+    width: 55px !important;
+}
 
 .input-text.cc_number_visible {
 	background-image: url('../images/cc-placeholder.png');
