@@ -38,7 +38,7 @@
             <span><!-- ko i18n: 'Date of Birth'--><!-- /ko --></span>
         </label>
         <div class="control">
-            <input type="text" name="payment[ps_cc_owner_birthday_day]" class="input-text ps_cc_birthdate" value=""
+            <input type="text" name="payment[ps_cc_owner_birthday_day]" class="input-text ps_cc_birthdate" value="" maxlength="2" max="31"
                    data-bind="attr: {
                                     autocomplete: off,
                                     placeholder: 'DD',
@@ -49,7 +49,7 @@
                             value: creditCardOwnerBirthDay,
                             valueUpdate: 'keyup'"
                                     />
-             <input type="text" name="payment[ps_cc_owner_birthday_month]" class="input-text ps_cc_birthdate" value=""
+             <input type="text" name="payment[ps_cc_owner_birthday_month]" class="input-text ps_cc_birthdate" value="" maxlength="2" max="12"
                    data-bind="attr: {
                                     autocomplete: off,
                                     placeholder: 'MM',
@@ -60,10 +60,10 @@
                             value: creditCardOwnerBirthMonth,
                             valueUpdate: 'keyup'"
                                     />
-               <input type="text" name="payment[ps_cc_owner_birthday_year]" class="input-text ps_cc_birthdate" value=""
+               <input type="text" name="payment[ps_cc_owner_birthday_year]" class="input-text ps_cc_birthdate ps_cc_birthdate_year" value="" maxlength="4" max="2015"
                    data-bind="attr: {
                                     autocomplete: off,
-                                    placeholder: 'YYYY',
+                                    placeholder: $t('YYYY'),
                                     id: getCode() + '_cc_owner_birthday_year',
                                     title: $t('YYYY'),
                                     'data-container': getCode() + '-cc-owner-birthday-year',
@@ -118,6 +118,7 @@
                               enable: isActive($parents),
                               value: creditCardNumber,
                               valueUpdate: 'keyup' "/>
+              <br/>
             <span id="card-msg"></span>
           </div>
         </div>
@@ -172,7 +173,6 @@
                    autocomplete="off"
                    class="input-text cvv"
                    name="payment[ps_cc_cid]"
-                   value=""
                    data-bind="attr: {id: getCode() + '_cc_cid',
                         title: $t('Card Verification Number'),
                         'data-container': getCode() + '-cc-cvv',

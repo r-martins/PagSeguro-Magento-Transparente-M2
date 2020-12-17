@@ -255,3 +255,4 @@
 "Beta: this feature is in tests. You must enable your cronjob and the corresponding PagSeguro cache in the cache section to work properly. Currently available only for simple, digital and virtual products.","Beta: este recurso está em fase de testes. Você deve ter o cron configurado e também deve habilitar o cache de parcelas na página de gerenciamento de cache. Disponível apenas para produtos simples, digitais e virtuais."
 "PagSeguro Installments","PagSeguro Parcelas"
 "Stores information about installments for each product","Armazena informações de parcelamento de cada produto"
+"YYYY","AAAA"
