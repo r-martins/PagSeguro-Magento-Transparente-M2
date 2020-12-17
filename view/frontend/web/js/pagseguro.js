@@ -2,7 +2,7 @@
  * PagSeguro Transparente para Magento
  * @author Ricardo Martins <pagseguro-transparente@ricardomartins.net.br>
  * @link http://bit.ly/pagseguromagento
- * @version 1.0.0
+ * @version 2.8.1
  */
 
 function RMPagSeguro(config) {
@@ -11,13 +11,13 @@ function RMPagSeguro(config) {
         }
          console.log('RMPagSeguro has been initialized.');
 
-        this.config = config;
-        this.config.maxSenderHashAttempts = 30;
+        window.rmconfig = config;
+        window.rmconfig.maxSenderHashAttempts = 30;
         var methis = this;
         PagSeguroDirectPayment.setSessionId(config.PagSeguroSessionId);
         var senderHashSuccess = this.updateSenderHash();
         if(!senderHashSuccess){
-            console.log('A new attempt to obtain sender_hash will be performed in 3 seconds.');
+            console.log('A new attempt to obtain sender_hash will be performed in 3 seconds. Note that this is not a required parameter.');
             var intervalSenderHash;
             var senderHashAttempts = 0;
             intervalSenderHash = setInterval(function(){
@@ -29,7 +29,7 @@ function RMPagSeguro(config) {
                 }
                 if (senderHashAttempts == 40) {
                     clearInterval(intervalSenderHash);
-                    console.error('Unable to get sender_hash after multiple attempts.');
+                    console.error('Unable to get sender_hash after multiple attempts. Don\'t bother, we don\'t need it.');
                 }
             }, 3000 );
         }
@@ -170,7 +170,7 @@ RMPagSeguro.prototype.updateCreditCardToken = function(){
             error: function(psresponse){
                 //TODO: get real message instead of trying to catch all errors in the universe
                 if(undefined!=psresponse.errors["30400"]) {
-                    jQuery('#card-msg').html('Dados do cartão inválidos.');
+                    jQuery('#card-msg').html('Dados do cartão inválidos. Verifique número, data de validade e CVV.');
                 }else if(undefined!=psresponse.errors["10001"]){
                     jQuery('#card-msg').html('Tamanho do cartão inválido.');
                 }else if(undefined!=psresponse.errors["10006"]){
@@ -180,16 +180,16 @@ RMPagSeguro.prototype.updateCreditCardToken = function(){
                 }else if(undefined!=psresponse.errors["30403"]){
                     this.updateSessionId(); //Se sessao expirar, atualizamos a session
                 }else if(undefined!=psresponse.errors["11157"]){
-                    jQuery('#card-cpf-msg').html('CPF invalid value.');
+                    jQuery('#card-cpf-msg').html('CPF inválido.');
                 }else{
-                    jQuery('#card-msg').html('Check your typed card data.');
+                    jQuery('#card-msg').html('Verifique os dados do cartão.');
                 }
-                console.error('Failed to get token from card.');
+                console.error('Falha ao obter token do cartão.');
                 console.log(psresponse.errors);
                 errors = true;
             },
             complete: function(psresponse){
-                 console.info('Card token updated successfully.');
+                 console.info('Token do cartão atualizado com sucesso.');
 
             }
         });
@@ -203,8 +203,8 @@ RMPagSeguro.prototype.updateBrand = function(){
         var ccNum = jQuery('input[name="payment[ps_cc_number]"]').val().replace(/^\s+|\s+$/g,'');
     }
     var currentBin = ccNum.substring(0, 6);
-    var flag = this.config.flag;
-    var debug = this.config.debug;
+    var flag = window.rmconfig.flag;
+    var debug = window.rmconfig.debug;
     var self = this;
 
     if(ccNum.length >= 6){
@@ -254,7 +254,7 @@ RMPagSeguro.prototype.updatePaymentHashes = function(){
         var inputCcType = jQuery('input[name="payment[pagseguropro_cc_cctype]"]');
             inputCcType.val((this.brand)?this.brand.name:'');
         var inputCcIsadmin = jQuery('input[name="payment[pagseguropro_cc_isadmin]"]');
-            inputCcIsadmin.val(this.config.is_admin);
+            inputCcIsadmin.val(window.rmconfig.is_admin);
     }
 }
 
@@ -319,7 +319,7 @@ RMPagSeguro.prototype.getInstallments = function(grandTotal, selectedInstallment
             var b = response.installments[brandName];
             parcelsDrop.empty();
 
-            if(self.config.force_installments_selection == 1){
+            if(window.rmconfig.force_installments_selection == 1){
                 parcelsDrop.append('<option value="" selected="selected">Selecione a quantidade de parcelas</option>');
             }
 
@@ -328,7 +328,7 @@ RMPagSeguro.prototype.getInstallments = function(grandTotal, selectedInstallment
                 var optionVal = '';
                 optionText = b[x].quantity + "x de R$" + b[x].installmentAmount.toFixed(2).toString().replace('.',',');
                 optionText += (b[x].interestFree)?" sem juros":" com juros";
-                if(self.config.show_total == 1){
+                if(window.rmconfig.show_total == 1){
                     optionText += " (total R$" + (b[x].installmentAmount*b[x].quantity).toFixed(2).toString().replace('.', ',') + ")";
                 }
                 optionVal = b[x].quantity + "|" + b[x].installmentAmount;
@@ -338,7 +338,7 @@ RMPagSeguro.prototype.getInstallments = function(grandTotal, selectedInstallment
                     parcelsDrop.append('<option value="'+optionVal+'">'+optionText+'</option>');
                 // }
             }
-            if(self.config.force_installments_selection != 1){
+            if(window.rmconfig.force_installments_selection != 1){
                 jQuery('#rm_pagseguro_cc_cc_installments option[selected="selected"]').each(
                     function() {
                         jQuery(this).removeAttr('selected');
@@ -373,13 +373,13 @@ RMPagSeguro.prototype.updateInstallments = function(){
         type: 'POST',
         data: installmentsData,
         success: function(response){
-            if(self.config.debug){
+            if(window.rmconfig.debug){
                 console.debug('Installments Data updated successfully.');
                 console.debug(installmentsData);
             }
         },
         error: function(response){
-            if(self.config.debug){
+            if(window.rmconfig.debug){
                 console.error('Failed to update Installments Data.');
                 console.error(response);
             }
@@ -400,7 +400,7 @@ RMPagSeguro.prototype.removeUnavailableBanks = function() {
     PagSeguroDirectPayment.getPaymentMethods({
         amount: this.grandTotal,
         success: function (response) {
-            if (response.error == true && this.config.debug) {
+            if (response.error == true && window.rmconfig.debug) {
                 console.log('Não foi possível obter os meios de pagamento que estão funcionando no momento.');
                 return;
             }
@@ -415,7 +415,7 @@ RMPagSeguro.prototype.removeUnavailableBanks = function() {
                     }
                 }
 
-                if(this.config.debug){
+                if(window.rmconfig.debug){
                     console.info('Bancos TEF atualizados com sucesso.');
                 }
             } catch (err) {
