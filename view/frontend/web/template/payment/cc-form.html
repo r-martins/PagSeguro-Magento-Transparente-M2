@@ -88,7 +88,10 @@
                                     'data-container': getCode() + '-cpf',
                                     'data-validate': JSON.stringify({'required':true})},
                             value: creditCardOwnerCpf,
-                            valueUpdate: 'keyup'"
+                            event: {
+                                keypress: function(data, e){ return e.currentTarget.value.length < 11;}
+                            }
+                            valueUpdate: 'keyup'",
                                     />
         </div>
         <span id="card-cpf-msg"></span>
@@ -178,6 +181,9 @@
                         'data-container': getCode() + '-cc-cvv',
                         'data-validate': JSON.stringify({'required-number':true, 'validate-card-cvv':'#' + getCode() + '_cc_type'})},
                         enable: isActive($parents),
+                        event: {
+                            keypress: function(data, e){ return e.currentTarget.value.length < 4;}
+                        },
                         value: creditCardVerificationNumber" />
             <div class="field-tooltip toggle">
                 <span class="field-tooltip-action action-cvv"
