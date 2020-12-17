@@ -640,6 +640,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             unset($return['senderCPF']);
         }
 
+        if (empty($return['senderHash'])) {
+            unset($return['senderHash']);
+        }
+
         return $return;
     }
 
