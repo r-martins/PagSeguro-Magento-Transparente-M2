@@ -49,7 +49,6 @@ class UpdateProductInstallmentValues
         )) {
             return;
         }
-
         $collection = $this->_productCollectionFactory->create();
         $collection->addAttributeToSelect('*');
         $collection->addAttributeToFilter('rm_pagseguro_last_update', [['eq'=>0], ['null'=>true]], 'left');
@@ -85,12 +84,14 @@ class UpdateProductInstallmentValues
             try {
                 $result = curl_exec($ch);
             } catch (\Exception $e) {
+                $product->setRmInterestOptions("");
                 throw new \Magento\Framework\Validator\Exception(
                     new Phrase('Communication failure with PagSeguro (' . $e->getMessage() . ')')
                 );
             }
 
             if (!$this->pagSeguroHelper->isJson($result)) {
+                $product->setRmInterestOptions("");
                 continue;
             }
 

@@ -56,6 +56,7 @@ class Installments extends Template
         }
 
         $interest_array = json_decode($interest_options, true);
+        if(json_last_error()!=JSON_ERROR_NONE) return "";
         $maximum = 0;
         $value = 0;
         foreach ($interest_array['installments']['visa'] as $installment_option) {
