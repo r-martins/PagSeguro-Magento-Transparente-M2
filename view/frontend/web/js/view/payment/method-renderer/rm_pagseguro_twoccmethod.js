@@ -3,13 +3,15 @@ define(
         'Magento_Payment/js/view/payment/cc-form',
         'jquery',
         'RicardoMartins_PagSeguro/js/model/credit-card-data',
+        'Magento_Payment/js/model/credit-card-validation/credit-card-data',
+        'Magento_Payment/js/model/credit-card-validation/credit-card-number-validator',
         'Magento_Checkout/js/action/place-order',
         'Magento_Checkout/js/model/full-screen-loader',
         'Magento_Checkout/js/model/payment/additional-validators',
         'Magento_Payment/js/model/credit-card-validation/validator',
         'PagseguroDirectMethod'
     ],
-    function (Component, $, creditCardSecondData) {
+    function (Component, $, creditCardSecondData, creditCardData, cardNumberValidator) {
         'use strict';
 
         return Component.extend({

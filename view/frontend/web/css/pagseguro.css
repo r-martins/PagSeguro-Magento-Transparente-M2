@@ -27,3 +27,261 @@
 .ps_installments_option .ps_installments_list .ps_installments_external {
     display: block;
 }
+
+.fieldset > div > .field,
+.fieldset > div > .fields > .field {
+  margin: 0 0 20px;
+}
+.fieldset > div > .field > .label,
+.fieldset > div > .fields > .field > .label {
+  margin: 0 0 8px;
+  display: inline-block;
+}
+.fieldset > div > .field:last-child,
+.fieldset > div > .fields > .field:last-child {
+  margin-bottom: 0;
+}
+.fieldset > div > .field > .label,
+.fieldset > div > .fields > .field > .label {
+  font-weight: 600;
+}
+.fieldset > div > .field > .label + br,
+.fieldset > div > .fields > .field > .label + br {
+  display: none;
+}
+.fieldset > div > .field .choice input,
+.fieldset > div > .fields > .field .choice input {
+  vertical-align: top;
+}
+.fieldset > div > .field .fields.group:before,
+.fieldset > div > .fields > .field .fields.group:before,
+.fieldset > div > .field .fields.group:after,
+.fieldset > div > .fields > .field .fields.group:after {
+  content: '';
+  display: table;
+}
+.fieldset > div > .field .fields.group:after,
+.fieldset > div > .fields > .field .fields.group:after {
+  clear: both;
+}
+.fieldset > div > .field .fields.group .field,
+.fieldset > div > .fields > .field .fields.group .field {
+  box-sizing: border-box;
+  float: left;
+}
+.fieldset > div > .field .fields.group.group-2 .field,
+.fieldset > div > .fields > .field .fields.group.group-2 .field {
+  width: 50% !important;
+}
+.fieldset > div > .field .fields.group.group-3 .field,
+.fieldset > div > .fields > .field .fields.group.group-3 .field {
+  width: 33.3% !important;
+}
+.fieldset > div > .field .fields.group.group-4 .field,
+.fieldset > div > .fields > .field .fields.group.group-4 .field {
+  width: 25% !important;
+}
+.fieldset > div > .field .fields.group.group-5 .field,
+.fieldset > div > .fields > .field .fields.group.group-5 .field {
+  width: 20% !important;
+}
+.fieldset > div > .field .addon,
+.fieldset > div > .fields > .field .addon {
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-flex-wrap: nowrap;
+  flex-wrap: nowrap;
+  padding: 0;
+  width: 100%;
+}
+.fieldset > div > .field .addon textarea,
+.fieldset > div > .fields > .field .addon textarea,
+.fieldset > div > .field .addon select,
+.fieldset > div > .fields > .field .addon select,
+.fieldset > div > .field .addon input,
+.fieldset > div > .fields > .field .addon input {
+  -ms-flex-order: 2;
+  -webkit-order: 2;
+  order: 2;
+  -webkit-flex-basis: 100%;
+  flex-basis: 100%;
+  display: inline-block;
+  margin: 0;
+  width: auto;
+}
+.fieldset > div > .field .addon .addbefore,
+.fieldset > div > .fields > .field .addon .addbefore,
+.fieldset > div > .field .addon .addafter,
+.fieldset > div > .fields > .field .addon .addafter {
+  background: #ffffff;
+  background-clip: padding-box;
+  border: 1px solid #c2c2c2;
+  border-radius: 1px;
+  font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  height: 32px;
+  line-height: 1.42857143;
+  padding: 0 9px;
+  vertical-align: baseline;
+  width: 100%;
+  box-sizing: border-box;
+  -ms-flex-order: 3;
+  -webkit-order: 3;
+  order: 3;
+  display: inline-block;
+  vertical-align: middle;
+  white-space: nowrap;
+  width: auto;
+}
+.fieldset > div > .field .addon .addbefore:disabled,
+.fieldset > div > .fields > .field .addon .addbefore:disabled,
+.fieldset > div > .field .addon .addafter:disabled,
+.fieldset > div > .fields > .field .addon .addafter:disabled {
+  opacity: 0.5;
+}
+.fieldset > div > .field .addon .addbefore::-moz-placeholder,
+.fieldset > div > .fields > .field .addon .addbefore::-moz-placeholder,
+.fieldset > div > .field .addon .addafter::-moz-placeholder,
+.fieldset > div > .fields > .field .addon .addafter::-moz-placeholder {
+  color: #575757;
+}
+.fieldset > div > .field .addon .addbefore::-webkit-input-placeholder,
+.fieldset > div > .fields > .field .addon .addbefore::-webkit-input-placeholder,
+.fieldset > div > .field .addon .addafter::-webkit-input-placeholder,
+.fieldset > div > .fields > .field .addon .addafter::-webkit-input-placeholder {
+  color: #575757;
+}
+.fieldset > div > .field .addon .addbefore:-ms-input-placeholder,
+.fieldset > div > .fields > .field .addon .addbefore:-ms-input-placeholder,
+.fieldset > div > .field .addon .addafter:-ms-input-placeholder,
+.fieldset > div > .fields > .field .addon .addafter:-ms-input-placeholder {
+  color: #575757;
+}
+.fieldset > div > .field .addon .addbefore,
+.fieldset > div > .fields > .field .addon .addbefore {
+  float: left;
+  -ms-flex-order: 1;
+  -webkit-order: 1;
+  order: 1;
+}
+.fieldset > div > .field .additional,
+.fieldset > div > .fields > .field .additional {
+  margin-top: 10px;
+}
+.fieldset > div > .field.required > .label:after,
+.fieldset > div > .fields > .field.required > .label:after,
+.fieldset > div > .field._required > .label:after,
+.fieldset > div > .fields > .field._required > .label:after {
+  content: '*';
+  color: #e02b27;
+  font-size: 1.2rem;
+  margin: 0 0 0 5px;
+}
+.fieldset > div > .field .note,
+.fieldset > div > .fields > .field .note {
+  font-size: 1.2rem;
+  margin: 3px 0 0;
+  padding: 0;
+  display: inline-block;
+  text-decoration: none;
+}
+.fieldset > div > .field .note:before,
+.fieldset > div > .fields > .field .note:before {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 24px;
+  line-height: 12px;
+  font-family: 'luma-icons';
+  vertical-align: middle;
+  display: inline-block;
+  font-weight: normal;
+  overflow: hidden;
+  speak: none;
+  text-align: center;
+}
+.fieldset > div > .field.no-label > .label,
+.fieldset > div > .fields > .field.no-label > .label {
+  border: 0;
+  clip: rect(0, 0, 0, 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+.fieldset > div > .field.choice .label,
+.fieldset > div > .fields > .field.choice .label {
+  display: inline;
+  font-weight: normal;
+  margin: 0;
+}
+.column:not(.main) .fieldset > div > .field .label,
+.column:not(.main) .fieldset > div > .fields > .field .label {
+  font-weight: normal;
+}
+.fieldset > div > .field .field.choice,
+.fieldset > div > .fields > .field .field.choice {
+  margin-bottom: 10px;
+}
+.fieldset > div > .field .field.choice:last-child,
+.fieldset > div > .fields > .field .field.choice:last-child {
+  margin-bottom: 0;
+}
+.checkout-payment-method .twoccard .legend {
+  border: 0;
+  clip: rect(0, 0, 0, 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+.checkout-payment-method .twoccard .fields > .year {
+  padding-left: 5px;
+}
+.checkout-payment-method .twoccard .fields .select {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+.checkout-payment-method .twoccard .month .select {
+  width: 140px;
+}
+.checkout-payment-method .twoccard .year .select {
+  width: 80px;
+}
+.checkout-payment-method .twoccard .captcha .input-text,
+.checkout-payment-method .twoccard .number .input-text {
+  width: 225px;
+}
+.checkout-payment-method .twoccard > .field.cvv > .control {
+  display: inline-block;
+  padding-right: 20px;
+}
+.checkout-payment-method .twoccard .cvv .label {
+  display: block;
+}
+.checkout-payment-method .twoccard .cvv .input-text {
+  width: 55px;
+}
+.checkout-payment-method .twoccard.fieldset > .field .fields.group.group-2 .field {
+  width: auto !important;
+}
+.fieldset > .first-card {
+    margin-right:10px;
+}
+.fieldset > .first-card,
+.fieldset > .second-card {
+    width: 45%;
+    float: left
+}
+.checkout-payment-method .input-text.ps_first_cc_birthdate,
+.checkout-payment-method .input-text.ps_second_cc_birthdate {
+	width: 50px !important;
+}
+.checkout-payment-method .twoccard .fields .select-installments {
+	padding-left: 5px;
+	padding-right: 25px;
+}

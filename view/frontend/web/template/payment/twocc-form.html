@@ -4,7 +4,7 @@
         <span><!-- ko i18n: 'Credit Card Information'--><!-- /ko --></span>
     </legend><br />
     <!-- /ko -->
-    <div>
+    <div class="first-card">
         <div class="field type">
             <div class="control">
                 <input type="hidden"
@@ -107,6 +107,7 @@
                                         id: getCode() + '_first_cc_number_visible'},
                                 enable: isActive($parents),
                                 valueUpdate: 'keyup',
+                                value: creditCardFirstNumber
                                 event: {keypress: numbervalidation} "/>
 
                 <input type="hidden" name="payment[ps_first_cc_number]" class="input-text" value=""
@@ -217,7 +218,7 @@
             </div>
         </div>
     </div>
-    <div>
+    <div class="second-card">
         <div class="field type">
             <div class="control">
                 <input type="hidden"
@@ -320,6 +321,7 @@
                                         id: getCode() + '_second_cc_number_visible'},
                                   enable: isActive($parents),
                                   valueUpdate: 'keyup',
+                                  value: creditCardSecondNumber,
                                   event: {keypress: numbervalidation} "/>
         
                 <input type="hidden" name="payment[ps_second_cc_number]" class="input-text" value=""
