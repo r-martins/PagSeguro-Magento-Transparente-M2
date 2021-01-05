@@ -10,10 +10,10 @@ use Magento\Sales\Api\OrderRepositoryInterface;
 
 class CreditMemoObserver implements ObserverInterface
 {
-    protected OrderRepositoryInterface $_order;
-    protected HistoryFactory $orderHistoryFactory;
-    protected OrderRepositoryInterface $orderRepository;
-    protected Session $authSession;
+    protected $_order;
+    protected $orderHistoryFactory;
+    protected $orderRepository;
+    protected $authSession;
 
     public function __construct(
         OrderRepositoryInterface $order,
