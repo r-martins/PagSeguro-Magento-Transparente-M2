@@ -9,16 +9,22 @@ class InfoCc extends \Magento\Payment\Block\Info
     protected $_scopeConfig;
 
     protected $_template = 'RicardoMartins_PagSeguro::info/cc.phtml';
+    /**
+     * @var \Magento\Framework\Url
+     */
+    private $urlHelper;
 
     public function __construct(
         \Magento\Framework\View\Element\Template\Context $context,
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Sales\Model\OrderFactory $orderFactory,
+        \Magento\Framework\Url $urlHelper,
         array $data = []
     ) {
 		parent::__construct($context, $data);
         $this->_checkoutSession = $checkoutSession;
         $this->_orderFactory = $orderFactory;
+        $this->urlHelper = $urlHelper;
     }
 
 
