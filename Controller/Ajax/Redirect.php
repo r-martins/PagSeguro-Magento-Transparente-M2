@@ -1,5 +1,6 @@
 <?php
 namespace RicardoMartins\PagSeguro\Controller\Ajax;
+use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Phrase;
@@ -12,7 +13,7 @@ use Magento\Framework\Phrase;
  * @copyright 2018-2021 Ricardo Martins
  * @license   https://www.gnu.org/licenses/gpl-3.0.pt-br.html GNU GPL, version 3
  */
-class Redirect implements HttpGetActionInterface
+class Redirect extends Action implements HttpGetActionInterface
 {
      /**
      * Checkout Session
@@ -21,9 +22,9 @@ class Redirect implements HttpGetActionInterface
      */
     protected $checkoutSession;
 
-    /** @var \Magento\Framework\Serialize\SerializerInterface  */
-    protected $serializer;
-
+    /**
+     * @var ResultFactory
+     */
     protected $result;
 
     /** @var \Magento\Framework\Message\Manager  */
@@ -39,11 +40,14 @@ class Redirect implements HttpGetActionInterface
      * @var \Magento\Framework\App\Action\Context
      */
     private $context;
-
     /**
      * @var \Magento\Sales\Api\Data\OrderInterfaceFactory
      */
     private $orderFactory;
+    /**
+     * @var \Magento\Framework\Url\Helper\Data
+     */
+    private $urlHelper;
 
     /**
      * @param \Magento\Checkout\Model\Session                  $checkoutSession
@@ -57,25 +61,27 @@ class Redirect implements HttpGetActionInterface
     public function __construct(
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Framework\App\Action\Context $context,
-        \Magento\Framework\Serialize\SerializerInterface $serializer,
         \Magento\Framework\Controller\ResultFactory $result,
         \Magento\Sales\Api\Data\OrderInterfaceFactory $orderFactory,
         \Magento\Framework\Message\Manager $messageManager,
         \RicardoMartins\PagSeguro\Helper\Data $pagSeguroHelper,
-        \RicardoMartins\PagSeguro\Helper\Cookie $cookieHelper
+        \RicardoMartins\PagSeguro\Helper\Cookie $cookieHelper,
+        \Magento\Framework\UrlInterface $urlHelper
      ) {
+        parent::__construct($context);
         $this->checkoutSession = $checkoutSession;
         $this->result = $result;
-        $this->serializer = $serializer;
         $this->orderFactory = $orderFactory;
         $this->messageManager = $messageManager;
         $this->pagSeguroHelper = $pagSeguroHelper;
         $this->cookieHelper = $cookieHelper;
         $this->context = $context;
+        $this->urlHelper = $urlHelper;
     }
 
     public function execute()
     {
+        $result = $this->result->create(ResultFactory::TYPE_REDIRECT);
         $url = $this->cookieHelper->get('redirectURL');
         if (is_null($url)) {
             $lastorderId = $this->checkoutSession->getLastRealOrderId();
@@ -91,13 +97,19 @@ class Redirect implements HttpGetActionInterface
             $url = $order->getPayment()->getAdditionalInformation('redirectUrl');
         }
 
-        $result = $this->result->create(ResultFactory::TYPE_REDIRECT);
-        $result->setUrl($url);
 
         if ($this->pagSeguroHelper->isRedirectToSuccessPageEnabled()) {
-            $result = $this->result->create(ResultFactory::TYPE_RAW);
-            $result->setHeader('Content-Type', 'text/plain')->setContents('false');
+            $url = $this->pagSeguroHelper->getStoreConfigValue('payment/rm_pagseguro_pagar_no_pagseguro/redirectURL');
+
+            if (!$url) {
+                $this->pagSeguroHelper->writeLog('Confira a URL de sucesso configurada em "Pagar no PagSeguro". Ela '
+                    . 'parece inválida.');
+            }
+
+            $url = $this->urlHelper->getUrl($url);
         }
+
+        $result->setUrl($url);
 
         return $result;
     }

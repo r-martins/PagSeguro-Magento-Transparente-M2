@@ -191,7 +191,7 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Ao ativar esta opção este método ficará disponível apenas no admin</comment>
                 </field>
-                <field id="redirectURL" translate="label" type="text" sortOrder="23" showInDefault="2" showInWebsite="1" showInStore="1">
+                <field id="redirectURL" translate="label" type="text" sortOrder="24" showInDefault="2" showInWebsite="1" showInStore="1">
                     <label>Success URL</label>
                     <comment><![CDATA[
                             URL para redirecionar o cliente após retornar do PagSeguro. Deixe em branco se estiver em dúvida ou <a target="_blank" href="//pagsegurotransparente.zendesk.com/hc/pt-br/articles/360022866052-Configurando-o-recurso-de-Pagar-no-PagSeguro">clique aqui</a> para mais detalhes.
@@ -199,8 +199,11 @@
                     <tooltip><![CDATA[
                             Não informe uma URL completa.<br/>O sistema usará o conversor interno do Magento para obter o url a partir do valor informado aqui.
                             ]]></tooltip>
+                    <depends>
+                        <field id="redirect_to_success_page">1</field>
+                    </depends>
                 </field>
-                <field id="redirect_to_success_page" translate="label" type="select" sortOrder="24" showInDefault="1" showInWebsite="1" showInStore="0">
+                <field id="redirect_to_success_page" translate="label" type="select" sortOrder="23" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Redirect to success page</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Quando ativado, o cliente irá para a página de sucesso do Magento onde há um link para pagar no PagSeguro ao invés de ser redirecionado para o PagSeguro. Útil para mensurar conversões na página de sucesso do Magento.
