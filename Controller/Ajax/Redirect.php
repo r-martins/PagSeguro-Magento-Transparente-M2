@@ -1,5 +1,6 @@
 <?php
 namespace RicardoMartins\PagSeguro\Controller\Ajax;
+use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Phrase;
 
@@ -8,11 +9,10 @@ use Magento\Framework\Phrase;
  *
  * @see       http://bit.ly/pagseguromagento Official Website
  * @author    Ricardo Martins (and others) <pagseguro-transparente@ricardomartins.net.br>
- * @copyright 2018-2019 Ricardo Martins
+ * @copyright 2018-2021 Ricardo Martins
  * @license   https://www.gnu.org/licenses/gpl-3.0.pt-br.html GNU GPL, version 3
- * @package   RicardoMartins\PagSeguro\Controller\Ajax
  */
-class Redirect extends \Magento\Framework\App\Action\Action
+class Redirect implements HttpGetActionInterface
 {
      /**
      * Checkout Session
@@ -31,6 +31,19 @@ class Redirect extends \Magento\Framework\App\Action\Action
 
     /** @var \RicardoMartins\PagSeguro\Helper\Data */
     protected $pagSeguroHelper;
+    /**
+     * @var \RicardoMartins\PagSeguro\Helper\Cookie
+     */
+    private $cookieHelper;
+    /**
+     * @var \Magento\Framework\App\Action\Context
+     */
+    private $context;
+
+    /**
+     * @var \Magento\Sales\Api\Data\OrderInterfaceFactory
+     */
+    private $orderFactory;
 
     /**
      * @param \Magento\Checkout\Model\Session                  $checkoutSession
@@ -48,7 +61,8 @@ class Redirect extends \Magento\Framework\App\Action\Action
         \Magento\Framework\Controller\ResultFactory $result,
         \Magento\Sales\Api\Data\OrderInterfaceFactory $orderFactory,
         \Magento\Framework\Message\Manager $messageManager,
-        \RicardoMartins\PagSeguro\Helper\Data $pagSeguroHelper
+        \RicardoMartins\PagSeguro\Helper\Data $pagSeguroHelper,
+        \RicardoMartins\PagSeguro\Helper\Cookie $cookieHelper
      ) {
         $this->checkoutSession = $checkoutSession;
         $this->result = $result;
@@ -56,22 +70,27 @@ class Redirect extends \Magento\Framework\App\Action\Action
         $this->orderFactory = $orderFactory;
         $this->messageManager = $messageManager;
         $this->pagSeguroHelper = $pagSeguroHelper;
-        parent::__construct($context);
+        $this->cookieHelper = $cookieHelper;
+        $this->context = $context;
     }
 
     public function execute()
     {
-        $lastorderId = $this->checkoutSession->getLastRealOrderId();
-        $order = $this->orderFactory->create()->loadByIncrementId($lastorderId);
-        if (!$order->getPayment()) {
-            $this->messageManager->addErrorMessage(
-                new Phrase('Something went wrong when placing the order with PagSeguro. Please try again.')
-            );
-            $result = $this->result->create(ResultFactory::TYPE_REDIRECT);
-            return $result->setUrl($this->_redirect->getRefererUrl());
+        $url = $this->cookieHelper->get('redirectURL');
+        if (is_null($url)) {
+            $lastorderId = $this->checkoutSession->getLastRealOrderId();
+            $order = $this->orderFactory->create()->loadByIncrementId($lastorderId);
+            if (!$order->getPayment()) {
+                $this->messageManager->addErrorMessage(
+                    new Phrase('Something went wrong when placing the order with PagSeguro. Please try again.')
+                );
+                $result = $this->result->create(ResultFactory::TYPE_REDIRECT);
+                return $result->setUrl($this->_redirect->getRefererUrl());
+            }
+
+            $url = $order->getPayment()->getAdditionalInformation('redirectUrl');
         }
 
-        $url = $order->getPayment()->getAdditionalInformation('redirectUrl');
         $result = $this->result->create(ResultFactory::TYPE_REDIRECT);
         $result->setUrl($url);
 
