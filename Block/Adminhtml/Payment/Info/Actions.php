@@ -18,12 +18,11 @@ class Actions extends \Magento\Backend\Block\Template
     private $authSession;
 
     public function __construct(
-        \Magento\Backend\Block\Template\Context $context, array $data = [], ?\Magento\Framework\Json\Helper\Data $jsonHelper = null,
-        ?\Magento\Directory\Helper\Data $directoryHelper = null,
+        \Magento\Backend\Block\Template\Context $context, array $data = [],
         \Magento\Framework\Authorization\PolicyInterface $policy,
         \Magento\Backend\Model\Auth\Session $authSession
     ) {
-        parent::__construct($context, $data, $jsonHelper, $directoryHelper);
+        parent::__construct($context, $data);
         $this->policy = $policy;
         $this->authSession = $authSession;
     }
