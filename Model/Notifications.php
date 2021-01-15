@@ -51,6 +51,10 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
 
     /** @var \Magento\Sales\Model\Order */
     protected $orderData;
+    /**
+     * @var \Magento\Framework\Api\SearchCriteriaBuilder
+     */
+    private $searchCriteriaBuilder;
 
     public function __construct(
         \Magento\Framework\Model\Context $context,
@@ -71,6 +75,8 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
         \Magento\Sales\Model\Order\Email\Sender\InvoiceSender $invoiceSender,
         \Magento\Framework\App\CacheInterface $cache,
         \Magento\Sales\Model\Order $orderData,
+        \Magento\Sales\Model\OrderRepository $orderRepository,
+        \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder,
         array $data = []
     ) {
         parent::__construct(
@@ -94,6 +100,8 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
         $this->invoiceSender = $invoiceSender;
         $this->cache = $cache;
         $this->orderData = $orderData;
+        $this->orderRepository = $orderRepository;
+        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
     }
 
     /**
@@ -119,13 +127,19 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                 $payment = $_payment;
             } else {
                 $orderNo = (string)$resultXML->reference;
-                $order = $this->orderModel->loadByIncrementId($orderNo);
-                if (!$order->getId()) {
+//                $order = $this->orderModel->loadByIncrementId($orderNo);
+                $searchCriteria = $this->searchCriteriaBuilder
+                    ->addFilter('increment_id', $orderNo, 'eq')->create();
+                $orderList = $this->orderRepository->getList($searchCriteria)->getItems();
+
+                /** @var \Magento\Sales\Model\Order $order */
+                $order = reset($orderList) ?? false;
+                if (!$order) {
                     $this->pagSeguroHelper->writeLog(
-                        sprintf(
-                            'Order %s not found on system. Unable to process return. '
+                        new \Magento\Framework\Phrase(
+                            'Order %1 not found on system. Unable to process return. '
                                 . 'A new attempt may happen in a few minutes.',
-                            $orderNo
+                            [$orderNo]
                         )
                     );
                     return false;

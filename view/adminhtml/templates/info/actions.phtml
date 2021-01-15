@@ -1,0 +1,13 @@
+<?php
+/** @var \RicardoMartins\PagSeguro\Block\Adminhtml\Payment\Info\Actions $block */
+$isPagSeguro = $block->isPagSeguro();
+if (!$isPagSeguro) {
+    return;
+}
+?>
+<?php
+if ($block->isAllowed(\RicardoMartins\PagSeguro\Controller\Adminhtml\Update\Index::ADMIN_RESOURCE)):
+    $updateUrl = $block->getUpdateOrderUrl();
+    ?>
+    <a href="<?php echo $updateUrl; ?>" onclick="return confirm('Tem certeza?')">Atualizar situação manualmente</a>
+<?php endif; ?>
