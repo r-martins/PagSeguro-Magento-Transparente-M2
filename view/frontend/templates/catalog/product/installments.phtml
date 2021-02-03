@@ -5,8 +5,14 @@ echo $block->getInstallmentsText();
 ?>
 </div>
 <script type="application/javascript">
-requirejs(['jquery'],function($){
-    document.getElementById("ps_installments_max").addEventListener("click", function(event){
+requirejs(['jquery', 'underscore'],function($, _){
+    let installmentsObj = document.getElementById("ps_installments_max");
+
+    if (_.isNull(installmentsObj)) {
+        return
+    }
+
+    installmentsObj.addEventListener("click", function(event){
         event.preventDefault();
         $('#installments_list').toggle({duration: 500});
     });

@@ -10,3 +10,5 @@ $info = $block->getPaymentInfo();
 <?php if (isset($info['transaction_id'])) : ?>
     <p>Código da transação: <?php echo $info['transaction_id']?></p>
 <?php endif?>
+<?php
+echo $block->getBlockHtml('pagseguro.actions');

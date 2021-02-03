@@ -35,21 +35,21 @@ class Payment extends \Magento\Payment\Model\Method\Cc
      * PagSeguro Helper
      *
      * @var RicardoMartins\PagSeguro\Helper\Data;
-     */ 
+     */
     protected $pagSeguroHelper;
 
     /**
      * PagSeguro Abstract Model
      *
      * @var RicardoMartins\PagSeguro\Model\Notifications
-     */ 
+     */
     protected $pagSeguroAbModel;
 
     /**
      * Backend Auth Session
      *
      * @var Magento\Backend\Model\Auth\Session $adminSession
-     */ 
+     */
     protected $adminSession;
 
 
@@ -87,10 +87,10 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         $this->_countryFactory = $countryFactory;
 
         // $this->_minAmount = 1;
-        // $this->_maxAmount = 999999999; 
-        $this->pagSeguroHelper = $pagSeguroHelper;  
-        $this->pagSeguroAbModel = $pagSeguroAbModel; 
-        $this->adminSession = $adminSession;    
+        // $this->_maxAmount = 999999999;
+        $this->pagSeguroHelper = $pagSeguroHelper;
+        $this->pagSeguroAbModel = $pagSeguroAbModel;
+        $this->adminSession = $adminSession;
     }
 
     public function order(\Magento\Payment\Model\InfoInterface $payment, $amount)
@@ -119,7 +119,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         //$this->pagSeguroHelper->writeLog('Inside capture');
         /*@var \Magento\Sales\Model\Order $order */
         $order = $payment->getOrder();
-        
+
         try {
 
             //will grab data to be send via POST to API inside $params
@@ -170,7 +170,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
             throw new \Magento\Framework\Validator\Exception(__('Payment capturing error.'));
             return;
 //             echo $this->pagSeguroHelper->getSessionVl();
-  
+
             //return;
         }
     }
@@ -193,7 +193,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
             'transactionCode'   => $transactionId,
             'refundValue'       => number_format($amount, 2, '.', ''),
         );
-    
+
         $params['token'] = $this->pagSeguroHelper->getToken();
         $params['email'] = $this->pagSeguroHelper->getMerchantEmail();
 
@@ -280,7 +280,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
      * @return bool
      */
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
-    {   
+    {
         if($this->adminSession->getUser()){
             return false;
         }
@@ -323,17 +323,12 @@ class Payment extends \Magento\Payment\Model\Method\Cc
      */
     public function validate()
     {
-        //parent::validate();
-        $missingInfo = $this->getInfoInstance();
-
-        $senderHash = $this->pagSeguroHelper->getPaymentHash('sender_hash');
         $creditCardToken = $this->pagSeguroHelper->getPaymentHash('credit_card_token');
         
-        if (!$creditCardToken || !$senderHash) {
+        if (!$creditCardToken) {
             $missingInfo = sprintf('Token do cartão: %s', var_export($creditCardToken, true));
-            $missingInfo .= sprintf('/ Sender_hash: %s', var_export($senderHash, true));
             $this->pagSeguroHelper->writeLog(
-                    "Falha ao obter o token do cartao ou sender_hash.
+                    "Falha ao obter o token do cartao.
                     Ative o modo debug e observe o console de erros do seu navegador.
                     Se esta for uma atualização via Ajax, ignore esta mensagem até a finalização do pedido.
                     $missingInfo"

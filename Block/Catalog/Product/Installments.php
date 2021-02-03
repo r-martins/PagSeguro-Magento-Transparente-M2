@@ -65,27 +65,15 @@ class Installments extends Template
             }
         }
 
-        if (!$maximum) {
+        if (!$maximum || $maximum == 1) {
             return "";
         }
 
         $text = "<div class='ps_installments_external'><div id='ps_installments_max'>Em até " . $maximum . "x de "
-            . "R$" . number_format($value, 2, ",", ".") . " sem juros no Cartão</div>";
+            . "R$" . number_format($value, 2, ",", ".") . " sem juros no Cartão com PagSeguro</div>";
 
-        if ($maximum==1) {
-            foreach ($interest_array['installments']['visa'] as $installment_option) {
-                $maximum = $installment_option['quantity'];
-                $value = $installment_option['installmentAmount'];
-            }
+        $text .= $this->getInstallmentsList($interest_options);
 
-            if ($maximum==1) {
-                return "";
-            }
-
-            $text = "<div class='ps_installments_external'><div id='ps_installments_max'>Em até " . $maximum. "x de "
-                . "R$".number_format($value, 2, ",", ".") . " com PagSeguro</div>";
-            $text .= $this->getInstallmentsList($interest_options);
-        }
         $text .= "</div>";
         return $text;
     }

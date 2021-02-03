@@ -68,6 +68,10 @@ class Redirect extends \RicardoMartins\PagSeguro\Model\Method\AbstractMethodExte
 
     /** @var \Magento\Framework\Message\ManagerInterface */
     protected $messageManager;
+    /**
+     * @var \RicardoMartins\PagSeguro\Helper\Cookie
+     */
+    private $cookieHelper;
 
     public function __construct(
         \Magento\Framework\Model\Context $context,
@@ -84,13 +88,15 @@ class Redirect extends \RicardoMartins\PagSeguro\Model\Method\AbstractMethodExte
         \RicardoMartins\PagSeguro\Helper\Data $pagSeguroHelper,
         \RicardoMartins\PagSeguro\Helper\Logger $pagSegurologger,
         \RicardoMartins\PagSeguro\Model\Notifications $pagSeguroAbModel,
-        \Magento\Backend\Model\Auth\Session $adminSession
+        \Magento\Backend\Model\Auth\Session $adminSession,
+        \RicardoMartins\PagSeguro\Helper\Cookie $cookieHelper
     ) {
         parent::__construct($context, $registry, $extensionFactory, $customAttributeFactory, $paymentData, $scopeConfig,
             $logger, $resource, $resourceCollection, $data, $directory, $pagSeguroHelper, $pagSegurologger);
         $this->pagSeguroHelper = $pagSeguroHelper;
         $this->pagSeguroAbModel = $pagSeguroAbModel;
         $this->adminSession = $adminSession;
+        $this->cookieHelper = $cookieHelper;
     }
 
     public function order(InfoInterface $payment, $amount)
@@ -147,6 +153,7 @@ class Redirect extends \RicardoMartins\PagSeguro\Model\Method\AbstractMethodExte
                 if(!$this->pagSeguroHelper->isRedirectToSuccessPageEnabled()) {
                     $this->setRedirectUrl($redirectUrl);
                 }
+                $this->cookieHelper->set('redirectURL', $redirectUrl, 3600);
                 $order->setStatus($this->getConfigData('order_status'));
                 $order->setState(Order::STATE_NEW);
             }

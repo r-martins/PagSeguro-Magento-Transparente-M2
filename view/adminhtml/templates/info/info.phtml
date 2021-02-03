@@ -8,3 +8,5 @@
     <a href="<?php echo $paymentInfo['url'];?>" target="_blank"><?php echo $paymentInfo['texto'];?></a>
 </p>
 <?php endif;?>
+<?php
+echo $block->getBlockHtml('pagseguro.actions');

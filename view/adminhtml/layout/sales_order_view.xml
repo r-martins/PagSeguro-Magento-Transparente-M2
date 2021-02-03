@@ -1,0 +1,5 @@
+<layout xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/layout_generic.xsd">
+    <referenceBlock name="order_payment">
+        <block name="pagseguro.actions" template="RicardoMartins_PagSeguro::info/actions.phtml" class="RicardoMartins\PagSeguro\Block\Adminhtml\Payment\Info\Actions"/>
+    </referenceBlock>
+</layout>

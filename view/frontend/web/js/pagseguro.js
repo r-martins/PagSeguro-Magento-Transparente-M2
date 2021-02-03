@@ -2,7 +2,7 @@
  * PagSeguro Transparente para Magento
  * @author Ricardo Martins <pagseguro-transparente@ricardomartins.net.br>
  * @link http://bit.ly/pagseguromagento
- * @version 1.0.0
+ * @version 2.8.1
  */
 
 function RMPagSeguro(config) {
@@ -11,13 +11,13 @@ function RMPagSeguro(config) {
         }
          console.log('RMPagSeguro has been initialized.');
 
-        this.config = config;
-        this.config.maxSenderHashAttempts = 30;
+        window.rmconfig = config;
+        window.rmconfig.maxSenderHashAttempts = 30;
         var methis = this;
         PagSeguroDirectPayment.setSessionId(config.PagSeguroSessionId);
         var senderHashSuccess = this.updateSenderHash();
         if(!senderHashSuccess){
-            console.log('A new attempt to obtain sender_hash will be performed in 3 seconds.');
+            console.log('A new attempt to obtain sender_hash will be performed in 3 seconds. Note that this is not a required parameter.');
             var intervalSenderHash;
             var senderHashAttempts = 0;
             intervalSenderHash = setInterval(function(){
@@ -44,7 +44,6 @@ RMPagSeguro.prototype.updateSenderHash = function(){
     if(typeof senderHash != "undefined" && senderHash != '')
     {
         this.senderHash = senderHash;
-        //this.updatePaymentHashes();
         return true;
     }
     console.log('PagSeguro: Failed to get senderHash.');
@@ -170,7 +169,7 @@ RMPagSeguro.prototype.updateCreditCardToken = function(){
             error: function(psresponse){
                 //TODO: get real message instead of trying to catch all errors in the universe
                 if(undefined!=psresponse.errors["30400"]) {
-                    jQuery('#card-msg').html('Dados do cartão inválidos.');
+                    jQuery('#card-msg').html('Dados do cartão inválidos. Verifique número, data de validade e CVV.');
                 }else if(undefined!=psresponse.errors["10001"]){
                     jQuery('#card-msg').html('Tamanho do cartão inválido.');
                 }else if(undefined!=psresponse.errors["10006"]){
@@ -330,7 +329,7 @@ RMPagSeguro.prototype.getInstallments = function(grandTotal, selectedInstallment
             var b = response.installments[brandName];
             parcelsDrop.empty();
 
-            if(self.config.force_installments_selection == 1){
+            if(window.rmconfig.force_installments_selection == 1){
                 parcelsDrop.append('<option value="" selected="selected">Selecione a quantidade de parcelas</option>');
             }
 
@@ -339,7 +338,7 @@ RMPagSeguro.prototype.getInstallments = function(grandTotal, selectedInstallment
                 var optionVal = '';
                 optionText = b[x].quantity + "x de R$" + b[x].installmentAmount.toFixed(2).toString().replace('.',',');
                 optionText += (b[x].interestFree)?" sem juros":" com juros";
-                if(self.config.show_total == 1){
+                if(window.rmconfig.show_total == 1){
                     optionText += " (total R$" + (b[x].installmentAmount*b[x].quantity).toFixed(2).toString().replace('.', ',') + ")";
                 }
                 optionVal = b[x].quantity + "|" + b[x].installmentAmount;
@@ -349,7 +348,7 @@ RMPagSeguro.prototype.getInstallments = function(grandTotal, selectedInstallment
                     parcelsDrop.append('<option value="'+optionVal+'">'+optionText+'</option>');
                 // }
             }
-            if(self.config.force_installments_selection != 1){
+            if(window.rmconfig.force_installments_selection != 1){
                 jQuery('#rm_pagseguro_cc_cc_installments option[selected="selected"]').each(
                     function() {
                         jQuery(this).removeAttr('selected');
@@ -411,7 +410,7 @@ RMPagSeguro.prototype.removeUnavailableBanks = function() {
     PagSeguroDirectPayment.getPaymentMethods({
         amount: this.grandTotal,
         success: function (response) {
-            if (response.error == true && this.config.debug) {
+            if (response.error == true && window.rmconfig.debug) {
                 console.log('Não foi possível obter os meios de pagamento que estão funcionando no momento.');
                 return;
             }
@@ -426,7 +425,7 @@ RMPagSeguro.prototype.removeUnavailableBanks = function() {
                     }
                 }
 
-                if(this.config.debug){
+                if(window.rmconfig.debug){
                     console.info('Bancos TEF atualizados com sucesso.');
                 }
             } catch (err) {

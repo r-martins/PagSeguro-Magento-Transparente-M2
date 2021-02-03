@@ -56,11 +56,11 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
      */
     public function execute()
     {
-        $notificationCode = $this->getRequest()->getPost('notificationCode', false);
+        $notificationCode = $this->getRequest()->getParam('notificationCode', false);
         if (false === $notificationCode) {
             //@TODO Implement nice notification page with form and notificationCode
             throw new \Magento\Framework\Validator\Exception(
-                new \Magento\Framework\Phrase('Parâmetro notificationCode não recebido.')
+                new \Magento\Framework\Phrase('Parâmetro notificationCode não recebido. Se você acessou esta URL manualmente isso já era esperado.')
             );
         }
         $response = $this->pagSeguroAbModel->getNotificationStatus($notificationCode);
