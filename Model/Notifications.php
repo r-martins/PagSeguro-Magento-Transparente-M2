@@ -216,7 +216,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                 $order->addStatusHistoryComment($message);
             }
 
-            if ((int)$resultXML->status == 3) {
+            if (in_array((int)$resultXML->status, array(3, 4))) { //Pago ou Disponivel
                 if (!$order->hasInvoices()) {
                     $invoice = $this->invoiceService->prepareInvoice($order);
                     $msg = sprintf('Captured payment. Transaction Identifier: %s', (string)$resultXML->code);
