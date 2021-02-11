@@ -4,7 +4,7 @@
         <section id="payment">
             <group id="rm_pagseguro" translate="label comment" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
                 <label>PagSeguro - General Settings - Ricardo Martins</label>
-                <comment><![CDATA[Need help? - <a href="https://pagseguro.ricardomartins.net.br/" target="_blank">Official site of the module</a> | <a href="//pagsegurotransparente.zendesk.com/hc/pt-br" target="_blank">Help Center</a>.<br/> To use this module you need to get your free unlimited public key <a href="https://pagseguro.ricardomartins.net.br/woocommerce/wizard.html" target="_blank"><strong>authorizing your PagSeguro account</strong></a> in the application model.]]></comment>
+                <comment><![CDATA[Need help? - <a href="https://pagseguro.ricardomartins.net.br/" target="_blank">Official site of the module</a> | <a href="//pagsegurotransparente.zendesk.com/hc/pt-br" target="_blank">Help Center</a>.<br/> To use this module you need to get your free unlimited public key <a href="https://pagseguro.ricardomartins.net.br/magento2/wizard.html" target="_blank"><strong>authorizing your PagSeguro account</strong></a> in the application model.]]></comment>
                 <field id="merchant_email" translate="label comment" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Email</label>
                     <comment>Store email (seller account)</comment>
