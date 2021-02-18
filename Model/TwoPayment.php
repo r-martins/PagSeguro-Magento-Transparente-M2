@@ -35,21 +35,21 @@ class TwoPayment extends \Magento\Payment\Model\Method\Cc
      * PagSeguro Helper
      *
      * @var RicardoMartins\PagSeguro\Helper\Data;
-     */ 
+     */
     protected $pagSeguroHelper;
 
     /**
      * PagSeguro Abstract Model
      *
      * @var RicardoMartins\PagSeguro\Model\Notifications
-     */ 
+     */
     protected $pagSeguroAbModel;
 
     /**
      * Backend Auth Session
      *
      * @var Magento\Backend\Model\Auth\Session $adminSession
-     */ 
+     */
     protected $adminSession;
 
 
@@ -87,10 +87,10 @@ class TwoPayment extends \Magento\Payment\Model\Method\Cc
         $this->_countryFactory = $countryFactory;
 
         // $this->_minAmount = 1;
-        // $this->_maxAmount = 999999999; 
-        $this->pagSeguroHelper = $pagSeguroHelper;  
-        $this->pagSeguroAbModel = $pagSeguroAbModel; 
-        $this->adminSession = $adminSession;    
+        // $this->_maxAmount = 999999999;
+        $this->pagSeguroHelper = $pagSeguroHelper;
+        $this->pagSeguroAbModel = $pagSeguroAbModel;
+        $this->adminSession = $adminSession;
     }
 
     public function order(\Magento\Payment\Model\InfoInterface $payment, $amount)
@@ -119,7 +119,7 @@ class TwoPayment extends \Magento\Payment\Model\Method\Cc
         //$this->pagSeguroHelper->writeLog('Inside capture');
         /*@var \Magento\Sales\Model\Order $order */
         $order = $payment->getOrder();
-        
+
         try {
 
             //will grab data to be send via POST to API inside $params
@@ -170,7 +170,7 @@ class TwoPayment extends \Magento\Payment\Model\Method\Cc
             throw new \Magento\Framework\Validator\Exception(__('Payment capturing error.'));
             return;
 //             echo $this->pagSeguroHelper->getSessionVl();
-  
+
             //return;
         }
     }
@@ -193,7 +193,7 @@ class TwoPayment extends \Magento\Payment\Model\Method\Cc
             'transactionCode'   => $transactionId,
             'refundValue'       => number_format($amount, 2, '.', ''),
         );
-    
+
         $params['token'] = $this->pagSeguroHelper->getToken();
         $params['email'] = $this->pagSeguroHelper->getMerchantEmail();
 
@@ -233,43 +233,81 @@ class TwoPayment extends \Magento\Payment\Model\Method\Cc
         }
 
         $info = $this->getInfoInstance();
-        $info->setAdditionalInformation('sender_hash', $this->pagSeguroHelper->getPaymentHash('sender_hash'))
-            ->setAdditionalInformation('credit_card_token', $this->pagSeguroHelper->getPaymentHash('credit_card_token'))
-            ->setAdditionalInformation('credit_card_owner', $this->pagSeguroHelper->getCCOwnerData('credit_card_owner'))
-            ->setCcType($this->pagSeguroHelper->getPaymentHash('cc_type'))
-            ->setCcLast4(substr($data['additional_data']['cc_number'], -4))
-            ->setCcExpYear($data['additional_data']['cc_exp_year'])
-            ->setCcExpMonth($data['additional_data']['cc_exp_month']);
+        $info->setAdditionalInformation('sender_hash', $data['additional_data']['sender_hash'] ?? null)
+            ->setAdditionalInformation(
+                'credit_card_token_first',
+                $data['additional_data']['credit_card_token_first'] ?? null
+            )
+            ->setAdditionalInformation(
+                'credit_card_token_second',
+                $data['additional_data']['credit_card_token_second'] ?? null
+            )
+            ->setAdditionalInformation('credit_card_owner_first', $data['additional_data']['first_cc_owner_name'] ?? null)
+            ->setAdditionalInformation('credit_card_type_first', $data['additional_data']['first_cc_type'] ?? null)
+            ->setAdditionalInformation('credit_card_last_four_first',substr($data['additional_data']['first_cc_number'] ?? null, -4))
+            ->setAdditionalInformation('credit_card_amount_first',$data['additional_data']['first_cc_amount'] ?? null)
+            ->setAdditionalInformation('credit_card_owner_second', $data['additional_data']['second_cc_owner_name'] ?? null)
+            ->setAdditionalInformation('credit_card_type_second', $data['additional_data']['second_cc_type'] ?? null)
+            ->setAdditionalInformation('credit_card_last_four_second',substr($data['additional_data']['second_cc_number'] ?? null, -4))
+            ->setAdditionalInformation('credit_card_amount_second',$data['additional_data']['second_cc_amount'] ?? null)
+            
+            ->setCcType($data['additional_data']['cc_type'] ?? null)
+            ->setCcLast4(substr($data['additional_data']['cc_number'] ?? null, -4))
+            ->setCcExpYear($data['additional_data']['cc_exp_year'] ?? null)
+            ->setCcExpMonth($data['additional_data']['cc_exp_month'] ?? null);
 
         // set cpf
         //if ($this->pagSeguroHelper->isCpfVisible()) {
-            $info->setAdditionalInformation($this->getCode() . '_cpf', $this->pagSeguroHelper->getCCOwnerData('credit_card_cpf'));
+            $ccOwnerCpf = $data['additional_data']['first_cc_owner_cpf'] ?? null;
+            $info->setAdditionalInformation($this->getCode() . '_cpf_first', $ccOwnerCpf);
+            $ccOwnerCpf = $data['additional_data']['second_cc_owner_cpf'] ?? null;
+            $info->setAdditionalInformation($this->getCode() . '_cpf_second', $ccOwnerCpf);
         //}
 
         //DOB value
         if ($this->pagSeguroHelper->isDobVisible()) {
+            $dobDay = $data['additional_data']['first_cc_owner_birthday_day'] ?? '01';
+            $dobMonth = $data['additional_data']['first_cc_owner_birthday_month'] ?? '01';
+            $dobYear = $data['additional_data']['first_cc_owner_birthday_year'] ?? '1970';
             $info->setAdditionalInformation(
-                'credit_card_owner_birthdate',
+                'credit_card_owner_birthdate_first',
                 date(
                     'd/m/Y',
                     strtotime(
-                        $this->pagSeguroHelper->getCCOwnerData('credit_card_birthyear').
-                        '/'.
-                        $this->pagSeguroHelper->getCCOwnerData('credit_card_birthmonth').
-                        '/'.$this->pagSeguroHelper->getCCOwnerData('credit_card_birthday')
+                        $dobMonth . '/' . $dobDay . '/' . $dobYear
+                    )
+                )
+            );
+            $dobDay = $data['additional_data']['second_cc_owner_birthday_day'] ?? '01';
+            $dobMonth = $data['additional_data']['second_cc_owner_birthday_month'] ?? '01';
+            $dobYear = $data['additional_data']['second_cc_owner_birthday_year'] ?? '1970';
+            $info->setAdditionalInformation(
+                'credit_card_owner_birthdate_second',
+                date(
+                    'd/m/Y',
+                    strtotime(
+                        $dobMonth . '/' . $dobDay . '/' . $dobYear
                     )
                 )
             );
         }
 
         //Installments value
-        if ($this->pagSeguroHelper->getInstallments('cc_installment')) {
-            $installments = explode('|', $this->pagSeguroHelper->getInstallments('cc_installment'));
+        if (isset($data['additional_data']['first_cc_installments'])) {
+            $installments = explode('|', $data['additional_data']['first_cc_installments']);
             if (false !== $installments && count($installments)==2) {
-                $info->setAdditionalInformation('installment_quantity', (int)$installments[0]);
-                $info->setAdditionalInformation('installment_value', $installments[1]);
+                $info->setAdditionalInformation('installment_quantity_first', (int)$installments[0]);
+                $info->setAdditionalInformation('installment_value_first', $installments[1]);
             }
         }
+        if (isset($data['additional_data']['second_cc_installments'])) {
+            $installments = explode('|', $data['additional_data']['second_cc_installments']);
+            if (false !== $installments && count($installments)==2) {
+                $info->setAdditionalInformation('installment_quantity_second', (int)$installments[0]);
+                $info->setAdditionalInformation('installment_value_second', $installments[1]);
+            }
+        }
+
         return $this;
     }
 
@@ -280,7 +318,7 @@ class TwoPayment extends \Magento\Payment\Model\Method\Cc
      * @return bool
      */
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
-    {   
+    {
         if($this->adminSession->getUser()){
             return false;
         }
@@ -323,17 +361,14 @@ class TwoPayment extends \Magento\Payment\Model\Method\Cc
      */
     public function validate()
     {
-        //parent::validate();
-        $missingInfo = $this->getInfoInstance();
+        $creditCardTokenFirst = $info->getAdditionalInformation('credit_card_token_first');
+        $creditCardTokenSecond = $info->getAdditionalInformation('credit_card_token_second');
 
-        $senderHash = $this->pagSeguroHelper->getPaymentHash('sender_hash');
-        $creditCardToken = $this->pagSeguroHelper->getPaymentHash('credit_card_token');
-        
-        if (!$creditCardToken || !$senderHash) {
-            $missingInfo = sprintf('Token do cartão: %s', var_export($creditCardToken, true));
-            $missingInfo .= sprintf('/ Sender_hash: %s', var_export($senderHash, true));
+        if (!$creditCardTokenFirst || !$creditCardTokenSecond) {
+            $missingInfo = sprintf('Token do 1º cartão: %s', var_export($creditCardTokenFirst, true));
+            $missingInfo .= "\n" . sprintf('Token do 2º cartão: %s', var_export($creditCardTokenSecond, true));
             $this->pagSeguroHelper->writeLog(
-                    "Falha ao obter o token do cartao ou sender_hash.
+                    "Falha ao obter o token do cartao.
                     Ative o modo debug e observe o console de erros do seu navegador.
                     Se esta for uma atualização via Ajax, ignore esta mensagem até a finalização do pedido.
                     $missingInfo"

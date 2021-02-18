@@ -57,6 +57,11 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
 
     protected $request;
 
+    /**
+     * @var \Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface
+     */
+    protected $transactionBuilder;
+
     public function __construct(
         \Magento\Framework\Model\Context $context,
         \Magento\Framework\Registry $registry,
@@ -73,6 +78,7 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
         \Magento\Backend\Model\Auth\Session $adminSession,
         \Magento\Framework\Message\ManagerInterface $messageManager,
         array $data = [],
+        \Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface $transactionBuilder,
         \Magento\Framework\App\Request\Http $request
     ) {
         parent::__construct(
@@ -97,6 +103,7 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
         $this->adminSession = $adminSession;
         $this->messageManager = $messageManager;
         $this->request = $request;
+        $this->transactionBuilder = $transactionBuilder;
     }
 
 
@@ -122,13 +129,20 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
         try {
 
             //will grab data to be send via POST to API inside $params
-            $params = $this->pagSeguroHelper->getCreditCardApiCallParams($order, $payment);
-            //call API
-            $returnXml = $this->pagSeguroHelper->callApi($params, $payment);
 
-            if (isset($returnXml->errors)) {
+            //First Credit Card
+            $params = $this->pagSeguroHelper->getCreditCardApiCallParams($order, $payment, '_first');
+            //call API
+            $returnXmlFirst = $this->pagSeguroHelper->callApi($params, $payment);
+
+            //Second Credit Card
+            $params = $this->pagSeguroHelper->getCreditCardApiCallParams($order, $payment, '_second');
+            //call API
+            $returnXmlSecond = $this->pagSeguroHelper->callApi($params, $payment);
+
+            if (isset($returnXmlFirst->errors)) {
                 $errMsg = [];
-                foreach ($returnXml->errors as $error) {
+                foreach ($returnXmlFirst->errors as $error) {
                     $message = $this->pagSeguroHelper->translateError((string)$error->message);
                     $errMsg[] = $message . '(' . $error->code . ')';
                 }
@@ -136,24 +150,55 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
                     'Um ou mais erros ocorreram no seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg)
                 );
             }
-            if (isset($returnXml->error)) {
-                $error = $returnXml->error;
+            if (isset($returnXmlSecond->errors)) {
+                $errMsg = [];
+                foreach ($returnXmlSecond->errors as $error) {
+                    $message = $this->pagSeguroHelper->translateError((string)$error->message);
+                    $errMsg[] = $message . '(' . $error->code . ')';
+                }
+                throw new \Magento\Framework\Validator\Exception(
+                    'Um ou mais erros ocorreram no seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg)
+                );
+            }
+
+            if (isset($returnXmlFirst->error)) {
+                $error = $returnXmlFirst->error;
                 $message = $this->pagSeguroHelper->translateError((string)$error->message);
                 $errMsg[] = $message . ' (' . $error->code . ')';
                 throw new \Magento\Framework\Validator\Exception(
                     'Um erro ocorreu em seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg)
                 );
             }
+
+            if (isset($returnXmlSecond->error)) {
+                $error = $returnXmlSecond->error;
+                $message = $this->pagSeguroHelper->translateError((string)$error->message);
+                $errMsg[] = $message . ' (' . $error->code . ')';
+                throw new \Magento\Framework\Validator\Exception(
+                    'Um erro ocorreu em seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg)
+                );
+            }
+
             /* process return result code status*/
-            if ((int)$returnXml->status == 6 || (int)$returnXml->status == 7) {
+            if ((int)$returnXmlFirst->status == 6 || (int)$returnXmlFirst->status == 7) {
+                throw new \Magento\Framework\Validator\Exception('An error occurred in your payment.');
+            }
+
+            /* process return result code status*/
+            if ((int)$returnXmlSecond->status == 6 || (int)$returnXmlSecond->status == 7) {
                 throw new \Magento\Framework\Validator\Exception('An error occurred in your payment.');
             }
 
             $payment->setSkipOrderProcessing(true);
 
-            if (isset($returnXml->code)) {
-
-                $additional = ['transaction_id' => (string)$returnXml->code];
+            /** TODO Pegar a Invoice de cada cartão para criar a TransactionId */
+            if (isset($returnXmlFirst->code) && isset($returnXmlSecond->code)) {
+                $transaction_id_first  = (string)$returnXmlFirst->code;
+                $transaction_id_second = (string)$returnXmlSecond->code;
+                $additional = [];
+                $additional['transaction_id'] = "{$transaction_id_first}_{$transaction_id_second}";
+                $additional['transaction_id_first'] = (string)$returnXmlFirst->code;
+                $additional['transaction_id_second'] = (string)$returnXmlSecond->code;
                 //Sandbox Mode
                 if ($this->pagSeguroHelper->isSandbox()) {
                     $additional['is_sandbox'] = '1';
@@ -167,12 +212,34 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
                 $payment->setAdditionalInformation($additional);
                 $invoices = $order->getInvoiceCollection();
                 foreach($invoices as $invoice){
-                    $invoice->setTransactionId((string)$returnXml->code);
+                    $invoice->setTransactionId("{$transaction_id_first}_{$transaction_id_second}");
                     $invoice->save();
                 }
+
+                $trans = $this->transactionBuilder;
+                $transaction = $trans->setPayment($payment)
+                ->setOrder($order)
+                ->setTransactionId($transaction_id_first . "-" . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH)
+                ->setAdditionalInformation(
+                    [\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS => (array) $additional]
+                )
+                ->setFailSafe(true)                
+                ->build(\Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH);
+
+                $trans = $this->transactionBuilder;
+                $transaction = $trans->setPayment($payment)
+                ->setOrder($order)
+                ->setTransactionId($transaction_id_second . "-" . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH)
+                ->setAdditionalInformation(
+                    [\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS => (array) $additional]
+                )
+                ->setFailSafe(true)                
+                ->build(\Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH);
             }
 
-            $this->pagSeguroAbModel->proccessNotificatonResult($returnXml, $payment);
+            $this->pagSeguroAbModel->proccessNotificatonResult($returnXmlFirst, $payment);
+            $this->pagSeguroAbModel->proccessNotificatonResult($returnXmlSecond, $payment);
+
         } catch (\Exception $e) {
 
             throw new \Magento\Framework\Exception\LocalizedException(__($e->getMessage()));
@@ -196,34 +263,103 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
         // recupera a informação adicional do PagSeguro
         $info           = $this->getInfoInstance();
         $transactionId = $payment->getAdditionalInformation('transaction_id');
+        $transactionIdFirst = $payment->getAdditionalInformation('transaction_id_first');
+        $transactionIdSecond = $payment->getAdditionalInformation('transaction_id_second');
 
-        $params = [
-            'transactionCode'   => $transactionId,
-            'refundValue'       => number_format($amount, 2, '.', '')
-        ];
+        $token = $this->pagSeguroHelper->getToken();
+        $email = $this->pagSeguroHelper->getMerchantEmail();
 
-        $params['token'] = $this->pagSeguroHelper->getToken();
-        $params['email'] = $this->pagSeguroHelper->getMerchantEmail();
+        if (isset($transactionIdFirst) && isset($transactionIdSecond)) {
+            $errorMsg = [];
 
-        try {
-            // call API - refund
-            $returnXml  = $this->pagSeguroHelper->callApi($params, $payment, 'transactions/refunds');
+            $params = [
+                'transactionCode'   => $transactionIdFirst,
+                'refundValue'       => number_format($payment->getAdditionalInformation('credit_card_amount_first'), 2, '.', '')
+            ];
+    
+            $params['token'] = $token;
+            $params['email'] = $email;
+    
+            try {
+                // call API - refund
+                $returnXml  = $this->pagSeguroHelper->callApi($params, $payment, 'transactions/refunds');
+    
+                if ($returnXml === null) {
+                    $errorMsg[] = 'Impossível gerar reembolso do 1º cartão. Aldo deu errado.';
+                }
+            } catch (\Exception $e) {
+                $this->debugData(['transaction_id' => $transactionId, 'exception' => $e->getMessage()]);
+                $this->pagSeguroHelper->writeLog(__('Payment refunding error.'));
+                $errorMsg[] = __('Payment refunding error.');
+            }
 
-            if ($returnXml === null) {
-                $errorMsg = 'Impossível gerar reembolso. Aldo deu errado.';
+            $payment
+                ->setTransactionId($transactionIdFirst . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND)
+                ->setParentTransactionId($transactionIdFirst . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH)
+                ->setIsTransactionClosed(1)
+                ->setShouldCloseParentTransaction(1);
+
+            $params = [
+                'transactionCode'   => $transactionIdSecond,
+                'refundValue'       => number_format($payment->getAdditionalInformation('credit_card_amount_second'), 2, '.', '')
+            ];
+    
+            $params['token'] = $token;
+            $params['email'] = $email;
+    
+            try {
+                // call API - refund
+                $returnXml  = $this->pagSeguroHelper->callApi($params, $payment, 'transactions/refunds');
+    
+                if ($returnXml === null) {
+                    $errorMsg[] = 'Impossível gerar reembolso do 2º cartão. Aldo deu errado.';
+                }
+            } catch (\Exception $e) {
+                $this->debugData(['transaction_id' => $transactionId, 'exception' => $e->getMessage()]);
+                $this->pagSeguroHelper->writeLog(__('Payment refunding error.'));
+                $errorMsg[] = __('Payment refunding error.');
+            }
+
+            $payment
+                ->setTransactionId($transactionIdSecond . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND)
+                ->setParentTransactionId($transactionIdSecond . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH)
+                ->setIsTransactionClosed(1)
+                ->setShouldCloseParentTransaction(1);
+
+            if (count($errorMsg) > 0) {
+                $errorMsg = implode ( "\n", array_unique($errorMsg));
                 throw new \Magento\Framework\Validator\Exception($errorMsg);
             }
-        } catch (\Exception $e) {
-            $this->debugData(['transaction_id' => $transactionId, 'exception' => $e->getMessage()]);
-            $this->pagSeguroHelper->writeLog(__('Payment refunding error.'));
-            throw new \Magento\Framework\Validator\Exception(__('Payment refunding error.'));
-        }
 
-        $payment
-            ->setTransactionId($transactionId . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND)
-            ->setParentTransactionId($transactionId)
-            ->setIsTransactionClosed(1)
-            ->setShouldCloseParentTransaction(1);
+        } else {
+            $params = [
+                'transactionCode'   => $transactionId,
+                'refundValue'       => number_format($amount, 2, '.', '')
+            ];
+    
+            $params['token'] = $token;
+            $params['email'] = $email;
+    
+            try {
+                // call API - refund
+                $returnXml  = $this->pagSeguroHelper->callApi($params, $payment, 'transactions/refunds');
+    
+                if ($returnXml === null) {
+                    $errorMsg = 'Impossível gerar reembolso. Aldo deu errado.';
+                    throw new \Magento\Framework\Validator\Exception($errorMsg);
+                }
+            } catch (\Exception $e) {
+                $this->debugData(['transaction_id' => $transactionId, 'exception' => $e->getMessage()]);
+                $this->pagSeguroHelper->writeLog(__('Payment refunding error.'));
+                throw new \Magento\Framework\Validator\Exception(__('Payment refunding error.'));
+            }
+
+            $payment
+                ->setTransactionId($transactionId . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND)
+                ->setParentTransactionId($transactionId)
+                ->setIsTransactionClosed(1)
+                ->setShouldCloseParentTransaction(1);
+        }
 
         return $this;
     }
@@ -243,10 +379,22 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
         $info = $this->getInfoInstance();
         $info->setAdditionalInformation('sender_hash', $data['additional_data']['sender_hash'] ?? null)
             ->setAdditionalInformation(
-                'credit_card_token',
-                $data['additional_data']['credit_card_token'] ?? null
+                'credit_card_token_first',
+                $data['additional_data']['credit_card_token_first'] ?? null
             )
-            ->setAdditionalInformation('credit_card_owner', $data['additional_data']['cc_owner_name'] ?? null)
+            ->setAdditionalInformation(
+                'credit_card_token_second',
+                $data['additional_data']['credit_card_token_second'] ?? null
+            )
+            ->setAdditionalInformation('credit_card_owner_first', $data['additional_data']['first_cc_owner_name'] ?? null)
+            ->setAdditionalInformation('credit_card_type_first', $data['additional_data']['first_cc_type'] ?? null)
+            ->setAdditionalInformation('credit_card_last_four_first',substr($data['additional_data']['first_cc_number'] ?? null, -4))
+            ->setAdditionalInformation('credit_card_amount_first',$data['additional_data']['first_cc_amount'] ?? null)
+            ->setAdditionalInformation('credit_card_owner_second', $data['additional_data']['second_cc_owner_name'] ?? null)
+            ->setAdditionalInformation('credit_card_type_second', $data['additional_data']['second_cc_type'] ?? null)
+            ->setAdditionalInformation('credit_card_last_four_second',substr($data['additional_data']['second_cc_number'] ?? null, -4))
+            ->setAdditionalInformation('credit_card_amount_second',$data['additional_data']['second_cc_amount'] ?? null)
+            
             ->setCcType($data['additional_data']['cc_type'] ?? null)
             ->setCcLast4(substr($data['additional_data']['cc_number'] ?? null, -4))
             ->setCcExpYear($data['additional_data']['cc_exp_year'] ?? null)
@@ -254,17 +402,31 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
 
         // set cpf
         if ($this->pagSeguroHelper->isCpfVisible()) {
-            $ccOwnerCpf = $data['additional_data']['cc_owner_cpf'] ?? null;
-            $info->setAdditionalInformation($this->getCode() . '_cpf', $ccOwnerCpf);
+            $ccOwnerCpf = $data['additional_data']['first_cc_owner_cpf'] ?? null;
+            $info->setAdditionalInformation($this->getCode() . '_cpf_first', $ccOwnerCpf);
+            $ccOwnerCpf = $data['additional_data']['second_cc_owner_cpf'] ?? null;
+            $info->setAdditionalInformation($this->getCode() . '_cpf_second', $ccOwnerCpf);
         }
 
         //DOB value
         if ($this->pagSeguroHelper->isDobVisible()) {
-            $dobDay = $data['additional_data']['cc_owner_birthday_day'] ?? '01';
-            $dobMonth = $data['additional_data']['cc_owner_birthday_month'] ?? '01';
-            $dobYear = $data['additional_data']['cc_owner_birthday_year'] ?? '1970';
+            $dobDay = $data['additional_data']['first_cc_owner_birthday_day'] ?? '01';
+            $dobMonth = $data['additional_data']['first_cc_owner_birthday_month'] ?? '01';
+            $dobYear = $data['additional_data']['first_cc_owner_birthday_year'] ?? '1970';
             $info->setAdditionalInformation(
-                'credit_card_owner_birthdate',
+                'credit_card_owner_birthdate_first',
+                date(
+                    'd/m/Y',
+                    strtotime(
+                        $dobMonth . '/' . $dobDay . '/' . $dobYear
+                    )
+                )
+            );
+            $dobDay = $data['additional_data']['second_cc_owner_birthday_day'] ?? '01';
+            $dobMonth = $data['additional_data']['second_cc_owner_birthday_month'] ?? '01';
+            $dobYear = $data['additional_data']['second_cc_owner_birthday_year'] ?? '1970';
+            $info->setAdditionalInformation(
+                'credit_card_owner_birthdate_second',
                 date(
                     'd/m/Y',
                     strtotime(
@@ -275,11 +437,18 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
         }
 
         //Installments value
-        if (isset($data['additional_data']['cc_installments'])) {
-            $installments = explode('|', $data['additional_data']['cc_installments']);
+        if (isset($data['additional_data']['first_cc_installments'])) {
+            $installments = explode('|', $data['additional_data']['first_cc_installments']);
             if (false !== $installments && count($installments)==2) {
-                $info->setAdditionalInformation('installment_quantity', (int)$installments[0]);
-                $info->setAdditionalInformation('installment_value', $installments[1]);
+                $info->setAdditionalInformation('installment_quantity_first', (int)$installments[0]);
+                $info->setAdditionalInformation('installment_value_first', $installments[1]);
+            }
+        }
+        if (isset($data['additional_data']['second_cc_installments'])) {
+            $installments = explode('|', $data['additional_data']['second_cc_installments']);
+            if (false !== $installments && count($installments)==2) {
+                $info->setAdditionalInformation('installment_quantity_second', (int)$installments[0]);
+                $info->setAdditionalInformation('installment_value_second', $installments[1]);
             }
         }
 
@@ -346,10 +515,12 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
         $info = $this->getInfoInstance();
 
         $senderHash = $info->getAdditionalInformation('sender_hash');
-        $creditCardToken = $info->getAdditionalInformation('credit_card_token');
+        $creditCardTokenFirst = $info->getAdditionalInformation('credit_card_token_first');
+        $creditCardTokenSecond = $info->getAdditionalInformation('credit_card_token_second');
 
-        if (!$creditCardToken || !$senderHash) {
-            $missingInfo = sprintf('Token do cartão: %s', var_export($creditCardToken, true));
+        if (!$creditCardTokenFirst || !$creditCardTokenSecond || !$senderHash) {
+            $missingInfo = sprintf('Token do 1º cartão: %s', var_export($creditCardTokenFirst, true));
+            $missingInfo .= sprintf('Token do 2º cartão: %s', var_export($creditCardTokenSecond, true));
             $missingInfo .= sprintf('/ Sender_hash: %s', var_export($senderHash, true));
             $this->pagSeguroHelper->writeLog(
                 "Falha ao obter o token do cartao ou sender_hash.
@@ -363,4 +534,5 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
         }
         return $this;
     }
+
 }

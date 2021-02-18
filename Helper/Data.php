@@ -71,16 +71,23 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     private $remoteAddress;
 
+        /**
+     * @var \Magento\Sales\Api\TransactionRepositoryInterface
+     */
+    protected $transactionRepository;
+
+
     /**
-     * @param \Magento\Store\Model\StoreManagerInterface       $storeManager
-     * @param \Magento\Checkout\Model\Session                  $checkoutSession
-     * @param \Magento\Customer\Model\Customer                 $customer
-     * @param \Magento\Framework\App\Helper\Context            $context
-     * @param Logger                                           $loggerHelper
-     * @param \Magento\Framework\App\ProductMetadataInterface  $productMetadata
-     * @param \Magento\Framework\Module\ModuleListInterface    $moduleList
-     * @param \Magento\Framework\HTTP\Client\Curl              $curl
-     * @param \Magento\Framework\Serialize\SerializerInterface $serializer
+     * @param \Magento\Store\Model\StoreManagerInterface        $storeManager
+     * @param \Magento\Checkout\Model\Session                   $checkoutSession
+     * @param \Magento\Customer\Model\Customer                  $customer
+     * @param \Magento\Framework\App\Helper\Context             $context
+     * @param Logger                                            $loggerHelper
+     * @param \Magento\Framework\App\ProductMetadataInterface   $productMetadata
+     * @param \Magento\Framework\Module\ModuleListInterface     $moduleList
+     * @param \Magento\Framework\HTTP\Client\Curl               $curl
+     * @param \Magento\Framework\Serialize\SerializerInterface  $serializer
+     * @param \Magento\Sales\Api\TransactionRepositoryInterface $transactionRepository
      */
 
     public function __construct(
@@ -93,7 +100,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Framework\Module\ModuleListInterface $moduleList,
         \Magento\Framework\HTTP\Client\Curl $curl,
         \Magento\Framework\Serialize\SerializerInterface $serializer,
-        \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress
+        \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress,
+        \Magento\Sales\Api\TransactionRepositoryInterface $transactionRepository
     ) {
         $this->storeManager = $storeManager;
         $this->checkoutSession = $checkoutSession;
@@ -104,6 +112,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->_curl = $curl;
         $this->serializer = $serializer;
         $this->remoteAddress = $remoteAddress;
+
+        $this->transactionRepository = $transactionRepository;
 
         parent::__construct($context);
     }
@@ -534,8 +544,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * Returns associative array with required parameters to API, used on CC method calls
      * @return array
      */
-    public function getCreditCardApiCallParams(\Magento\Sales\Model\Order $order, $payment)
+    public function getCreditCardApiCallParams(\Magento\Sales\Model\Order $order, $payment, $cc = '')
     {
+        $percent = 1.0;
+        if (!empty($cc)) {
+            $percent = floatval(str_replace(",",".",$payment->getAdditionalInformation('credit_card_amount' . $cc))) / $order->getGrandTotal();
+        }
         $params = [
             'email'             => $this->getMerchantEmail(),
             'token'             => $this->getToken(),
@@ -543,17 +557,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'paymentMethod'     =>  'creditCard',
             'receiverEmail'     =>  $this->getMerchantEmail(),
             'currency'          => 'BRL',
-            'creditCardToken'   => $payment->getAdditionalInformation('credit_card_token'),
+            'creditCardToken'   => $payment->getAdditionalInformation('credit_card_token'. $cc),
             'reference'         => $order->getIncrementId(),
-            'extraAmount'       => $this->getExtraAmount($order),
+            'extraAmount'       => $this->getExtraAmount($order, $percent),
             'notificationURL'   => $this->getStoreUrl().'pseguro/notification/index',
             ];
-        $params = array_merge($params, $this->getItemsParams($order));
-        $params = array_merge($params, $this->getSenderParams($order, $payment));
-        $params = array_merge($params, $this->getAddressParams($order, 'shipping'));
+         
+        $params = array_merge($params, $this->getItemsParams($order, $percent));
+        $params = array_merge($params, $this->getSenderParams($order, $payment, $cc));
+        $params = array_merge($params, $this->getAddressParams($order, 'shipping', $percent));
         $params = array_merge($params, $this->getAddressParams($order, 'billing'));
-        $params = array_merge($params, $this->getCreditCardHolderParams($order, $payment));
-        $params = array_merge($params, $this->getCreditCardInstallmentsParams($order, $payment));
+        $params = array_merge($params, $this->getCreditCardHolderParams($order, $payment, $cc));
+        $params = array_merge($params, $this->getCreditCardInstallmentsParams($order, $payment, $cc));
 
         return $params;
     }
@@ -565,7 +580,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return float
      */
-    public function getExtraAmount($order)
+    public function getExtraAmount($order, $percent = 1.0)
     {
         $discount = $order->getDiscountAmount();
         $taxAmount = $order->getTaxAmount();
@@ -582,22 +597,24 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 $extra -= 0.01 * $item->getQtyOrdered();
             }
         }
+        $extra *= $percent;
         return number_format($extra, 2, '.', '');
     }
 
      /**
       * Return items information, to be send to API
       * @param Magento\Sales\Model\Order $order
+      * @param float $percent
       * @return array
       */
-    public function getItemsParams(\Magento\Sales\Model\Order $order)
+    public function getItemsParams(\Magento\Sales\Model\Order $order, $percent = 1.0)
     {
         $return = [];
         $items = $this->getAllVisibleItems($order);
         if ($items) {
             $itemsCount = count($items);
             for ($x=1, $y=0; $x <= $itemsCount; $x++, $y++) {
-                $itemPrice = $items[$y]->getPrice();
+                $itemPrice = $items[$y]->getPrice()*$percent;
                 $qtyOrdered = $items[$y]->getQtyOrdered();
                 $return['itemId'.$x] = $items[$y]->getId()? $items[$y]->getId() : $items[$y]->getData('quote_item_id');
                 $return['itemDescription'.$x] = substr($items[$y]->getName(), 0, 100);
@@ -618,12 +635,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @param Magento\Sales\Model\Order $order
      * @param $payment
+     * @param string $cc
      * @return array
      */
-    public function getSenderParams(\Magento\Sales\Model\Order $order, $payment)
+    public function getSenderParams(\Magento\Sales\Model\Order $order, $payment, $cc = '')
     {
         $digits = new \Zend\Filter\Digits();
-        $cpf = $this->getCustomerCpfValue($order, $payment);
+        $cpf = $this->getCustomerCpfValue($order, $payment, $cc);
 
         $phone = $this->extractPhone($order->getBillingAddress()->getTelephone());
 
@@ -656,19 +674,20 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * Returns an array with credit card's owner (Customer) to be used on API
      * @param Magento\Sales\Model\Order $order
      * @param $payment
+     * @param string $cc
      * @return array
      */
-    public function getCreditCardHolderParams(\Magento\Sales\Model\Order $order, $payment)
+    public function getCreditCardHolderParams(\Magento\Sales\Model\Order $order, $payment, $cc = '')
     {
         $digits = new \Zend\Filter\Digits();
-        $cpf = $this->getCustomerCpfValue($order, $payment);
+        $cpf = $this->getCustomerCpfValue($order, $payment, $cc);
 
         //data
         $customer = $this->customerRepo->load($order->getCustomerId());
-        $creditCardHolderBirthDate = $this->getCustomerCcDobValue($customer, $payment);
+        $creditCardHolderBirthDate = $this->getCustomerCcDobValue($customer, $payment, $cc);
         $phone = $this->extractPhone($order->getBillingAddress()->getTelephone());
 
-        $holderName = $this->removeDuplicatedSpaces($payment['additional_information']['credit_card_owner']);
+        $holderName = $this->removeDuplicatedSpaces($payment['additional_information']['credit_card_owner' . $cc]);
         $return = [
             'creditCardHolderName'      => $holderName,
             'creditCardHolderBirthDate' => $creditCardHolderBirthDate,
@@ -683,27 +702,30 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Return an array with installment information to be used with API
      * @param Magento\Sales\Model\Order $order
-     * @param $payment Magento\Sales\Model\Order\Payment
+     * @param Magento\Sales\Model\Order\Payment $payment
+     * @param string $cc
      * @return array
      */
-    public function getCreditCardInstallmentsParams(\Magento\Sales\Model\Order $order, $payment)
+    public function getCreditCardInstallmentsParams(\Magento\Sales\Model\Order $order, $payment, $cc = '')
     {
         $return = [];
-        if ($payment->getAdditionalInformation('installment_quantity')
-            && $payment->getAdditionalInformation('installment_value')) {
+        if ($payment->getAdditionalInformation('installment_quantity' . $cc)
+            && $payment->getAdditionalInformation('installment_value' . $cc)) {
             $return = [
-                'installmentQuantity'   => $payment->getAdditionalInformation('installment_quantity'),
+                'installmentQuantity'   => $payment->getAdditionalInformation('installment_quantity' . $cc),
                 'installmentValue'      => number_format(
-                    $payment->getAdditionalInformation('installment_value'),
+                    $payment->getAdditionalInformation('installment_value' . $cc),
                     2,
                     '.',
                     ''
                 ),
             ];
         } else {
+            $value = ($cc == '')?$order->getGrandTotal():$payment->getAdditionalInformation('credit_card_amount' . $cc);
+            $value = floatval(str_replace(",",".",$value));
             $return = [
                 'installmentQuantity'   => '1',
-                'installmentValue'      => number_format($order->getGrandTotal(), 2, '.', ''),
+                'installmentValue'      => number_format($value, 2, '.', ''),
                 ];
         }
         return $return;
@@ -713,9 +735,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * Return an array with address (shipping/billing) information to be used on API
      * @param Magento\Sales\Model\Order $order
      * @param string (billing|shipping) $type
+     * @param float $percent
      * @return array
      */
-    public function getAddressParams(\Magento\Sales\Model\Order $order, $type)
+    public function getAddressParams(\Magento\Sales\Model\Order $order, $type, $percent = 1.0)
     {
         $digits = new \Zend\Filter\Digits();
 
@@ -763,7 +786,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         //shipping specific
         if ($type == 'shipping') {
             $shippingType = $this->getShippingType($order);
-            $shippingCost = $order->getShippingAmount();
+            $shippingCost = $order->getShippingAmount()*$percent;
             $return['shippingType'] = $shippingType;
             if ($shippingCost > 0) {
                 if ($this->shouldSplit($order)) {
@@ -781,10 +804,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * Returns customer's CPF based on your module configuration
      * @param Mage_Sales_Model_Order $order
      * @param Mage_Payment_Model_Method_Abstract $payment
+     * @param string $cc
      *
      * @return mixed
      */
-    private function getCustomerCpfValue(\Magento\Sales\Model\Order $order, $payment)
+    private function getCustomerCpfValue(\Magento\Sales\Model\Order $order, $payment, $cc = '')
     {
         $customerCpfAttribute = $this->scopeConfig->getValue(
             'payment/rm_pagseguro/customer_cpf_attribute',
@@ -792,8 +816,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
 
         if (empty($customerCpfAttribute)) { //Asked with payment data
-            if (isset($payment['additional_information'][$payment->getMethod() . '_cpf'])) {
-                return $payment['additional_information'][$payment->getMethod() . '_cpf'];
+            if (isset($payment['additional_information'][$payment->getMethod() . '_cpf' . $cc])) {
+                return $payment['additional_information'][$payment->getMethod() . '_cpf' . $cc];
             }
         }
         $entity = explode('|', $customerCpfAttribute);
@@ -966,10 +990,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * Returns customer's date of birthday, based on your module configuration or return a default date
      * @param Magento\Customer\Model\Customer $customer
      * @param                              $payment
+     * @param string $cc
      *
      * @return mixed
      */
-    private function getCustomerCcDobValue(\Magento\Customer\Model\Customer $customer, $payment)
+    private function getCustomerCcDobValue(\Magento\Customer\Model\Customer $customer, $payment, $cc = '')
     {
         $ccDobAttribute = $this->scopeConfig->getValue(
             'payment/rm_pagseguro_cc/owner_dob_attribute',
@@ -977,8 +1002,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
 
         if (empty($ccDobAttribute)) { //when asked with payment data
-            if (isset($payment['additional_information']['credit_card_owner_birthdate'])) {
-                return $payment['additional_information']['credit_card_owner_birthdate'];
+            if (isset($payment['additional_information']['credit_card_owner_birthdate'. $cc])) {
+                return $payment['additional_information']['credit_card_owner_birthdate'. $cc];
             }
         }
 
@@ -1320,5 +1345,107 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             return false;
 
         return $senderIp;
+    }
+
+    public function TwoCardCancel($payment) {
+        
+        $transactionId = $payment->getAdditionalInformation('transaction_id');
+        $transactionIdFirst = $payment->getAdditionalInformation('transaction_id_first');
+        $amountFirst = $payment->getAdditionalInformation('credit_card_amount_first');
+        $transactionIdSecond = $payment->getAdditionalInformation('transaction_id_second');
+        $amountSecond = $payment->getAdditionalInformation('credit_card_amount_second');
+
+        $transactionIdFirstObj = false;
+        $transactionIdSecondObj = false;
+
+        $token = $this->getToken();
+        $email = $this->getMerchantEmail();
+
+        if (isset($transactionIdFirst) && isset($transactionIdSecond)) {
+            $errorMsg = [];
+
+            $transactionIdFirstObj  = $this->getTransaction($transactionIdFirst, $payment);
+            $transactionIdSecondObj = $this->getTransaction($transactionIdSecond, $payment);
+
+            if (false !== $transactionIdFirstObj) {
+                $params = [
+                    'transactionCode'   => $transactionIdFirst,
+                    'refundValue'       => number_format(str_replace(",",".", $amountFirst), 2, '.', '')
+                ];
+        
+                $params['token'] = $token;
+                $params['email'] = $email;
+        
+                try {
+                    // call API - refund
+                    $returnXml  = $this->callApi($params, $payment, 'transactions/refunds');
+        
+                    if ($returnXml === null) {
+                        $errorMsg[] = 'Impossível gerar reembolso do 1º cartão. Aldo deu errado.';
+                    }
+                } catch (\Exception $e) {
+                    $this->debugData(['transaction_id' => $transactionId, 'exception' => $e->getMessage()]);
+                    $this->writeLog(__('Payment refunding error.'));
+                    $errorMsg[] = __('Payment refunding error.');
+                }
+
+                $payment
+                    ->setTransactionId($transactionIdFirst . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND)
+                    ->setParentTransactionId($transactionIdFirst . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH)
+                    ->setIsTransactionClosed(1)
+                    ->setShouldCloseParentTransaction(1);
+            }
+
+            if (false !== $transactionIdSecondObj) {
+                $params = [
+                    'transactionCode'   => $transactionIdSecond,
+                    'refundValue'       => number_format(str_replace(",",".",$amountSecond), 2, '.', '')
+                ];
+        
+                $params['token'] = $token;
+                $params['email'] = $email;
+        
+                try {
+                    // call API - refund
+                    $returnXml  = $this->callApi($params, $payment, 'transactions/refunds');
+        
+                    if ($returnXml === null) {
+                        $errorMsg[] = 'Impossível gerar reembolso do 2º cartão. Aldo deu errado.';
+                    }
+                } catch (\Exception $e) {
+                    $this->debugData(['transaction_id' => $transactionId, 'exception' => $e->getMessage()]);
+                    $this->writeLog(__('Payment refunding error.'));
+                    $errorMsg[] = __('Payment refunding error.');
+                }
+    
+                $payment
+                    ->setTransactionId($transactionIdSecond . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND)
+                    ->setParentTransactionId($transactionIdSecond . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH)
+                    ->setIsTransactionClosed(1)
+                    ->setShouldCloseParentTransaction(1);
+            }
+
+            if (count($errorMsg) > 0) {
+                $errorMsg = implode ( "\n", array_unique($errorMsg));
+                throw new \Magento\Framework\Validator\Exception($errorMsg);
+            }
+
+        }
+    }
+
+    /**
+     * @param string $transactionId
+     * @param Payment $payment
+     * @return false|\Magento\Sales\Model\Order\Payment\Transaction
+     */
+    public function getTransaction($transactionId, $payment)
+    {
+        $transactionData = false;
+        try {
+            $transactionData = $this->transactionRepository->getByTransactionId($transactionId, $payment->getId(), $payment->getOrder()->getId());
+        } catch (\Magento\Framework\Exception\NoSuchEntityException $exception) {
+            throw new \Magento\Framework\Exception\LocalizedException($exception->getMessage());
+        }
+        return $transactionData;
     }
 }

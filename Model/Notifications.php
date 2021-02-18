@@ -51,6 +51,10 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
 
     /** @var \Magento\Sales\Model\Order */
     protected $orderData;
+    /**
+     * @var \Magento\Framework\Api\SearchCriteriaBuilder
+     */
+    private $searchCriteriaBuilder;
 
     public function __construct(
         \Magento\Framework\Model\Context $context,
@@ -69,8 +73,10 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
         \Magento\Sales\Model\Order\Email\Sender\OrderCommentSender $commentSender,
         \Magento\Sales\Model\Service\InvoiceService $invoiceService,
         \Magento\Sales\Model\Order\Email\Sender\InvoiceSender $invoiceSender,
-        \Magento\Framework\App\CacheInterface $cache,
+        \Magento\Framework\App\CacheInterface $cache,        
         \Magento\Sales\Model\Order $orderData,
+        \Magento\Sales\Model\OrderRepository $orderRepository,
+        \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder,
         array $data = []
     ) {
         parent::__construct(
@@ -94,13 +100,15 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
         $this->invoiceSender = $invoiceSender;
         $this->cache = $cache;
         $this->orderData = $orderData;
+        $this->orderRepository = $orderRepository;
+        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
     }
 
     /**
      * Processes notification XML data. XML is sent right after order is sent to PagSeguro, and on order updates.
      * @param SimpleXMLElement $resultXML
      */
-    public function proccessNotificatonResult($resultXML, $_payment = false)
+    public function proccessNotificatonResult($resultXML, $_payment = false) 
     {
         if (isset($resultXML->error)) {
             $errMsg = __((string)$resultXML->error->message);
@@ -119,13 +127,18 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                 $payment = $_payment;
             } else {
                 $orderNo = (string)$resultXML->reference;
-                $order = $this->orderModel->loadByIncrementId($orderNo);
-                if (!$order->getId()) {
+                $searchCriteria = $this->searchCriteriaBuilder
+                    ->addFilter('increment_id', $orderNo, 'eq')->create();
+                $orderList = $this->orderRepository->getList($searchCriteria)->getItems();
+
+                /** @var \Magento\Sales\Model\Order $order */
+                $order = reset($orderList) ?? false;
+                if (!$order) {
                     $this->pagSeguroHelper->writeLog(
-                        sprintf(
+                        new \Magento\Framework\Phrase(
                             'Order %s not found on system. Unable to process return. '
                                 . 'A new attempt may happen in a few minutes.',
-                            $orderNo
+                            [$orderNo]
                         )
                     );
                     return false;
@@ -138,9 +151,25 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
             $contentCacheId = hash('sha256', $resultXML->asXML());
             $this->cache->save('1', $contentCacheId, ['RM_PAGSEGURO_NOTIFICATION'], 60);
 
-
             $this->_code = $payment->getMethod();
             $processedState = $this->processStatus((int)$resultXML->status);
+
+            $isFirst = false;
+            $isSecond = false;
+
+            $transactionIdFirst = null;
+            $transactionIdSecond = null;
+
+            if ($this->_code == \RicardoMartins\PagSeguro\Model\Method\Twocc::CODE) {
+                $transaction_id = (string)$resultXML->code;
+                $transaction_id_first = (string)$payment->getAdditionalInformation('transaction_id_first');
+                $transaction_id_second = (string)$payment->getAdditionalInformation('transaction_id_second');
+                $transactionIdFirst = $this->pagSeguroHelper->getTransaction($transaction_id_first, $payment);
+                $transactionIdSecond = $this->pagSeguroHelper->getTransaction($transaction_id_second, $payment);
+
+                $isFirst = ($transaction_id === $transaction_id_first);
+                $isSecond = ($transaction_id === $transaction_id_second);
+            }
 
             $message = $processedState->getMessage();
 
@@ -161,6 +190,9 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                         'Returned: Amount returned to buyer.'
                     );
                 }
+                if ($this->_code == \RicardoMartins\PagSeguro\Model\Method\Twocc::CODE) {
+                    $this->pagSeguroHelper->TwoCardCancel($payment);
+                }
             }
 
             if ((int)$resultXML->status == 7 && isset($resultXML->cancellationSource)) {
@@ -179,6 +211,9 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
 
                 $cancelOrder = $this->orderData->load($order->getId());
                 $cancelOrder->cancel()->save();
+                if ($this->_code == \RicardoMartins\PagSeguro\Model\Method\Twocc::CODE) {
+                    $this->pagSeguroHelper->TwoCardCancel($payment);
+                }
             }
 
             if ($processedState->getStateChanged()) {
@@ -190,6 +225,15 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
 
                     $order->setState($processedState->getState());
                     $order->setStatus($processedState->getState());
+
+                    if ($this->_code === \RicardoMartins\PagSeguro\Model\Method\Twocc::CODE && (int)$resultXML->status == 3) {
+                        $order->setState(\Magento\Sales\Model\Order::STATE_PENDING_PAYMENT);
+                        $order->setStatus(\Magento\Sales\Model\Order::STATE_PENDING_PAYMENT);
+                        if (is_object($_payment)) {
+                            $_payment->setIsTransactionPending(true);
+                        }
+                    }
+
                     $order->addStatusHistoryComment($message);
 
                     if ((int)$resultXML->status == 1 && is_object($_payment)) {
@@ -203,36 +247,90 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
             }
 
             if ((int)$resultXML->status == 3) {
-                if (!$order->hasInvoices()) {
-                    $invoice = $this->invoiceService->prepareInvoice($order);
-                    $msg = sprintf('Captured payment. Transaction Identifier: %s', (string)$resultXML->code);
-                    $invoice->addComment($msg);
-                    $invoice->setRequestedCaptureCase(\Magento\Sales\Model\Order\Invoice::CAPTURE_ONLINE);
-                    $invoice->register();
 
-                    if ($this->pagSeguroHelper->getStoreConfigValue('payment/rm_pagseguro/send_invoice_email')) {
-                        try {
-                            $this->invoiceSender->send($invoice);
-                        } catch (\Exception $e) {
-                            $this->logger->debug(__('We can\'t send the invoice email right now.'));
+                if ($this->_code === \RicardoMartins\PagSeguro\Model\Method\Twocc::CODE) {
+                    $transaction_id = (string)$resultXML->code;
+                    $payment->setTransactionId($transaction_id);
+                    
+                    $transaction = $payment->addTransaction(
+                        \Magento\Sales\Model\Order\Payment\Transaction::TYPE_CAPTURE,
+                        null,
+                        true
+                    );                    
+
+                    $createInvoices = false;
+
+                    if ( ($isFirst && $transactionIdSecond) || ($isSecond && $transactionIdFirst) )
+                    {
+                            $createInvoices = true;
+                            $order->setState($processedState->getState());
+                            $order->setStatus($processedState->getState());
+                    }
+
+                    if ( $createInvoices && !$order->hasInvoices()) {
+                        $invoice = $this->invoiceService->prepareInvoice($order);
+                        $msg = sprintf('Captured payment. Transaction Identifier: %s', (string)$resultXML->code);
+                        $invoice->addComment($msg);
+                        $invoice->setRequestedCaptureCase(\Magento\Sales\Model\Order\Invoice::CAPTURE_ONLINE);
+                        $invoice->register();
+    
+                        if ($this->pagSeguroHelper->getStoreConfigValue('payment/rm_pagseguro/send_invoice_email')) {
+                            try {
+                                $this->invoiceSender->send($invoice);
+                            } catch (\Exception $e) {
+                                $this->logger->debug(__('We can\'t send the invoice email right now.'));
+                            }
                         }
+    
+                        // salva o transaction id na invoice
+                        if (isset($resultXML->code)) {
+                            $invoice->setTransactionId((string)$resultXML->code)->save();
+                            $paymentAdditionalInformation = $payment->getAdditionalInformation();
+                            $paymentAdditionalInformation['transaction_id'] = (string)$resultXML->code;
+                            $payment->setAdditionalInformation($paymentAdditionalInformation)->save();
+                        }
+    
+                        $this->transactionFactory->addObject($invoice)
+                            ->addObject($invoice->getOrder())
+                            ->save();
+                        $order->addStatusHistoryComment(
+                            sprintf('Invoice #%s successfully created.', $invoice->getIncrementId())
+                        );
+    
                     }
 
-                    // salva o transaction id na invoice
-                    if (isset($resultXML->code)) {
-                        $invoice->setTransactionId((string)$resultXML->code)->save();
-                        $paymentAdditionalInformation = $payment->getAdditionalInformation();
-                        $paymentAdditionalInformation['transaction_id'] = (string)$resultXML->code;
-                        $payment->setAdditionalInformation($paymentAdditionalInformation)->save();
+                } else {
+                    if (!$order->hasInvoices()) {
+                        $invoice = $this->invoiceService->prepareInvoice($order);
+                        $msg = sprintf('Captured payment. Transaction Identifier: %s', (string)$resultXML->code);
+                        $invoice->addComment($msg);
+                        $invoice->setRequestedCaptureCase(\Magento\Sales\Model\Order\Invoice::CAPTURE_ONLINE);
+                        $invoice->register();
+    
+                        if ($this->pagSeguroHelper->getStoreConfigValue('payment/rm_pagseguro/send_invoice_email')) {
+                            try {
+                                $this->invoiceSender->send($invoice);
+                            } catch (\Exception $e) {
+                                $this->logger->debug(__('We can\'t send the invoice email right now.'));
+                            }
+                        }
+    
+                        // salva o transaction id na invoice
+                        if (isset($resultXML->code)) {
+                            $invoice->setTransactionId((string)$resultXML->code)->save();
+                            $paymentAdditionalInformation = $payment->getAdditionalInformation();
+                            $paymentAdditionalInformation['transaction_id'] = (string)$resultXML->code;
+                            $payment->setAdditionalInformation($paymentAdditionalInformation)->save();
+                        }
+    
+                        $this->transactionFactory->addObject($invoice)
+                            ->addObject($invoice->getOrder())
+                            ->save();
+                        $order->addStatusHistoryComment(
+                            sprintf('Invoice #%s successfully created.', $invoice->getIncrementId())
+                        );
+    
                     }
-
-                    $this->transactionFactory->addObject($invoice)
-                        ->addObject($invoice->getOrder())
-                        ->save();
-                    $order->addStatusHistoryComment(
-                        sprintf('Invoice #%s successfully created.', $invoice->getIncrementId())
-                    );
-
                 }
             }
 
@@ -326,7 +424,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
         switch ($statusCode) {
             case '1':
                 $return->setState(\Magento\Sales\Model\Order::STATE_PENDING_PAYMENT);
-                $return->setIsCustomerNotified($this->getCode()!='pagseguro_cc');
+                $return->setIsCustomerNotified(($this->getCode()!='pagseguro_cc')&&($this->getCode()!='pagseguro_twocc'));
 
                 $return->setMessage(
                     __('Awaiting payment: the buyer initiated the transaction, but so far PagSeguro has not '
@@ -395,4 +493,5 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
         }
         return $return;
     }
+
 }

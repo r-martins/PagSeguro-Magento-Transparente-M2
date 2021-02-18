@@ -5,13 +5,14 @@ define(
         'RicardoMartins_PagSeguro/js/model/credit-card-data',
         'Magento_Payment/js/model/credit-card-validation/credit-card-data',
         'Magento_Payment/js/model/credit-card-validation/credit-card-number-validator',
+        'Magento_Checkout/js/model/quote',
         'Magento_Checkout/js/action/place-order',
         'Magento_Checkout/js/model/full-screen-loader',
         'Magento_Checkout/js/model/payment/additional-validators',
         'Magento_Payment/js/model/credit-card-validation/validator',
         'PagseguroDirectMethod'
     ],
-    function (Component, $, creditCardSecondData, creditCardData, cardNumberValidator) {
+    function (Component, $, creditCardSecondData, creditCardData, cardNumberValidator, quote) {
         'use strict';
 
         return Component.extend({
@@ -36,17 +37,20 @@ define(
                 creditCardSecondVerificationNumber: '',
                 selectedCardSecondType: null,
                 creditCardFirstOwnerName: '',
+                creditCardFirstAmount: '',
                 creditCardFirstOwnerBirthDay: '',
                 creditCardFirstOwnerBirthMonth: '',
                 creditCardFirstOwnerBirthYear: '',
                 creditCardFirstOwnerCpf: '',
                 creditCardFirstInstallments: '',
                 creditCardSecondOwnerName: '',
+                creditCardSecondAmount: '',
                 creditCardSecondOwnerBirthDay: '',
                 creditCardSecondOwnerBirthMonth: '',
                 creditCardSecondOwnerBirthYear: '',
                 creditCardSecondOwnerCpf: '',
-                creditCardSecondInstallments: ''
+                creditCardSecondInstallments: '',
+                amountTotal: 0
             },
 
             getPagSeguroCcImagesHtml: function () {
@@ -75,12 +79,14 @@ define(
                         'creditCardSecondVerificationNumber',
                         'selectedCardSecondType',
                         'creditCardFirstOwnerName',
+                        'creditCardFirstAmount',
                         'creditCardFirstOwnerBirthDay',
                         'creditCardFirstOwnerBirthMonth',
                         'creditCardFirstOwnerBirthYear',
                         'creditCardFirstOwnerCpf',
                         'creditCardFirstInstallments',
                         'creditCardSecondOwnerName',
+                        'creditCardSecondAmount',
                         'creditCardSecondOwnerBirthDay',
                         'creditCardSecondOwnerBirthMonth',
                         'creditCardSecondOwnerBirthYear',
@@ -177,10 +183,36 @@ define(
                 this.creditCardSecondVerificationNumber.subscribe(function (value) {
                     creditCardSecondData.cvvSecondCode = value;
                 });
+
+                this.creditCardFirstAmount(this.getAmountInit());
+                this.creditCardSecondAmount(this.getAmountInit());
+
+                setInterval(this.updAmount.bind(this, quote), 3000);
+
             },
 
             getCode: function() {
                 return 'rm_pagseguro_twocc';
+            },
+
+            getAmountInit: function() {
+                var orderAmount = quote.getTotals()().grand_total / 2;
+                var amount = orderAmount.toFixed(2);
+                var decimalSeparator = ',';
+                var separator = ".";
+                amount = amount.replace(separator, decimalSeparator);
+                var orderAmountOriginal =  amount.replace(decimalSeparator, ".");
+                this.amountTotal = quote.getTotals()().grand_total;
+                var amountBalance = (quote.getTotals()().grand_total - orderAmountOriginal).toFixed(2);
+                return amountBalance.replace(".", decimalSeparator);
+            },
+
+            updAmount: function() {
+                if (this.amountTotal !== quote.getTotals()().grand_total) {
+                    this.amountTotal = quote.getTotals()().grand_total;
+                    this.creditCardFirstAmount(this.getAmountInit());
+                    this.creditCardSecondAmount(this.getAmountInit());
+                }
             },
 
             getData: function () {
@@ -196,6 +228,7 @@ define(
                         'first_cc_exp_month': this.creditCardFirstExpMonth(),
                         'first_cc_number': this.creditCardFirstNumber(),
                         'first_cc_owner_name' : this.creditCardFirstOwnerName(),
+                        'first_cc_amount' : this.creditCardFirstAmount(),
                         'first_cc_owner_birthday_day' : this.creditCardFirstOwnerBirthDay(),
                         'first_cc_owner_birthday_month' : this.creditCardFirstOwnerBirthMonth(),
                         'first_cc_owner_birthday_year' : this.creditCardFirstOwnerBirthYear(),
@@ -210,6 +243,7 @@ define(
                         'second_cc_exp_month': this.creditCardSecondExpMonth(),
                         'second_cc_number': this.creditCardSecondNumber(),
                         'second_cc_owner_name' : this.creditCardSecondOwnerName(),
+                        'second_cc_amount' : this.creditCardSecondAmount(),
                         'second_cc_owner_birthday_day' : this.creditCardSecondOwnerBirthDay(),
                         'second_cc_owner_birthday_month' : this.creditCardSecondOwnerBirthMonth(),
                         'second_cc_owner_birthday_year' : this.creditCardSecondOwnerBirthYear(),
@@ -220,8 +254,7 @@ define(
                         'credit_card_token_second' : $('input[name="payment[pagseguropro_second_cc_cctoken]"]').val(),
                         'first_cc_type' : $('input[name="payment[pagseguropro_first_cc_cctype]"]').val(),
                         'second_cc_type' : $('input[name="payment[pagseguropro_second_cc_cctype]"]').val(),
-                        'is_admin_first' : $('input[name="payment[pagseguropro_first_cc_isadmin]"]').val(),
-                        'is_admin_second' : $('input[name="payment[pagseguropro_second_cc_isadmin]"]').val(),
+                        'is_admin' : $('input[name="payment[pagseguropro_cc_isadmin]"]').val()
                     }
                 };
             },
@@ -248,6 +281,27 @@ define(
                     return false;
                 }
                 return true;
+            },
+
+            /**
+             * Get credit card details
+             * @returns {Array}
+             */
+            getInfo: function () {
+                return [
+                    {
+                        'name': 'First Credit Card Type', value: this.getCcTypeTitleByCode(this.creditCardFirstType())
+                    },
+                    {
+                        'name': 'First Credit Card Number', value: this.formatDisplayCcNumber(this.creditCardFirstNumber())
+                    },
+                    {
+                        'name': 'Second Credit Card Type', value: this.getCcTypeTitleByCode(this.creditCardSecondType())
+                    },
+                    {
+                        'name': 'Second Credit Card Number', value: this.formatDisplayCcNumber(this.creditCardSecondNumber())
+                    }
+                ];
             }
         });
     }

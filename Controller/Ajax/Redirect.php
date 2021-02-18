@@ -109,7 +109,7 @@ class Redirect extends Action implements HttpGetActionInterface
             $url = $this->urlHelper->getUrl($url);
         }
 
-        $result->setUrl($url)
+        $result->setUrl($url);
 
         return $result;
     }

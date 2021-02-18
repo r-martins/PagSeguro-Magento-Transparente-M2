@@ -17,6 +17,23 @@
             </div>
         </div>
         <div class="field number required">
+            <label data-bind="attr: {for: getCode() + '_first_cc_amount'}" class="label">
+                <span><!-- ko i18n: 'Amount For This Credit Card'--><!-- /ko --></span>
+            </label>
+            <div class="control">
+                <input type="text" name="payment[ps_first_cc_amount]" class="input-text money first" value=""
+                    data-bind="attr: {
+                                        autocomplete: off,
+                                        id: getCode() + '_first_cc_amount',
+                                        title: $t('Amount For This Credit Card'),
+                                        'data-container': getCode() + '-first-cc-value',
+                                        'data-validate': JSON.stringify({'required':true})},
+                                value: creditCardFirstAmount,
+                                valueUpdate: 'keyup'"
+                                        />
+            </div>
+        </div>
+        <div class="field number required">
             <label data-bind="attr: {for: getCode() + '_first_cc_owner'}" class="label">
                 <span><!-- ko i18n: 'Credit Card Owner Name'--><!-- /ko --></span>
             </label>
@@ -120,7 +137,7 @@
                                 enable: isActive($parents),
                                 value: creditCardFirstNumber,
                                 valueUpdate: 'keyup' "/>
-                <span id="card-msg"></span>
+                <span id="first-card-msg"></span>
             </div>
             </div>
         </div>
@@ -230,6 +247,23 @@
                        ">
             </div>
         </div>
+        <div class="field number required">
+            <label data-bind="attr: {for: getCode() + '_second_cc_amount'}" class="label">
+                <span><!-- ko i18n: 'Amount For This Credit Card'--><!-- /ko --></span>
+            </label>
+            <div class="control">
+                <input type="text" name="payment[ps_second_cc_amount]" class="input-text money second" value=""
+                    data-bind="attr: {
+                                        autocomplete: off,
+                                        id: getCode() + '_second_cc_amount',
+                                        title: $t('Amount For This Credit Card'),
+                                        'data-container': getCode() + '-second-cc-value',
+                                        'data-validate': JSON.stringify({'required':true})},
+                                value: creditCardSecondAmount,
+                                valueUpdate: 'keyup'"
+                                        />
+            </div>
+        </div>
          <div class="field number required">
             <label data-bind="attr: {for: getCode() + '_second_cc_owner'}" class="label">
                 <span><!-- ko i18n: 'Credit Card Owner Name'--><!-- /ko --></span>
@@ -334,7 +368,7 @@
                                   enable: isActive($parents),
                                   value: creditCardSecondNumber,
                                   valueUpdate: 'keyup' "/>
-                <span id="card-msg"></span>
+                <span id="second-card-msg"></span>
               </div>
             </div>
         </div>
@@ -434,12 +468,11 @@
     </div>
 </fieldset>
 <div data-bind="afterRender: preparePagSeguro()"></div>
-<input type="hidden" name="payment[pagseguropro_first_cc_senderhash]" class="ccsenderhash" value="" />
+<input type="hidden" name="payment[pagseguropro_cc_senderhash]" class="ccsenderhash" value="" />
+<input type="hidden" name="payment[pagseguropro_cc_isadmin]" class="ccisadmin" value="" />
+
 <input type="hidden" name="payment[pagseguropro_first_cc_cctoken]" class="cctoken" value="" />
 <input type="hidden" name="payment[pagseguropro_first_cc_cctype]" class="cctype" value="" />
-<input type="hidden" name="payment[pagseguropro_first_cc_isadmin]" class="ccisadmin" value="" />
 
-<input type="hidden" name="payment[pagseguropro_second_cc_senderhash]" class="ccsenderhash" value="" />
 <input type="hidden" name="payment[pagseguropro_second_cc_cctoken]" class="cctoken" value="" />
 <input type="hidden" name="payment[pagseguropro_second_cc_cctype]" class="cctype" value="" />
-<input type="hidden" name="payment[pagseguropro_second_cc_isadmin]" class="ccisadmin" value="" />

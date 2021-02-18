@@ -29,14 +29,20 @@ function RMPagSeguro(config) {
                 }
                 if (senderHashAttempts == 40) {
                     clearInterval(intervalSenderHash);
-                    console.error('Unable to get sender_hash after multiple attempts.');
+                    console.error('Unable to get sender_hash after multiple attempts. Don\'t bother, we don\'t need it.');
                 }
             }, 3000 );
         }
 
         var parcelsDrop = jQuery('#rm_pagseguro_cc_cc_installments');
+        var parcelsFirstDrop = jQuery('#rm_pagseguro_twocc_first_cc_installments');
+        var parcelsSecondDrop = jQuery('#rm_pagseguro_twocc_second_cc_installments');
+
         //Please enter credit card data to calculate
         parcelsDrop.append('<option value="">Informe os dados do cartão para calcular</option>');
+        parcelsFirstDrop.append('<option value="">Informe os dados do cartão para calcular</option>');
+        parcelsSecondDrop.append('<option value="">Informe os dados do cartão para calcular</option>');
+
 }
 
 RMPagSeguro.prototype.updateSenderHash = function(){
@@ -59,8 +65,24 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
         var ccExpYrVisibileElm = jQuery('#rm_pagseguro_cc_cc_year_visible');
         var ccNumVisibleElm = jQuery('.cc_number_visible');
 
+        var ccFirstAmount = jQuery('input[name="payment[ps_first_cc_amount]"]');
+        var ccFirstNumElm = jQuery('input[name="payment[ps_first_cc_number]"]');
+        var ccFirstExpMoElm = jQuery('input[name="payment[ps_first_cc_exp_month]"]');
+        var ccFirstExpYrElm = jQuery('input[name="payment[ps_first_cc_exp_year]"]');
+        var ccFirstCvvElm = jQuery('input[name="payment[ps_first_cc_cid]"]');
+        var ccFirstExpYrVisibileElm = jQuery('#rm_pagseguro_twocc_first_cc_year_visible');
+        var ccFirstNumVisibleElm = jQuery('.first_cc_number_visible');
+
+        var ccSecondAmount = jQuery('input[name="payment[ps_second_cc_amount]"]');
+        var ccSecondNumElm = jQuery('input[name="payment[ps_second_cc_number]"]');
+        var ccSecondExpMoElm = jQuery('input[name="payment[ps_second_cc_exp_month]"]');
+        var ccSecondExpYrElm = jQuery('input[name="payment[ps_second_cc_exp_year]"]');
+        var ccSecondCvvElm = jQuery('input[name="payment[ps_second_cc_cid]"]');
+        var ccSecondExpYrVisibileElm = jQuery('#rm_pagseguro_twocc_second_cc_year_visible');
+        var ccSecondNumVisibleElm = jQuery('.second_cc_number_visible');
+
         jQuery(ccNumElm).keyup(function( event ) {
-            obj.updateCreditCardToken();
+            obj.updateOneCreditCardToken();
         });
         jQuery(ccNumVisibleElm).keyup(function( event ) {
 
@@ -84,20 +106,17 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
                 cc_num = cc_num.trim();
                 return cc_num;
             });
-            obj.updateCreditCardToken();
+            obj.updateOneCreditCardToken();
         });
         jQuery(ccExpMoElm).keyup(function( event ) {
-            obj.updateCreditCardToken();
+            obj.updateOneCreditCardToken();
         });
         jQuery(ccExpYrElm).keyup(function( event ) {
-            obj.updateCreditCardToken();
+            obj.updateOneCreditCardToken();
         });
         jQuery(ccCvvElm).keyup(function( event ) {
-            obj.updateCreditCardToken();
+            obj.updateOneCreditCardToken();
         });
-        /*jQuery(cpf).keyup(function( event ) {
-            obj.updateCreditCardToken();
-        });*/
         jQuery(ccExpYrVisibileElm).keyup(function( event ) {
             var ccExpYr = '';
             if(jQuery(this).val().length == 1) {
@@ -109,23 +128,124 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
             }
             jQuery(ccExpYrElm).val(ccExpYr);
         });
-
-        jQuery( "#pagseguro_cc_method .actions-toolbar .checkout" ).on("click", function() {
-                obj.updateCreditCardToken();
+        jQuery(ccFirstAmount).keyup(function( event ) {
+            obj.updateTwoCreditCardToken('first');
         });
+        jQuery(ccFirstNumElm).keyup(function( event ) {
+            obj.updateTwoCreditCardToken('first');
+        });
+        jQuery(ccFirstNumVisibleElm).keyup(function( event ) {
 
+            jQuery(this).val(function (index, value) {
+                var cc_num;
+                var key = event.which || event.keyCode || event.charCode;
+                if(key == 8) {
+                    cc_num = value.replace(/\s+/g, '');
+                    jQuery(ccFirstNumElm).val(cc_num);
+
+                } else {
+                    if (value != ' ') {
+                        var cc_num_original = value.replace(/\s+/g, '');
+
+                        jQuery(ccFirstNumElm).val(cc_num_original);
+                        jQuery(ccFirstNumElm).keyup();
+                    }
+                }
+
+                cc_num = value.replace(/\W/gi, '').replace(/(.{4})/g, '$1 ');
+                cc_num = cc_num.trim();
+                return cc_num;
+            });
+            obj.updateTwoCreditCardToken('first');
+        });
+        jQuery(ccFirstExpMoElm).keyup(function( event ) {
+            obj.updateTwoCreditCardToken('first');
+        });
+        jQuery(ccFirstExpYrElm).keyup(function( event ) {
+            obj.updateTwoCreditCardToken('first');
+        });
+        jQuery(ccFirstCvvElm).keyup(function( event ) {
+            obj.updateTwoCreditCardToken('first');
+        });
+        jQuery(ccFirstExpYrVisibileElm).keyup(function( event ) {
+            var ccExpYr = '';
+            if(jQuery(this).val().length == 1) {
+                ccExpYr = '200' + jQuery(ccFirstExpYrVisibileElm).val();
+            }
+
+            if(jQuery(this).val().length == 2) {
+                ccExpYr = '20' + jQuery(ccFirstExpYrVisibileElm).val();
+            }
+            jQuery(ccFirstExpYrElm).val(ccExpYr);
+        });
+        jQuery(ccSecondAmount).keyup(function( event ) {
+            obj.updateTwoCreditCardToken('second');
+        });
+        jQuery(ccSecondNumElm).keyup(function( event ) {
+            obj.updateTwoCreditCardToken('second');
+        });
+        jQuery(ccSecondNumVisibleElm).keyup(function( event ) {
+
+            jQuery(this).val(function (index, value) {
+                var cc_num;
+                var key = event.which || event.keyCode || event.charCode;
+                if(key == 8) {
+                    cc_num = value.replace(/\s+/g, '');
+                    jQuery(ccSecondNumElm).val(cc_num);
+
+                } else {
+                    if (value != ' ') {
+                        var cc_num_original = value.replace(/\s+/g, '');
+
+                        jQuery(ccSecondNumElm).val(cc_num_original);
+                        jQuery(ccSecondNumElm).keyup();
+                    }
+                }
+
+                cc_num = value.replace(/\W/gi, '').replace(/(.{4})/g, '$1 ');
+                cc_num = cc_num.trim();
+                return cc_num;
+            });
+            obj.updateTwoCreditCardToken('second');
+        });
+        jQuery(ccSecondExpMoElm).keyup(function( event ) {
+            obj.updateTwoCreditCardToken('second');
+        });
+        jQuery(ccSecondExpYrElm).keyup(function( event ) {
+            obj.updateTwoCreditCardToken('second');
+        });
+        jQuery(ccSecondCvvElm).keyup(function( event ) {
+            obj.updateTwoCreditCardToken('second');
+        });
+        jQuery(ccSecondExpYrVisibileElm).keyup(function( event ) {
+            var ccExpYr = '';
+            if(jQuery(this).val().length == 1) {
+                ccExpYr = '200' + jQuery(ccSecondExpYrVisibileElm).val();
+            }
+
+            if(jQuery(this).val().length == 2) {
+                ccExpYr = '20' + jQuery(ccSecondExpYrVisibileElm).val();
+            }
+            jQuery(ccSecondExpYrElm).val(ccExpYr);
+        });
+        jQuery( "#pagseguro_cc_method .actions-toolbar .checkout" ).on("click", function() {
+                obj.updateOneCreditCardToken();
+        });
         jQuery( "#pagseguro_tef_method .actions-toolbar .checkout" ).on("click", function() {
                 obj.updatePaymentHashes();
         });
-
         jQuery("#rm_pagseguro_cc_cc_installments").change(function( event ) {
             obj.updateInstallments();
         });
-
+        jQuery("#rm_pagseguro_twocc_first_cc_installments").change(function( event ) {
+            obj.updateTwoInstallments('first');
+        });
+        jQuery("#rm_pagseguro_twocc_second_cc_installments").change(function( event ) {
+            obj.updateTwoInstallments('second');
+        });
         jQuery("#pagseguropro_tef_bank").change(function( event ) {
             jQuery(".tefbank").val(jQuery(this).val());
         });
-
         jQuery('#rm_pagseguro_tef').change(function() {
             if(this.checked) {
                obj.removeUnavailableBanks();
@@ -138,6 +258,15 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
 }
 
 RMPagSeguro.prototype.updateCreditCardToken = function(){
+    if (jQuery("input[name='payment[method]']:checked").val() === 'rm_pagseguro_twocc' ) {
+        self.updateTwoCreditCardToken('first');
+        self.updateTwoCreditCardToken('second');
+    } else {
+        self.updateOneCreditCardToken();
+    }
+}
+
+RMPagSeguro.prototype.updateOneCreditCardToken = function() {
     var ccNum = jQuery('input[name="payment[ps_cc_number]"]').val().replace(/^\s+|\s+$/g,'');
     var ccExpMo = jQuery('input[name="payment[ps_cc_exp_month]"]').val().replace(/^\s+|\s+$/g,'');
     var ccExpYr = jQuery('input[name="payment[ps_cc_exp_year]"]').val().replace(/^\s+|\s+$/g,'');
@@ -179,17 +308,88 @@ RMPagSeguro.prototype.updateCreditCardToken = function(){
                 }else if(undefined!=psresponse.errors["30403"]){
                     this.updateSessionId(); //Se sessao expirar, atualizamos a session
                 }else if(undefined!=psresponse.errors["11157"]){
-                    jQuery('#card-cpf-msg').html('CPF invalid value.');
+                    jQuery('#card-cpf-msg').html('CPF inválido.');
                 }else{
-                    jQuery('#card-msg').html('Check your typed card data.');
+                    jQuery('#card-msg').html('Verifique os dados do cartão.');
                 }
-                console.error('Failed to get token from card.');
+                console.error('Falha ao obter token do cartão.');
                 console.log(psresponse.errors);
                 errors = true;
             },
             complete: function(psresponse){
-                 console.info('Card token updated successfully.');
+                 console.info('Token do cartão atualizado com sucesso.');
+            }
+        });
+    }    
+}
 
+RMPagSeguro.prototype.updateTwoCreditCardToken = function(cardLabel){
+    var ccNum = jQuery('input[name="payment[ps_'+ cardLabel +'_cc_number]"]').val().replace(/^\s+|\s+$/g,'');
+    var ccExpMo = jQuery('input[name="payment[ps_'+ cardLabel +'_cc_exp_month]"]').val().replace(/^\s+|\s+$/g,'');
+    var ccExpYr = jQuery('input[name="payment[ps_'+ cardLabel +'_cc_exp_year]"]').val().replace(/^\s+|\s+$/g,'');
+    var ccCvv = jQuery('input[name="payment[ps_'+ cardLabel +'_cc_cid]"]').val().replace(/^\s+|\s+$/g,'');
+    var amount = jQuery('input[name="payment[ps_'+ cardLabel +'_cc_amount]"]').val().replace(',','.');
+    var brandName = '';
+    var self = this;
+
+    if (cardLabel === 'first') {
+        if(typeof this.lastFirstCcNum != "undefined" || ccNum != this.lastFirstCcNum){
+            this.updateTwoBrand(cardLabel);
+            if(typeof this.firstBrand != "undefined"){
+                brandName = this.firstBrand.name;
+            }
+        }
+    } else {
+        if(typeof this.lastSecondCcNum != "undefined" || ccNum != this.lastSecondCcNum){
+            this.updateTwoBrand(cardLabel);
+            if(typeof this.secondBrand != "undefined"){
+                brandName = this.secondBrand.name;
+            }
+        }
+    }
+
+    if(ccNum.length > 6 && ccExpMo != "" && ccExpYr != "" && ccCvv.length >= 3)
+    {
+        PagSeguroDirectPayment.createCardToken({
+            cardNumber: ccNum,
+            brand: brandName,
+            cvv: ccCvv,
+            expirationMonth: ccExpMo,
+            expirationYear: ccExpYr,
+            success: function(psresponse){
+                console.log(psresponse);
+                if (cardLabel === 'first') {
+                    self.creditCardTokenFirst = psresponse.card.token;
+                } else {
+                    self.creditCardTokenSecond = psresponse.card.token;
+                }
+                self.updatePaymentHashes();
+                self.getTwoInstallments(amount, self.installmentsQty, cardLabel);
+                jQuery('#'+cardLabel+'-card-msg').html('');
+            },
+            error: function(psresponse){
+                //TODO: get real message instead of trying to catch all errors in the universe
+                if(undefined!=psresponse.errors["30400"]) {
+                    jQuery('#'+cardLabel+'-card-msg').html('Dados do cartão inválidos. Verifique número, data de validade e CVV.');
+                }else if(undefined!=psresponse.errors["10001"]){
+                    jQuery('#'+cardLabel+'-card-msg').html('Tamanho do cartão inválido.');
+                }else if(undefined!=psresponse.errors["10006"]){
+                    jQuery('#'+cardLabel+'-card-msg').html('Tamanho do CVV inválido.');
+                }else if(undefined!=psresponse.errors["30405"]){
+                    jQuery('#'+cardLabel+'-card-msg').html('Data de validade incorreta.');
+                }else if(undefined!=psresponse.errors["30403"]){
+                    this.updateSessionId(); //Se sessao expirar, atualizamos a session
+                }else if(undefined!=psresponse.errors["11157"]){
+                    jQuery('#card-cpf-msg').html('CPF inválido.');
+                }else{
+                    jQuery('#'+cardLabel+'-card-msg').html('Verifique os dados do cartão.');
+                }
+                console.error('Falha ao obter token do cartão.');
+                console.log(psresponse.errors);
+                errors = true;
+            },
+            complete: function(psresponse){
+                 console.info('Token do cartão atualizado com sucesso.');
             }
         });
     }
@@ -197,13 +397,22 @@ RMPagSeguro.prototype.updateCreditCardToken = function(){
 }
 
 RMPagSeguro.prototype.updateBrand = function(){
+    if (jQuery("input[name='payment[method]']:checked").val() === 'rm_pagseguro_twocc' ) {
+        this.updateTwoBrand('first');
+        this.updateTwoBrand('second');
+    } else {
+        this.updateOneBrand();
+    }
+}
+
+RMPagSeguro.prototype.updateOneBrand = function(){
     var ccNum ='';
     if(jQuery('input[name="payment[ps_cc_number]"]').val()){
         var ccNum = jQuery('input[name="payment[ps_cc_number]"]').val().replace(/^\s+|\s+$/g,'');
     }
     var currentBin = ccNum.substring(0, 6);
-    var flag = this.config.flag;
-    var debug = this.config.debug;
+    var flag = window.rmconfig.flag;
+    var debug = window.rmconfig.debug;
     var self = this;
 
     if(ccNum.length >= 6){
@@ -220,6 +429,59 @@ RMPagSeguro.prototype.updateBrand = function(){
                 self.brand = psresponse.brand;
                 if(flag != ''){
                     jQuery('.cc_number_visible').attr('style','background-image:url("https://stc.pagseguro.uol.com.br/public/img/payment-methods-flags/' +flag + '/' + psresponse.brand.name + '.png") !important');
+                }
+            },
+            error: function(psresponse){
+                console.error('Failed to get card flag.');
+                if(debug){
+                    console.debug('Check the call to / getBin on df.uol.com on your Network inspector for more details.');
+                }
+            }
+        })
+    }
+}
+
+RMPagSeguro.prototype.updateTwoBrand = function(cardLabel){
+    var ccNum ='';
+    if(jQuery('input[name="payment[ps_'+ cardLabel +'_cc_number]"]').val()){
+        var ccNum = jQuery('input[name="payment[ps_'+ cardLabel +'_cc_number]"]').val().replace(/^\s+|\s+$/g,'');
+    }
+    var currentBin = ccNum.substring(0, 6);
+    var flag = window.rmconfig.flag;
+    var debug = window.rmconfig.debug;
+    var self = this;
+
+    if(ccNum.length >= 6){
+        if (cardLabel === 'first') {
+            if (typeof this.cardFirstBin != "undefined" && currentBin == this.cardFirstBin) {
+                if(typeof this.firstBrand != "undefined"){
+                    jQuery('.'+cardLabel+'_cc_number_visible').attr('style','background-image:url("https://stc.pagseguro.uol.com.br/public/img/payment-methods-flags/' +flag + '/' + this.firstBrand.name + '.png") !important');
+                }
+                return;
+            }
+        } else {
+            if (typeof this.cardSecondBin != "undefined" && currentBin == this.cardSecondBin) {
+                if(typeof this.secondBrand != "undefined"){
+                    jQuery('.'+cardLabel+'_cc_number_visible').attr('style','background-image:url("https://stc.pagseguro.uol.com.br/public/img/payment-methods-flags/' +flag + '/' + this.secondBrand.name + '.png") !important');
+                }
+                return;
+            }
+        }
+        if (cardLabel === 'first') {
+            this.cardFirstBin = ccNum.substring(0, 6);
+        } else {
+            this.cardSecondBin = ccNum.substring(0, 6);
+        }
+        PagSeguroDirectPayment.getBrand({
+            cardBin: currentBin,
+            success: function(psresponse){
+                if (cardLabel === 'first') {
+                    self.firstBrand = psresponse.brand;
+                } else {
+                    self.secondBrand = psresponse.brand;
+                }                
+                if(flag != ''){
+                    jQuery('.'+cardLabel+'_cc_number_visible').attr('style','background-image:url("https://stc.pagseguro.uol.com.br/public/img/payment-methods-flags/' +flag + '/' + psresponse.brand.name + '.png") !important');
                 }
             },
             error: function(psresponse){
@@ -253,18 +515,22 @@ RMPagSeguro.prototype.updatePaymentHashes = function(){
         var inputCcType = jQuery('input[name="payment[pagseguropro_cc_cctype]"]');
             inputCcType.val((this.brand)?this.brand.name:'');
         var inputCcIsadmin = jQuery('input[name="payment[pagseguropro_cc_isadmin]"]');
-            inputCcIsadmin.val(this.config.is_admin);
+            inputCcIsadmin.val(window.rmconfig.is_admin);
     }
 
     if (currentSelectedPayment == 'rm_pagseguro_twocc') {
         var inputCcSenderHash = jQuery('input[name="payment[pagseguropro_cc_senderhash]"]');
             inputCcSenderHash.val(this.senderHash);
-        var inputCcToken = jQuery('input[name="payment[pagseguropro_cc_cctoken]"]');
-            inputCcToken.val(this.creditCardToken);
-        var inputCcType = jQuery('input[name="payment[pagseguropro_cc_cctype]"]');
-            inputCcType.val((this.brand)?this.brand.name:'');
+        var inputFirstCcToken = jQuery('input[name="payment[pagseguropro_first_cc_cctoken]"]');
+            inputFirstCcToken.val(this.creditCardTokenFirst);
+        var inputFirstCcType = jQuery('input[name="payment[pagseguropro_first_cc_cctype]"]');
+            inputFirstCcType.val((this.firstBrand)?this.firstBrand.name:'');
+        var inputSecondCcToken = jQuery('input[name="payment[pagseguropro_second_cc_cctoken]"]');
+            inputSecondCcToken.val(this.creditCardTokenSecond);
+        var inputSecondCcType = jQuery('input[name="payment[pagseguropro_second_cc_cctype]"]');
+            inputSecondCcType.val((this.secondBrand)?this.secondBrand.name:'');
         var inputCcIsadmin = jQuery('input[name="payment[pagseguropro_cc_isadmin]"]');
-            inputCcIsadmin.val(this.config.is_admin);
+            inputCcIsadmin.val(window.rmconfig.is_admin);
     }
 }
 
@@ -369,6 +635,72 @@ RMPagSeguro.prototype.getInstallments = function(grandTotal, selectedInstallment
     });
 }
 
+RMPagSeguro.prototype.getTwoInstallments = function(grandTotal, selectedInstallment, cardLabel){
+    var brandName = "";
+    var self = this;
+    if (cardLabel === 'first') {
+        if(typeof this.firstBrand == "undefined"){
+            return;
+        }
+        brandName = this.firstBrand.name;
+    } else if (cardLabel === 'second') { 
+        if(typeof this.secondBrand == "undefined"){
+            return;
+        }
+        brandName = this.secondBrand.name;
+    } else {
+        return;
+    }
+    
+    if(typeof grandTotal == "undefined"){
+       this.getGrandTotal();
+    }
+
+    //this.grandTotal = grandTotal;    
+    PagSeguroDirectPayment.getInstallments({
+        amount: grandTotal,
+        brand: brandName,
+        success: function(response) {
+            var parcelsDrop = jQuery('#rm_pagseguro_twocc_'+ cardLabel +'_cc_installments');
+            var b = response.installments[brandName];
+            parcelsDrop.empty();
+
+            if(window.rmconfig.force_installments_selection == 1){
+                parcelsDrop.append('<option value="" selected="selected">Selecione a quantidade de parcelas</option>');
+            }
+
+            for(var x=0; x < b.length; x++){
+                var optionText = '';
+                var optionVal = '';
+                optionText = b[x].quantity + "x de R$" + b[x].installmentAmount.toFixed(2).toString().replace('.',',');
+                optionText += (b[x].interestFree)?" sem juros":" com juros";
+                if(window.rmconfig.show_total == 1){
+                    optionText += " (total R$" + (b[x].installmentAmount*b[x].quantity).toFixed(2).toString().replace('.', ',') + ")";
+                }
+                optionVal = b[x].quantity + "|" + b[x].installmentAmount;
+                parcelsDrop.append('<option value="'+optionVal+'">'+optionText+'</option>');
+            }
+            if(window.rmconfig.force_installments_selection != 1){
+                jQuery('#rm_pagseguro_twocc_'+ cardLabel +'_cc_installments option[selected="selected"]').each(
+                    function() {
+                        jQuery(this).removeAttr('selected');
+                    }
+                );
+                parcelsDrop.prop("selectedIndex",0);
+            }
+             // updating installment value in checkout session
+              self.updateTwoInstallments(cardLabel);
+        },
+        error: function(response) {
+            console.error('Error getting parcels:');
+            console.error(response);
+        },
+        complete: function(response) {
+             console.log('inside getInstallments complete');
+        }
+    });
+}
+
 RMPagSeguro.prototype.updateInstallments = function(){
     var url = this.storeUrl + 'pseguro/ajax/updateInstallments';
     ccInstallment = jQuery('select[name="payment[ps_cc_installments]"] option:selected').val();
@@ -383,13 +715,42 @@ RMPagSeguro.prototype.updateInstallments = function(){
         type: 'POST',
         data: installmentsData,
         success: function(response){
-            if(self.config.debug){
+            if(window.rmconfig.debug){
                 console.debug('Installments Data updated successfully.');
                 console.debug(installmentsData);
             }
         },
         error: function(response){
-            if(self.config.debug){
+            if(window.rmconfig.debug){
+                console.error('Failed to update Installments Data.');
+                console.error(response);
+            }
+            return false;
+        }
+    });
+}
+
+RMPagSeguro.prototype.updateTwoInstallments = function(cardLabel){
+    var url = this.storeUrl + 'pseguro/ajax/updateInstallments';    
+    ccInstallment = jQuery('select[name="payment[ps_'+ cardLabel +'_cc_installments]"] option:selected').val();
+    var arr = ccInstallment.split("|");
+    this.setInstallmentsQty(arr[0]);
+    var self = this;
+    var installmentsData = {
+        "installment[cc_installment]": ccInstallment,
+    };
+    jQuery.ajax({
+        url: url,
+        type: 'POST',
+        data: installmentsData,
+        success: function(response){
+            if(window.rmconfig.debug){
+                console.debug('Installments Data updated successfully.');
+                console.debug(installmentsData);
+            }
+        },
+        error: function(response){
+            if(window.rmconfig.debug){
                 console.error('Failed to update Installments Data.');
                 console.error(response);
             }
