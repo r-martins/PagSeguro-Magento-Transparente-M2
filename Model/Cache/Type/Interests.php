@@ -46,9 +46,6 @@ class Interests extends TagScope
         $this->eavConfig = $eavConfig;
     }
 
-    /**
-     * 
-     */
     public function clean($mode = \Zend_Cache::CLEANING_MODE_ALL, array $tags = [])
     {
         // checks if interest attributes exist
@@ -61,13 +58,11 @@ class Interests extends TagScope
         $this->_resetInterestProductAttributes();
     }
 
-    /**
-     * 
-     */
-    public function flush($mode = \Zend_Cache::CLEANING_MODE_ALL, array $tags = [])
+    //Nunca utilizado?
+    /*public function flush($mode = \Zend_Cache::CLEANING_MODE_ALL, array $tags = [])
     {
-        $this->_resetInterestProductAttributes();
-    }
+        $this->clean();
+    }*/
 
     /**
      * @param $attributeId
@@ -84,27 +79,27 @@ class Interests extends TagScope
     }
 
     /**
-     * Reset interest product 
+     * Reset interest product
      * attributes values
      */
     private function _resetInterestProductAttributes()
     {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        
+
         /** @var \Magento\Catalog\Model\ResourceModel\Product\Collection $productCollection */
         $productCollection = $objectManager->create('Magento\Catalog\Model\ResourceModel\Product\Collection');
 
-        // only update attributes if 
+        // only update attributes if
         // there are products on catalog
         if($productCollection->getSize() > 0)
         {
             $productIds = [];
-            
+
             foreach($productCollection as $product)
             {
                 $productIds[] = $product->getId();
             }
-            
+
             $productActionObject = $objectManager->create('Magento\Catalog\Model\Product\Action');
             $productActionObject->updateAttributes($productIds, array('rm_interest_options' => ""), 0);
             $productActionObject->updateAttributes($productIds,array('rm_pagseguro_last_update' => 0), 0);
