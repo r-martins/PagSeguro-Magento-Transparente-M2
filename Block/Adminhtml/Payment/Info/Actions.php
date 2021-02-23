@@ -54,6 +54,9 @@ class Actions extends \Magento\Backend\Block\Template
     public function getUpdateOrderUrl()
     {
         $info = $this->getPayment()->getAdditionalInformation();
+        if (isset($info['transaction_id_first']) && isset($info['transaction_id_second'])) {
+            return ["1º" => $this->getUrl('pseguroadmin/update/index', ['transactionId' => $info['transaction_id_first']]), "2º" => $this->getUrl('pseguroadmin/update/index', ['transactionId' => $info['transaction_id_second']])];
+        }
         if (isset($info['transaction_id'])) {
             return $this->getUrl('pseguroadmin/update/index', ['transactionId' => $info['transaction_id']]);
         }

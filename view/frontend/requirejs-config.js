@@ -1,8 +1,7 @@
 var config = {
     map: {
         '*': {
-            'Magento_Checkout/js/model/place-order':'RicardoMartins_PagSeguro/js/model/place-order',
-            inputRMMask: 'RicardoMartins_PagSeguro/jquery.mask'
+            'Magento_Checkout/js/model/place-order':'RicardoMartins_PagSeguro/js/model/place-order'
         }
     }
 };

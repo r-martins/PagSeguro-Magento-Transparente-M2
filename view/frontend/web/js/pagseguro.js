@@ -129,6 +129,7 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
             jQuery(ccExpYrElm).val(ccExpYr);
         });
         jQuery(ccFirstAmount).keyup(function( event ) {
+            obj.updateAmount('first');
             obj.updateTwoCreditCardToken('first');
         });
         jQuery(ccFirstNumElm).keyup(function( event ) {
@@ -179,6 +180,7 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
             jQuery(ccFirstExpYrElm).val(ccExpYr);
         });
         jQuery(ccSecondAmount).keyup(function( event ) {
+            obj.updateAmount('second');
             obj.updateTwoCreditCardToken('second');
         });
         jQuery(ccSecondNumElm).keyup(function( event ) {
@@ -321,6 +323,40 @@ RMPagSeguro.prototype.updateOneCreditCardToken = function() {
             }
         });
     }    
+}
+
+RMPagSeguro.prototype.updateAmount = function(cardLabel) {
+    
+    var orginalValue = parseFloat(this.grandTotal).toFixed(2);
+    var orderAmount = String(orginalValue).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+    orderAmount = orderAmount.replace(/[^0-9]/g, '');
+    orderAmount = Number(orderAmount);
+
+    var value = jQuery('input[name="payment[ps_'+ cardLabel +'_cc_amount]"]').val().replace(',','.');
+    value = value.replace(/[^0-9]/g, '');
+    value = Number(value);
+
+    if (value >= orderAmount) {
+        value = orderAmount - 1;
+    }
+
+    if (isNaN(value) || value == 0) {
+        value = 1;
+    }
+
+    var remaining = orderAmount - value;
+
+    remaining = (remaining / 100).toFixed(2);
+    value = (value / 100).toFixed(2);
+
+    if (cardLabel == 'first') {        
+        jQuery('input[name="payment[ps_second_cc_amount]"]').val(remaining.toString().replace('.', ','));
+    }
+    if (cardLabel == 'second') {
+        jQuery('input[name="payment[ps_first_cc_amount]"]').val(remaining.toString().replace('.', ','));
+    }    
+    jQuery('input[name="payment[ps_'+ cardLabel +'_cc_amount]"]').val(value.toString().replace('.', ','));
+
 }
 
 RMPagSeguro.prototype.updateTwoCreditCardToken = function(cardLabel){

@@ -17,102 +17,6 @@
             </div>
         </div>
         <div class="field number required">
-            <label data-bind="attr: {for: getCode() + '_first_cc_amount'}" class="label">
-                <span><!-- ko i18n: 'Amount For This Credit Card'--><!-- /ko --></span>
-            </label>
-            <div class="control">
-                <input type="text" name="payment[ps_first_cc_amount]" class="input-text money first" value=""
-                    data-bind="attr: {
-                                        autocomplete: off,
-                                        id: getCode() + '_first_cc_amount',
-                                        title: $t('Amount For This Credit Card'),
-                                        'data-container': getCode() + '-first-cc-value',
-                                        'data-validate': JSON.stringify({'required':true})},
-                                value: creditCardFirstAmount,
-                                valueUpdate: 'keyup'"
-                                        />
-            </div>
-        </div>
-        <div class="field number required">
-            <label data-bind="attr: {for: getCode() + '_first_cc_owner'}" class="label">
-                <span><!-- ko i18n: 'Credit Card Owner Name'--><!-- /ko --></span>
-            </label>
-            <div class="control">
-                <input type="text" name="payment[ps_first_cc_owner]" class="input-text" value=""
-                    data-bind="attr: {
-                                        autocomplete: off,
-                                        id: getCode() + '_first_cc_owner',
-                                        title: $t('Credit Card Owner Name'),
-                                        'data-container': getCode() + '-first-cc-owner',
-                                        'data-validate': JSON.stringify({'required':true})},
-                                value: creditCardFirstOwnerName,
-                                valueUpdate: 'keyup'"
-                                        />
-            </div>
-        </div>
-        <!-- ko if: (window.visibleDob)-->
-        <div class="field number required">
-            <label data-bind="attr: {for: getCode() + '_first_cc_owner_birthday_day'}" class="label">
-                <span><!-- ko i18n: 'Date of Birth'--><!-- /ko --></span>
-            </label>
-            <div class="control">
-                <input type="text" name="payment[ps_first_cc_owner_birthday_day]" class="input-text ps_first_cc_birthdate" value=""
-                    data-bind="attr: {
-                                        autocomplete: off,
-                                        placeholder: 'DD',
-                                        id: getCode() + '_first_cc_owner_birthday_day',
-                                        title: $t('DD'),
-                                        'data-container': getCode() + '-first-cc-owner-birthday-day',
-                                        'data-validate': JSON.stringify({'required':true})},
-                                value: creditCardFirstOwnerBirthDay,
-                                valueUpdate: 'keyup'"
-                                        />
-                <input type="text" name="payment[ps_first_cc_owner_birthday_month]" class="input-text ps_first_cc_birthdate" value=""
-                    data-bind="attr: {
-                                        autocomplete: off,
-                                        placeholder: 'MM',
-                                        id: getCode() + '_first_cc_owner_birthday_month',
-                                        title: $t('MM'),
-                                        'data-container': getCode() + '-first-cc-owner-birthday-month',
-                                        'data-validate': JSON.stringify({'required':true})},
-                                value: creditCardFirstOwnerBirthMonth,
-                                valueUpdate: 'keyup'"
-                                        />
-                <input type="text" name="payment[ps_first_cc_owner_birthday_year]" class="input-text ps_first_cc_birthdate" value=""
-                    data-bind="attr: {
-                                        autocomplete: off,
-                                        placeholder: 'YYYY',
-                                        id: getCode() + '_first_cc_owner_birthday_year',
-                                        title: $t('YYYY'),
-                                        'data-container': getCode() + '-first-cc-owner-birthday-year',
-                                        'data-validate': JSON.stringify({'required':true})},
-                                value: creditCardFirstOwnerBirthYear,
-                                valueUpdate: 'keyup'"
-                                        />
-            </div>
-        </div>
-        <!-- /ko -->
-        <!-- ko if: (window.visibleCpf)-->
-        <div class="field number required">
-            <label data-bind="attr: {for: getCode() + '_first_cpf'}" class="label">
-                <span><!-- ko i18n: 'CPF '--><!-- /ko --></span>
-            </label>
-            <div class="control">
-                <input type="text" name="payment[ps_first_cc_cpf]" class="input-text" value=""
-                    data-bind="attr: {
-                                        autocomplete: off,
-                                        id: getCode() + '_first_cpf',
-                                        title: $t('CPF'),
-                                        'data-container': getCode() + '-first-cpf',
-                                        'data-validate': JSON.stringify({'required':true})},
-                                value: creditCardFirstOwnerCpf,
-                                valueUpdate: 'keyup'"
-                                        />
-            </div>
-            <span id="card-cpf-msg"></span>
-        </div>
-        <!-- /ko -->
-        <div class="field number required">
             <label data-bind="attr: {for: getCode() + '_first_cc_number'}" class="label">
                 <span><!-- ko i18n: 'Credit Card Number'--><!-- /ko --></span>
             </label>
@@ -197,6 +101,9 @@
                             'data-container': getCode() + '-first-cc-cvv',
                             'data-validate': JSON.stringify({'required-number':true, 'validate-card-cvv':'#' + getCode() + '_cc_type'})},
                             enable: isActive($parents),
+                            event: {
+                                keypress: function(data, e){ return e.currentTarget.value.length < 4;}
+                            },
                             value: creditCardFirstVerificationNumber" />
                 <div class="field-tooltip toggle">
                     <span class="field-tooltip-action action-cvv"
@@ -212,6 +119,102 @@
             </div>
         </div>
         <!-- /ko -->
+        <div class="field number required">
+            <label data-bind="attr: {for: getCode() + '_first_cc_owner'}" class="label">
+                <span><!-- ko i18n: 'Credit Card Owner Name'--><!-- /ko --></span>
+            </label>
+            <div class="control">
+                <input type="text" name="payment[ps_first_cc_owner]" class="input-text" value=""
+                    data-bind="attr: {
+                                        autocomplete: off,
+                                        id: getCode() + '_first_cc_owner',
+                                        title: $t('Credit Card Owner Name'),
+                                        'data-container': getCode() + '-first-cc-owner',
+                                        'data-validate': JSON.stringify({'required':true})},
+                                value: creditCardFirstOwnerName,
+                                valueUpdate: 'keyup'"
+                                        />
+            </div>
+        </div>
+        <!-- ko if: (window.visibleDob)-->
+        <div class="field number required">
+            <label data-bind="attr: {for: getCode() + '_first_cc_owner_birthday_day'}" class="label">
+                <span><!-- ko i18n: 'Date of Birth'--><!-- /ko --></span>
+            </label>
+            <div class="control">
+                <input type="text" name="payment[ps_first_cc_owner_birthday_day]" class="input-text ps_first_cc_birthdate" value=""
+                    data-bind="attr: {
+                                        autocomplete: off,
+                                        placeholder: 'DD',
+                                        id: getCode() + '_first_cc_owner_birthday_day',
+                                        title: $t('DD'),
+                                        'data-container': getCode() + '-first-cc-owner-birthday-day',
+                                        'data-validate': JSON.stringify({'required':true})},
+                                value: creditCardFirstOwnerBirthDay,
+                                valueUpdate: 'keyup'"
+                                        />
+                <input type="text" name="payment[ps_first_cc_owner_birthday_month]" class="input-text ps_first_cc_birthdate" value=""
+                    data-bind="attr: {
+                                        autocomplete: off,
+                                        placeholder: 'MM',
+                                        id: getCode() + '_first_cc_owner_birthday_month',
+                                        title: $t('MM'),
+                                        'data-container': getCode() + '-first-cc-owner-birthday-month',
+                                        'data-validate': JSON.stringify({'required':true})},
+                                value: creditCardFirstOwnerBirthMonth,
+                                valueUpdate: 'keyup'"
+                                        />
+                <input type="text" name="payment[ps_first_cc_owner_birthday_year]" class="input-text ps_first_cc_birthdate" value=""
+                    data-bind="attr: {
+                                        autocomplete: off,
+                                        placeholder: 'YYYY',
+                                        id: getCode() + '_first_cc_owner_birthday_year',
+                                        title: $t('YYYY'),
+                                        'data-container': getCode() + '-first-cc-owner-birthday-year',
+                                        'data-validate': JSON.stringify({'required':true})},
+                                value: creditCardFirstOwnerBirthYear,
+                                valueUpdate: 'keyup'"
+                                        />
+            </div>
+        </div>
+        <!-- /ko -->
+        <!-- ko if: (window.visibleCpf)-->
+        <div class="field number required">
+            <label data-bind="attr: {for: getCode() + '_first_cpf'}" class="label">
+                <span><!-- ko i18n: 'CPF '--><!-- /ko --></span>
+            </label>
+            <div class="control">
+                <input type="text" name="payment[ps_first_cc_cpf]" class="input-text" value=""
+                    data-bind="attr: {
+                                        autocomplete: off,
+                                        id: getCode() + '_first_cpf',
+                                        title: $t('CPF'),
+                                        'data-container': getCode() + '-first-cpf',
+                                        'data-validate': JSON.stringify({'required':true})},
+                                value: creditCardFirstOwnerCpf,
+                                valueUpdate: 'keyup'"
+                                        />
+            </div>
+            <span id="card-cpf-msg"></span>
+        </div>
+        <!-- /ko -->
+        <div class="field number required">
+            <label data-bind="attr: {for: getCode() + '_first_cc_amount'}" class="label">
+                <span><!-- ko i18n: 'Amount For This Credit Card'--><!-- /ko --></span>
+            </label>
+            <div class="control">
+                <input type="text" name="payment[ps_first_cc_amount]" class="input-text money first" value=""
+                    data-bind="attr: {
+                                        autocomplete: off,
+                                        id: getCode() + '_first_cc_amount',
+                                        title: $t('Amount For This Credit Card'),
+                                        'data-container': getCode() + '-first-cc-value',
+                                        'data-validate': JSON.stringify({'required':true})},
+                                value: creditCardFirstAmount,
+                                valueUpdate: 'keyup'"
+                                        />
+            </div>
+        </div>
         <div class="field date required" data-bind="attr: {id: getCode() + '_first_cc_installments_div'}">
             <label data-bind="attr: {for: getCode() + '_first_cc_installments'}" class="label">
                 <span><!-- ko i18n: 'Installments'--><!-- /ko --></span>
@@ -247,102 +250,6 @@
                        ">
             </div>
         </div>
-        <div class="field number required">
-            <label data-bind="attr: {for: getCode() + '_second_cc_amount'}" class="label">
-                <span><!-- ko i18n: 'Amount For This Credit Card'--><!-- /ko --></span>
-            </label>
-            <div class="control">
-                <input type="text" name="payment[ps_second_cc_amount]" class="input-text money second" value=""
-                    data-bind="attr: {
-                                        autocomplete: off,
-                                        id: getCode() + '_second_cc_amount',
-                                        title: $t('Amount For This Credit Card'),
-                                        'data-container': getCode() + '-second-cc-value',
-                                        'data-validate': JSON.stringify({'required':true})},
-                                value: creditCardSecondAmount,
-                                valueUpdate: 'keyup'"
-                                        />
-            </div>
-        </div>
-         <div class="field number required">
-            <label data-bind="attr: {for: getCode() + '_second_cc_owner'}" class="label">
-                <span><!-- ko i18n: 'Credit Card Owner Name'--><!-- /ko --></span>
-            </label>
-            <div class="control">
-                <input type="text" name="payment[ps_second_cc_owner]" class="input-text" value=""
-                       data-bind="attr: {
-                                        autocomplete: off,
-                                        id: getCode() + '_second_cc_owner',
-                                        title: $t('Credit Card Owner Name'),
-                                        'data-container': getCode() + '-second-cc-owner',
-                                        'data-validate': JSON.stringify({'required':true})},
-                                value: creditCardSecondOwnerName,
-                                valueUpdate: 'keyup'"
-                                        />
-            </div>
-        </div>
-         <!-- ko if: (window.visibleDob)-->
-        <div class="field number required">
-            <label data-bind="attr: {for: getCode() + '_second_cc_owner_birthday_day'}" class="label">
-                <span><!-- ko i18n: 'Date of Birth'--><!-- /ko --></span>
-            </label>
-            <div class="control">
-                <input type="text" name="payment[ps_second_cc_owner_birthday_day]" class="input-text ps_second_cc_birthdate" value=""
-                       data-bind="attr: {
-                                        autocomplete: off,
-                                        placeholder: 'DD',
-                                        id: getCode() + '_second_cc_owner_birthday_day',
-                                        title: $t('DD'),
-                                        'data-container': getCode() + '-second-cc-owner-birthday-day',
-                                        'data-validate': JSON.stringify({'required':true})},
-                                value: creditCardSecondOwnerBirthDay,
-                                valueUpdate: 'keyup'"
-                                        />
-                 <input type="text" name="payment[ps_second_cc_owner_birthday_month]" class="input-text ps_second_cc_birthdate" value=""
-                       data-bind="attr: {
-                                        autocomplete: off,
-                                        placeholder: 'MM',
-                                        id: getCode() + '_second_cc_owner_birthday_month',
-                                        title: $t('MM'),
-                                        'data-container': getCode() + '-second-cc-owner-birthday-month',
-                                        'data-validate': JSON.stringify({'required':true})},
-                                value: creditCardSecondOwnerBirthMonth,
-                                valueUpdate: 'keyup'"
-                                        />
-                   <input type="text" name="payment[ps_second_cc_owner_birthday_year]" class="input-text ps_second_cc_birthdate" value=""
-                       data-bind="attr: {
-                                        autocomplete: off,
-                                        placeholder: 'YYYY',
-                                        id: getCode() + '_second_cc_owner_birthday_year',
-                                        title: $t('YYYY'),
-                                        'data-container': getCode() + '-second-cc-owner-birthday-year',
-                                        'data-validate': JSON.stringify({'required':true})},
-                                value: creditCardSecondOwnerBirthYear,
-                                valueUpdate: 'keyup'"
-                                        />
-            </div>
-        </div>
-         <!-- /ko -->
-         <!-- ko if: (window.visibleCpf)-->
-        <div class="field number required">
-            <label data-bind="attr: {for: getCode() + '_second_cpf'}" class="label">
-                <span><!-- ko i18n: 'CPF '--><!-- /ko --></span>
-            </label>
-            <div class="control">
-                <input type="text" name="payment[ps_second_cc_cpf]" class="input-text" value=""
-                       data-bind="attr: {
-                                        autocomplete: off,
-                                        id: getCode() + '_second_cpf',
-                                        title: $t('CPF'),
-                                        'data-container': getCode() + '-second-cpf',
-                                        'data-validate': JSON.stringify({'required':true})},
-                                value: creditCardSecondOwnerCpf,
-                                valueUpdate: 'keyup'"
-                                        />
-            </div>
-            <span id="card-cpf-msg"></span>
-        </div>
-         <!-- /ko -->
         <div class="field number required">
             <label data-bind="attr: {for: getCode() + '_second_cc_number'}" class="label">
                 <span><!-- ko i18n: 'Credit Card Number'--><!-- /ko --></span>
@@ -419,30 +326,130 @@
             </label>
             <div class="control _with-tooltip">
                 <input type="number"
-                       autocomplete="off"
-                       class="input-text cvv"
-                       name="payment[ps_second_cc_cid]"
-                       value=""
-                       data-bind="attr: {id: getCode() + '_second_cc_cid',
+                        autocomplete="off"
+                        class="input-text cvv"
+                        name="payment[ps_second_cc_cid]"
+                        value=""
+                        data-bind="attr: {id: getCode() + '_second_cc_cid',
                             title: $t('Card Verification Number'),
                             'data-container': getCode() + '-second-cc-cvv',
                             'data-validate': JSON.stringify({'required-number':true, 'validate-card-cvv':'#' + getCode() + '_cc_type'})},
                             enable: isActive($parents),
+                            event: {
+                                keypress: function(data, e){ return e.currentTarget.value.length < 4;}
+                            },
                             value: creditCardSecondVerificationNumber" />
                 <div class="field-tooltip toggle">
                     <span class="field-tooltip-action action-cvv"
-                          tabindex="0"
-                          data-toggle="dropdown"
-                          data-bind="attr: {title: $t('What is this?')}, mageInit: {'dropdown':{'activeClass': '_active'}}">
+                            tabindex="0"
+                            data-toggle="dropdown"
+                            data-bind="attr: {title: $t('What is this?')}, mageInit: {'dropdown':{'activeClass': '_active'}}">
                         <span><!-- ko i18n: 'What is this?'--><!-- /ko --></span>
                     </span>
                     <div class="field-tooltip-content"
-                         data-target="dropdown"
-                         data-bind="html: getCvvImageHtml()"></div>
+                            data-target="dropdown"
+                            data-bind="html: getCvvImageHtml()"></div>
                 </div>
             </div>
         </div>
         <!-- /ko -->
+        <div class="field number required">
+            <label data-bind="attr: {for: getCode() + '_second_cc_owner'}" class="label">
+                <span><!-- ko i18n: 'Credit Card Owner Name'--><!-- /ko --></span>
+            </label>
+            <div class="control">
+                <input type="text" name="payment[ps_second_cc_owner]" class="input-text" value=""
+                       data-bind="attr: {
+                                        autocomplete: off,
+                                        id: getCode() + '_second_cc_owner',
+                                        title: $t('Credit Card Owner Name'),
+                                        'data-container': getCode() + '-second-cc-owner',
+                                        'data-validate': JSON.stringify({'required':true})},
+                                value: creditCardSecondOwnerName,
+                                valueUpdate: 'keyup'"
+                                        />
+            </div>
+        </div>
+        <!-- ko if: (window.visibleDob)-->
+        <div class="field number required">
+            <label data-bind="attr: {for: getCode() + '_second_cc_owner_birthday_day'}" class="label">
+                <span><!-- ko i18n: 'Date of Birth'--><!-- /ko --></span>
+            </label>
+            <div class="control">
+                <input type="text" name="payment[ps_second_cc_owner_birthday_day]" class="input-text ps_second_cc_birthdate" value=""
+                       data-bind="attr: {
+                                        autocomplete: off,
+                                        placeholder: 'DD',
+                                        id: getCode() + '_second_cc_owner_birthday_day',
+                                        title: $t('DD'),
+                                        'data-container': getCode() + '-second-cc-owner-birthday-day',
+                                        'data-validate': JSON.stringify({'required':true})},
+                                value: creditCardSecondOwnerBirthDay,
+                                valueUpdate: 'keyup'"
+                                        />
+                 <input type="text" name="payment[ps_second_cc_owner_birthday_month]" class="input-text ps_second_cc_birthdate" value=""
+                       data-bind="attr: {
+                                        autocomplete: off,
+                                        placeholder: 'MM',
+                                        id: getCode() + '_second_cc_owner_birthday_month',
+                                        title: $t('MM'),
+                                        'data-container': getCode() + '-second-cc-owner-birthday-month',
+                                        'data-validate': JSON.stringify({'required':true})},
+                                value: creditCardSecondOwnerBirthMonth,
+                                valueUpdate: 'keyup'"
+                                        />
+                   <input type="text" name="payment[ps_second_cc_owner_birthday_year]" class="input-text ps_second_cc_birthdate" value=""
+                       data-bind="attr: {
+                                        autocomplete: off,
+                                        placeholder: 'YYYY',
+                                        id: getCode() + '_second_cc_owner_birthday_year',
+                                        title: $t('YYYY'),
+                                        'data-container': getCode() + '-second-cc-owner-birthday-year',
+                                        'data-validate': JSON.stringify({'required':true})},
+                                value: creditCardSecondOwnerBirthYear,
+                                valueUpdate: 'keyup'"
+                                        />
+            </div>
+        </div>
+        <!-- /ko -->
+        <!-- ko if: (window.visibleCpf)-->
+        <div class="field number required">
+            <label data-bind="attr: {for: getCode() + '_second_cpf'}" class="label">
+                <span><!-- ko i18n: 'CPF '--><!-- /ko --></span>
+            </label>
+            <div class="control">
+                <input type="text" name="payment[ps_second_cc_cpf]" class="input-text" value=""
+                       data-bind="attr: {
+                                        autocomplete: off,
+                                        id: getCode() + '_second_cpf',
+                                        title: $t('CPF'),
+                                        'data-container': getCode() + '-second-cpf',
+                                        'data-validate': JSON.stringify({'required':true})},
+                                value: creditCardSecondOwnerCpf,
+                                valueUpdate: 'keyup'"
+                                        />
+            </div>
+            <span id="card-cpf-msg"></span>
+        </div>
+        <!-- /ko -->
+
+        <div class="field number required">
+            <label data-bind="attr: {for: getCode() + '_second_cc_amount'}" class="label">
+                <span><!-- ko i18n: 'Amount For This Credit Card'--><!-- /ko --></span>
+            </label>
+            <div class="control">
+                <input type="text" name="payment[ps_second_cc_amount]" class="input-text money second" value=""
+                    data-bind="attr: {
+                                        autocomplete: off,
+                                        id: getCode() + '_second_cc_amount',
+                                        title: $t('Amount For This Credit Card'),
+                                        'data-container': getCode() + '-second-cc-value',
+                                        'data-validate': JSON.stringify({'required':true})},
+                                value: creditCardSecondAmount,
+                                valueUpdate: 'keyup'"
+                                        />
+            </div>
+        </div>
         <div class="field date required" data-bind="attr: {id: getCode() + '_second_cc_installments_div'}">
             <label data-bind="attr: {for: getCode() + '_second_cc_installments'}" class="label">
                 <span><!-- ko i18n: 'Installments'--><!-- /ko --></span>

@@ -443,12 +443,22 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
                 $info->setAdditionalInformation('installment_quantity_first', (int)$installments[0]);
                 $info->setAdditionalInformation('installment_value_first', $installments[1]);
             }
+        } else {
+            if (isset($data['additional_data']['first_cc_amount'])) {
+                $info->setAdditionalInformation('installment_quantity_first', 1);
+                $info->setAdditionalInformation('installment_value_first', $data['additional_data']['first_cc_amount']);
+            }
         }
         if (isset($data['additional_data']['second_cc_installments'])) {
             $installments = explode('|', $data['additional_data']['second_cc_installments']);
             if (false !== $installments && count($installments)==2) {
                 $info->setAdditionalInformation('installment_quantity_second', (int)$installments[0]);
                 $info->setAdditionalInformation('installment_value_second', $installments[1]);
+            }
+        } else {
+            if (isset($data['additional_data']['second_cc_amount'])) {
+                $info->setAdditionalInformation('installment_quantity_second', 1);
+                $info->setAdditionalInformation('installment_value_second', $data['additional_data']['second_cc_amount']);
             }
         }
 

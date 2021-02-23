@@ -201,17 +201,22 @@ define(
                 var decimalSeparator = ',';
                 var separator = ".";
                 amount = amount.replace(separator, decimalSeparator);
-                var orderAmountOriginal =  amount.replace(decimalSeparator, ".");
+                var orderAmountOriginal =  amount.replace(decimalSeparator, separator);
                 this.amountTotal = quote.getTotals()().grand_total;
                 var amountBalance = (quote.getTotals()().grand_total - orderAmountOriginal).toFixed(2);
-                return amountBalance.replace(".", decimalSeparator);
+                return amountBalance.replace(separator, decimalSeparator);
             },
 
             updAmount: function() {
                 if (this.amountTotal !== quote.getTotals()().grand_total) {
+                    var decimalSeparator = ',';
+                    var separator = ".";
+                    var percentFirst = $('input[name="payment[ps_first_cc_amount]"]').val().replace(',','.') / this.amountTotal;
                     this.amountTotal = quote.getTotals()().grand_total;
-                    this.creditCardFirstAmount(this.getAmountInit());
-                    this.creditCardSecondAmount(this.getAmountInit());
+                    var amountFirst = (this.amountTotal * percentFirst).toFixed(2);
+                    var amountSecond = (this.amountTotal - amountFirst).toFixed(2);
+                    this.creditCardFirstAmount( amountFirst.toString().replace(separator, decimalSeparator) );
+                    this.creditCardSecondAmount( amountSecond.toString().replace(separator, decimalSeparator) );
                 }
             },
 
