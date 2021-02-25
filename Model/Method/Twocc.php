@@ -270,61 +270,112 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
         $email = $this->pagSeguroHelper->getMerchantEmail();
 
         if (isset($transactionIdFirst) && isset($transactionIdSecond)) {
+
+            $transactionIdFirstObj  = $this->pagSeguroHelper->getTransaction($transactionIdFirst, $payment);
+            $transactionIdSecondObj = $this->pagSeguroHelper->getTransaction($transactionIdSecond, $payment);
+
             $errorMsg = [];
 
-            $params = [
-                'transactionCode'   => $transactionIdFirst,
-                'refundValue'       => number_format($payment->getAdditionalInformation('credit_card_amount_first'), 2, '.', '')
-            ];
-    
-            $params['token'] = $token;
-            $params['email'] = $email;
-    
-            try {
-                // call API - refund
-                $returnXml  = $this->pagSeguroHelper->callApi($params, $payment, 'transactions/refunds');
-    
-                if ($returnXml === null) {
-                    $errorMsg[] = 'Impossível gerar reembolso do 1º cartão. Aldo deu errado.';
+            if (false !== $transactionIdFirstObj) {
+                $params = [
+                    'transactionCode'   => $transactionIdFirst,
+                    'refundValue'       => number_format($payment->getAdditionalInformation('credit_card_amount_first'), 2, '.', '')
+                ];
+        
+                $params['token'] = $token;
+                $params['email'] = $email;
+        
+                try {
+                    // call API - refund
+                    $returnXml  = $this->pagSeguroHelper->callApi($params, $payment, 'transactions/refunds');
+        
+                    if ($returnXml === null) {
+                        $errorMsg[] = 'Impossível gerar reembolso do 1º cartão. Aldo deu errado.';
+                    }
+                } catch (\Exception $e) {
+                    $this->debugData(['transaction_id' => $transactionId, 'exception' => $e->getMessage()]);
+                    $this->pagSeguroHelper->writeLog(__('Payment refunding error.'));
+                    $errorMsg[] = __('Payment refunding error.');
                 }
-            } catch (\Exception $e) {
-                $this->debugData(['transaction_id' => $transactionId, 'exception' => $e->getMessage()]);
-                $this->pagSeguroHelper->writeLog(__('Payment refunding error.'));
-                $errorMsg[] = __('Payment refunding error.');
-            }
 
-            $payment
-                ->setTransactionId($transactionIdFirst . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND)
-                ->setParentTransactionId($transactionIdFirst . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH)
-                ->setIsTransactionClosed(1)
-                ->setShouldCloseParentTransaction(1);
-
-            $params = [
-                'transactionCode'   => $transactionIdSecond,
-                'refundValue'       => number_format($payment->getAdditionalInformation('credit_card_amount_second'), 2, '.', '')
-            ];
-    
-            $params['token'] = $token;
-            $params['email'] = $email;
-    
-            try {
-                // call API - refund
-                $returnXml  = $this->pagSeguroHelper->callApi($params, $payment, 'transactions/refunds');
-    
-                if ($returnXml === null) {
-                    $errorMsg[] = 'Impossível gerar reembolso do 2º cartão. Aldo deu errado.';
+                $payment
+                    ->setTransactionId($transactionIdFirst . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND)
+                    ->setParentTransactionId($transactionIdFirst . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH)
+                    ->setIsTransactionClosed(1)
+                    ->setShouldCloseParentTransaction(1);
+            } else {
+                $params = [
+                    'transactionCode'   => $transactionIdFirst
+                ];
+        
+                try {
+                    // call API - cancels
+                    $returnXml  = $this->callApi($params, $payment, 'transactions/cancels/');
+        
+                    if ($returnXml === null) {
+                        $errorMsg[] = 'Impossível cancelar compra do 1º cartão. Aldo deu errado.';
+                    }
+                } catch (\Exception $e) {                    
+                    $this->writeLog(__('Payment cancels error.'));
+                    $errorMsg[] = __('Payment cancels error.');
                 }
-            } catch (\Exception $e) {
-                $this->debugData(['transaction_id' => $transactionId, 'exception' => $e->getMessage()]);
-                $this->pagSeguroHelper->writeLog(__('Payment refunding error.'));
-                $errorMsg[] = __('Payment refunding error.');
-            }
 
-            $payment
-                ->setTransactionId($transactionIdSecond . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND)
-                ->setParentTransactionId($transactionIdSecond . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH)
-                ->setIsTransactionClosed(1)
-                ->setShouldCloseParentTransaction(1);
+                $payment
+                    ->setTransactionId($transactionIdFirst . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_VOID)
+                    ->setParentTransactionId($transactionIdFirst . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH)
+                    ->setIsTransactionClosed(1)
+                    ->setShouldCloseParentTransaction(1);
+            }
+            if (false !== $transactionIdSecondObj) {
+                $params = [
+                    'transactionCode'   => $transactionIdSecond,
+                    'refundValue'       => number_format($payment->getAdditionalInformation('credit_card_amount_second'), 2, '.', '')
+                ];
+        
+                $params['token'] = $token;
+                $params['email'] = $email;
+        
+                try {
+                    // call API - refund
+                    $returnXml  = $this->pagSeguroHelper->callApi($params, $payment, 'transactions/refunds');
+        
+                    if ($returnXml === null) {
+                        $errorMsg[] = 'Impossível gerar reembolso do 2º cartão. Aldo deu errado.';
+                    }
+                } catch (\Exception $e) {
+                    $this->debugData(['transaction_id' => $transactionId, 'exception' => $e->getMessage()]);
+                    $this->pagSeguroHelper->writeLog(__('Payment refunding error.'));
+                    $errorMsg[] = __('Payment refunding error.');
+                }
+
+                $payment
+                    ->setTransactionId($transactionIdSecond . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND)
+                    ->setParentTransactionId($transactionIdSecond . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH)
+                    ->setIsTransactionClosed(1)
+                    ->setShouldCloseParentTransaction(1);
+            } else {
+                $params = [
+                    'transactionCode'   => $transactionIdSecond
+                ];
+        
+                try {
+                    // call API - cancels
+                    $returnXml  = $this->callApi($params, $payment, 'transactions/cancels/');
+        
+                    if ($returnXml === null) {
+                        $errorMsg[] = 'Impossível cancelar compra do 2º cartão. Aldo deu errado.';
+                    }
+                } catch (\Exception $e) {
+                    $this->writeLog(__('Payment cancels error.'));
+                    $errorMsg[] = __('Payment cancels error.');
+                }
+
+                $payment
+                    ->setTransactionId($transactionIdSecond . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_VOID)
+                    ->setParentTransactionId($transactionIdSecond . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH)
+                    ->setIsTransactionClosed(1)
+                    ->setShouldCloseParentTransaction(1);
+            }
 
             if (count($errorMsg) > 0) {
                 $errorMsg = implode ( "\n", array_unique($errorMsg));

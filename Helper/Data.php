@@ -714,7 +714,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $return = [
                 'installmentQuantity'   => $payment->getAdditionalInformation('installment_quantity' . $cc),
                 'installmentValue'      => number_format(
-                    $payment->getAdditionalInformation('installment_value' . $cc),
+                    floatval(str_replace(",",".", $payment->getAdditionalInformation('installment_value' . $cc))),
                     2,
                     '.',
                     ''
@@ -1393,14 +1393,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                     ->setParentTransactionId($transactionIdFirst . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH)
                     ->setIsTransactionClosed(1)
                     ->setShouldCloseParentTransaction(1);
-            }/* else {
+            } else {
                 $params = [
-                    'transactionCode'   => $transactionIdFirst,
-                    'refundValue'       => number_format(str_replace(",",".", $amountFirst), 2, '.', '')
+                    'transactionCode'   => $transactionIdFirst
                 ];
-        
-                $params['token'] = $token;
-                $params['email'] = $email;
         
                 try {
                     // call API - cancels
@@ -1415,12 +1411,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 }
 
                 $payment
-                    ->setTransactionId($transactionIdFirst . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND)
+                    ->setTransactionId($transactionIdFirst . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_VOID)
                     ->setParentTransactionId($transactionIdFirst . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH)
                     ->setIsTransactionClosed(1)
                     ->setShouldCloseParentTransaction(1);
-            }*/
-            
+            }
+            $payment->save();
             if (false !== $transactionIdSecondObj) {
                 $params = [
                     'transactionCode'   => $transactionIdSecond,
@@ -1447,14 +1443,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                     ->setParentTransactionId($transactionIdSecond . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH)
                     ->setIsTransactionClosed(1)
                     ->setShouldCloseParentTransaction(1);
-            } /*else {
+            } else {
                 $params = [
-                    'transactionCode'   => $transactionIdSecond,
-                    'refundValue'       => number_format(str_replace(",",".", $amountSecond), 2, '.', '')
+                    'transactionCode'   => $transactionIdSecond
                 ];
-        
-                $params['token'] = $token;
-                $params['email'] = $email;
         
                 try {
                     // call API - cancels
@@ -1469,12 +1461,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 }
 
                 $payment
-                    ->setTransactionId($transactionIdSecond . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND)
+                    ->setTransactionId($transactionIdSecond . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_VOID)
                     ->setParentTransactionId($transactionIdSecond . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH)
                     ->setIsTransactionClosed(1)
                     ->setShouldCloseParentTransaction(1);
-            }*/
-
+            }
+            $payment->save();
             if (count($errorMsg) > 0) {
                 $errorMsg = implode ( "\n", array_unique($errorMsg));
                 throw new \Magento\Framework\Validator\Exception(__($errorMsg));
