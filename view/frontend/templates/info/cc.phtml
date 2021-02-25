@@ -9,7 +9,7 @@ $info = $block->getPaymentInfo();
     <p>Bandeira: <?php echo ucwords($info['credit_card_type_first']); ?></p>
     <?php endif?>
     <?php if (isset($info['installment_quantity_first']) && isset($info['installment_value_first'])) : ?>
-    <p>Parcelas: <?php echo $info['installment_quantity_first']?> (R$ <?php echo number_format($info['installment_value_first'], 2, ',', '.')?>)</p>
+    <p>Parcelas: <?php echo $info['installment_quantity_first']?> (R$ <?php echo number_format(str_replace(',','.',$info['installment_value_first']), 2, ',', '.')?>)</p>
     <?php endif?>
     <?php if (isset($info['transaction_id_first'])) : ?>
         <p>Código da transação do 1º cartão: <?php echo $info['transaction_id_first']?></p>
@@ -19,7 +19,7 @@ $info = $block->getPaymentInfo();
     <p>Bandeira: <?php echo ucwords($info['credit_card_type_second']); ?></p>
     <?php endif?>
     <?php if (isset($info['installment_quantity_second']) && isset($info['installment_value_second'])) : ?>
-    <p>Parcelas: <?php echo $info['installment_quantity_second']?> (R$ <?php echo number_format($info['installment_value_second'], 2, ',', '.')?>)</p>
+    <p>Parcelas: <?php echo $info['installment_quantity_second']?> (R$ <?php echo number_format(str_replace(',','.',$info['installment_value_second']), 2, ',', '.')?>)</p>
     <?php endif?>
     <?php if (isset($info['transaction_id_second'])) : ?>
         <p>Código da transação do 2º cartão: <?php echo $info['transaction_id_second']?></p>
