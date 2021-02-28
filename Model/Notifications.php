@@ -127,6 +127,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                 $payment = $_payment;
             } else {
                 $orderNo = (string)$resultXML->reference;
+//                $order = $this->orderModel->loadByIncrementId($orderNo);
                 $searchCriteria = $this->searchCriteriaBuilder
                     ->addFilter('increment_id', $orderNo, 'eq')->create();
                 $orderList = $this->orderRepository->getList($searchCriteria)->getItems();
@@ -136,7 +137,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                 if (!$order) {
                     $this->pagSeguroHelper->writeLog(
                         new \Magento\Framework\Phrase(
-                            'Order %s not found on system. Unable to process return. '
+                            'Order %1 not found on system. Unable to process return. '
                                 . 'A new attempt may happen in a few minutes.',
                             [$orderNo]
                         )
@@ -246,7 +247,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                 $order->addStatusHistoryComment($message);
             }
 
-            if ((int)$resultXML->status == 3) {
+            if (in_array((int)$resultXML->status, array(3, 4))) { //Pago ou Disponivel
 
                 if ($this->_code === \RicardoMartins\PagSeguro\Model\Method\Twocc::CODE) {
                     $transaction_id = (string)$resultXML->code;
