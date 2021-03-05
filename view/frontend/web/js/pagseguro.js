@@ -130,7 +130,10 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
         });
         jQuery(ccFirstAmount).keyup(function( event ) {
             obj.updateAmount('first');
-            obj.updateTwoCreditCardToken('first');
+            obj.updateTwoCreditCardToken('first');            
+        });
+        jQuery(ccFirstAmount).blur(function(event){
+            obj.updateTwoCreditCardToken('second');
         });
         jQuery(ccFirstNumElm).keyup(function( event ) {
             obj.updateTwoCreditCardToken('first');
@@ -182,6 +185,9 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
         jQuery(ccSecondAmount).keyup(function( event ) {
             obj.updateAmount('second');
             obj.updateTwoCreditCardToken('second');
+        });
+        jQuery(ccSecondAmount).blur(function(event){
+            obj.updateTwoCreditCardToken('first');
         });
         jQuery(ccSecondNumElm).keyup(function( event ) {
             obj.updateTwoCreditCardToken('second');
@@ -354,9 +360,8 @@ RMPagSeguro.prototype.updateAmount = function(cardLabel) {
     }
     if (cardLabel == 'second') {
         jQuery('input[name="payment[ps_first_cc_amount]"]').val(remaining.toString().replace('.', ','));
-    }    
+    }
     jQuery('input[name="payment[ps_'+ cardLabel +'_cc_amount]"]').val(value.toString().replace('.', ','));
-
 }
 
 RMPagSeguro.prototype.updateTwoCreditCardToken = function(cardLabel){
@@ -692,12 +697,12 @@ RMPagSeguro.prototype.getTwoInstallments = function(grandTotal, selectedInstallm
        this.getGrandTotal();
     }
 
-    //this.grandTotal = grandTotal;    
     PagSeguroDirectPayment.getInstallments({
         amount: grandTotal,
         brand: brandName,
         success: function(response) {
             var parcelsDrop = jQuery('#rm_pagseguro_twocc_'+ cardLabel +'_cc_installments');
+            var value = jQuery('#rm_pagseguro_twocc_'+ cardLabel +'_cc_installments option:selected').val().split("|")[0];
             var b = response.installments[brandName];
             parcelsDrop.empty();
 
@@ -714,18 +719,19 @@ RMPagSeguro.prototype.getTwoInstallments = function(grandTotal, selectedInstallm
                     optionText += " (total R$" + (b[x].installmentAmount*b[x].quantity).toFixed(2).toString().replace('.', ',') + ")";
                 }
                 optionVal = b[x].quantity + "|" + b[x].installmentAmount;
-                parcelsDrop.append('<option value="'+optionVal+'">'+optionText+'</option>');
+                isSelected = (Number(value) == b[x].quantity)?" selected=\"selected\"":""
+                parcelsDrop.append('<option value="'+optionVal+'"'+isSelected+'>'+optionText+'</option>');
             }
-            if(window.rmconfig.force_installments_selection != 1){
+            if(window.rmconfig.force_installments_selection == 1){
                 jQuery('#rm_pagseguro_twocc_'+ cardLabel +'_cc_installments option[selected="selected"]').each(
                     function() {
                         jQuery(this).removeAttr('selected');
                     }
                 );
                 parcelsDrop.prop("selectedIndex",0);
-            }
-             // updating installment value in checkout session
-              self.updateTwoInstallments(cardLabel);
+            } 
+            // updating installment value in checkout session
+            self.updateTwoInstallments(cardLabel);
         },
         error: function(response) {
             console.error('Error getting parcels:');
