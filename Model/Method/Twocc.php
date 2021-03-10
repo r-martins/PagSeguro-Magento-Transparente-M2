@@ -126,6 +126,8 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
         /*@var \Magento\Sales\Model\Order $order */
         $order = $payment->getOrder();
 
+        $transactions = [];
+
         try {
 
             //will grab data to be send via POST to API inside $params
@@ -135,24 +137,9 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
             //call API
             $returnXmlFirst = $this->pagSeguroHelper->callApi($params, $payment);
 
-            //Second Credit Card
-            $params = $this->pagSeguroHelper->getCreditCardApiCallParams($order, $payment, '_second');
-            //call API
-            $returnXmlSecond = $this->pagSeguroHelper->callApi($params, $payment);
-
             if (isset($returnXmlFirst->errors)) {
                 $errMsg = [];
                 foreach ($returnXmlFirst->errors as $error) {
-                    $message = $this->pagSeguroHelper->translateError((string)$error->message);
-                    $errMsg[] = $message . '(' . $error->code . ')';
-                }
-                throw new \Magento\Framework\Validator\Exception(
-                    'Um ou mais erros ocorreram no seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg)
-                );
-            }
-            if (isset($returnXmlSecond->errors)) {
-                $errMsg = [];
-                foreach ($returnXmlSecond->errors as $error) {
                     $message = $this->pagSeguroHelper->translateError((string)$error->message);
                     $errMsg[] = $message . '(' . $error->code . ')';
                 }
@@ -170,24 +157,53 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
                 );
             }
 
+            $transactionId  = (string)$returnXmlFirst->code;
+            $data = $payment->getAdditionalInformation();
+            $amount = $data['credit_card_amount_first'];
+            $transactions[] = [$transactionId, $amount];
+
+            /* process return result code status*/
+            if ((int)$returnXmlFirst->status == 6 || (int)$returnXmlFirst->status == 7) {
+                throw new \Magento\Framework\Validator\Exception('An error occurred in your payment.');
+            }
+            
+            //Second Credit Card
+            $params = $this->pagSeguroHelper->getCreditCardApiCallParams($order, $payment, '_second');
+            //call API
+            $returnXmlSecond = $this->pagSeguroHelper->callApi($params, $payment);
+
+            if (isset($returnXmlSecond->errors)) {
+                $errMsg = [];
+                foreach ($returnXmlSecond->errors as $error) {
+                    $message = $this->pagSeguroHelper->translateError((string)$error->message);
+                    $errMsg[] = $message . '(' . $error->code . ')';
+                }
+
+                $this->pagSeguroHelper->TransactionCancel($payment, $transactionId, $amount);
+                throw new \Magento\Framework\Validator\Exception(
+                    'Um ou mais erros ocorreram no seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg)
+                );
+            }
+
             if (isset($returnXmlSecond->error)) {
                 $error = $returnXmlSecond->error;
                 $message = $this->pagSeguroHelper->translateError((string)$error->message);
                 $errMsg[] = $message . ' (' . $error->code . ')';
+                $this->pagSeguroHelper->TransactionCancel($payment, $transactionId, $amount);
                 throw new \Magento\Framework\Validator\Exception(
                     'Um erro ocorreu em seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg)
                 );
             }
 
             /* process return result code status*/
-            if ((int)$returnXmlFirst->status == 6 || (int)$returnXmlFirst->status == 7) {
+            if ((int)$returnXmlSecond->status == 6 || (int)$returnXmlSecond->status == 7) {
+                $this->pagSeguroHelper->TransactionCancel($payment, $transactionId, $amount);
                 throw new \Magento\Framework\Validator\Exception('An error occurred in your payment.');
             }
 
-            /* process return result code status*/
-            if ((int)$returnXmlSecond->status == 6 || (int)$returnXmlSecond->status == 7) {
-                throw new \Magento\Framework\Validator\Exception('An error occurred in your payment.');
-            }
+            $transactionId  = (string)$returnXmlSecond->code;            
+            $amount = $data['credit_card_amount_second'];
+            $transactions[] = [$transactionId, $amount];
 
             $payment->setSkipOrderProcessing(true);
 
@@ -241,7 +257,9 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
             $this->pagSeguroAbModel->proccessNotificatonResult($returnXmlSecond, $payment);
 
         } catch (\Exception $e) {
-
+            foreach($transactions as $transaction) {
+                $this->pagSeguroHelper->TransactionCancel($payment, $transaction[0], $transaction[1]);
+            }
             throw new \Magento\Framework\Exception\LocalizedException(__($e->getMessage()));
         }
         return $this;
@@ -413,6 +431,36 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
         }
 
         return $this;
+    }
+
+    private function TransactionCancel($payment, $transactionId, $amount) {
+        
+        $token = $this->getToken();
+        $email = $this->getMerchantEmail();
+
+        $errorMsg = [];
+
+        $params = [
+            'transactionCode'   => $transactionIdFirst
+        ];
+        
+        try {
+            // call API - cancels
+            $returnXml  = $this->pagSeguroHelper->callApi($params, $payment, 'transactions/cancels/');
+
+            if ($returnXml === null) {
+                $errorMsg[] = 'Impossível cancelar compra . Aldo deu errado.';
+            }
+        } catch (\Exception $e) {                    
+            $this->writeLog(__('Payment cancels error.'));
+            $errorMsg[] = __('Payment cancels error.');
+        }
+
+        if (count($errorMsg) > 0) {
+            $errorMsg = implode ( "\n", array_unique($errorMsg));
+            throw new \Magento\Framework\Validator\Exception(__($errorMsg));
+        }
+
     }
 
     /**
