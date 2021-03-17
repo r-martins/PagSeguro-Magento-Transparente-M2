@@ -341,8 +341,12 @@ class Cc extends \Magento\Payment\Model\Method\Cc
      */
     public function validate()
     {
-        if(stristr($this->request->getUriString(),"/set-payment-information"))
+        if( stristr($this->request->getUriString(),"/set-payment-information") || 
+            stristr($this->request->getUriString(),"/selected-payment-method")
+        ) {
             return $this;
+        }
+
         $info = $this->getInfoInstance();
 
         $senderHash = $info->getAdditionalInformation('sender_hash');
