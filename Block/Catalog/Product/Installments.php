@@ -44,7 +44,7 @@ class Installments extends Template
         if (!$this->_scopeConfig->getValue(
             'payment/rm_pagseguro_cc/show_installments_product_page', ScopeInterface::SCOPE_WEBSITE
         )) {
-            return;
+            return "";
         }
         $product = $this->getProduct();
         if (in_array($product->getTypeId(), ['configurable', 'bundle', 'grouped'])) {
@@ -55,14 +55,34 @@ class Installments extends Template
             return "";
         }
 
+        $showOnlyInterestFreeFlag = $this->_scopeConfig->getValue(
+            'payment/rm_pagseguro_cc/show_installments_product_page_interest_free_only', ScopeInterface::SCOPE_WEBSITE
+        );
+
         $interest_array = json_decode($interest_options, true);
+        
+        if(!$interest_array || !isset($interest_array['installments']['visa']))
+        {
+            return "";
+        }
+        
         $maximum = 0;
         $value = 0;
+        $isInterestFree = false;
+
         foreach ($interest_array['installments']['visa'] as $installment_option) {
-            if ($installment_option['interestFree'] && $installment_option['quantity']>$maximum) {
-                $maximum = $installment_option['quantity'];
-                $value = $installment_option['installmentAmount'];
+            
+            if($showOnlyInterestFreeFlag && !$installment_option['interestFree']) {
+                continue;
             }
+            
+            if ($installment_option['quantity'] <= $maximum) {
+                continue;
+            }
+
+            $maximum = $installment_option['quantity'];
+            $value = $installment_option['installmentAmount'];
+            $isInterestFree = $installment_option['interestFree'];
         }
 
         if (!$maximum || $maximum == 1) {
@@ -70,7 +90,7 @@ class Installments extends Template
         }
 
         $text = "<div class='ps_installments_external'><div id='ps_installments_max'>Em até " . $maximum . "x de "
-            . "R$" . number_format($value, 2, ",", ".") . " sem juros no Cartão com PagSeguro</div>";
+            . "R$" . number_format($value, 2, ",", ".") . ($isInterestFree ? " sem juros" : "") . " no Cartão com PagSeguro</div>";
 
         $text .= $this->getInstallmentsList($interest_options);
 

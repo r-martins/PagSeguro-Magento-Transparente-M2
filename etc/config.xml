@@ -15,6 +15,8 @@
                 <info_brl>1</info_brl>
                 <show_total>0</show_total>
                 <force_installments_selection>0</force_installments_selection>
+                <show_installments_product_page>0</show_installments_product_page>
+                <show_installments_product_page_interest_free_only>0</show_installments_product_page_interest_free_only>
             </rm_pagseguro_cc>
             <rm_pagseguro>
                 <title>PagSeguro UOL</title>
