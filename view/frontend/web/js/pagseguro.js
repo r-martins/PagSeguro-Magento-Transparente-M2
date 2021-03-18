@@ -357,11 +357,14 @@ RMPagSeguro.prototype.updateAmount = function(cardLabel) {
 
     if (cardLabel == 'first') {        
         jQuery('input[name="payment[ps_second_cc_amount]"]').val(remaining.toString().replace('.', ','));
+        jQuery('input[name="payment[pagseguropro_second_cc_amount]"]').val(remaining.toString().replace('.', ','));
     }
     if (cardLabel == 'second') {
         jQuery('input[name="payment[ps_first_cc_amount]"]').val(remaining.toString().replace('.', ','));
+        jQuery('input[name="payment[pagseguropro_first_cc_amount]"]').val(remaining.toString().replace('.', ','));
     }
     jQuery('input[name="payment[ps_'+ cardLabel +'_cc_amount]"]').val(value.toString().replace('.', ','));
+    jQuery('input[name="payment[pagseguropro_'+ cardLabel +'_cc_amount]"]').val(value.toString().replace('.', ','));
 }
 
 RMPagSeguro.prototype.updateTwoCreditCardToken = function(cardLabel){
