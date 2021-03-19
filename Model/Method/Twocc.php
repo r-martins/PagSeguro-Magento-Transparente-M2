@@ -179,7 +179,7 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
                     $errMsg[] = $message . '(' . $error->code . ')';
                 }
 
-                $this->pagSeguroHelper->TransactionCancel($payment, $transactionId, $amount);
+                $this->TransactionCancel($payment, $transactionId);
                 throw new \Magento\Framework\Validator\Exception(
                     'Um ou mais erros ocorreram no seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg)
                 );
@@ -189,7 +189,7 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
                 $error = $returnXmlSecond->error;
                 $message = $this->pagSeguroHelper->translateError((string)$error->message);
                 $errMsg[] = $message . ' (' . $error->code . ')';
-                $this->pagSeguroHelper->TransactionCancel($payment, $transactionId, $amount);
+                $this->TransactionCancel($payment, $transactionId);
                 throw new \Magento\Framework\Validator\Exception(
                     'Um erro ocorreu em seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg)
                 );
@@ -197,7 +197,7 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
 
             /* process return result code status*/
             if ((int)$returnXmlSecond->status == 6 || (int)$returnXmlSecond->status == 7) {
-                $this->pagSeguroHelper->TransactionCancel($payment, $transactionId, $amount);
+                $this->TransactionCancel($payment, $transactionId);
                 throw new \Magento\Framework\Validator\Exception('An error occurred in your payment.');
             }
 
@@ -258,7 +258,7 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
 
         } catch (\Exception $e) {
             foreach($transactions as $transaction) {
-                $this->pagSeguroHelper->TransactionCancel($payment, $transaction[0], $transaction[1]);
+                $this->TransactionCancel($payment, $transaction[0]);
             }
             throw new \Magento\Framework\Exception\LocalizedException(__($e->getMessage()));
         }
@@ -433,7 +433,7 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
         return $this;
     }
 
-    private function TransactionCancel($payment, $transactionId, $amount) {
+    private function TransactionCancel($payment, $transactionId) {
         
         $token = $this->getToken();
         $email = $this->getMerchantEmail();
@@ -441,7 +441,7 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
         $errorMsg = [];
 
         $params = [
-            'transactionCode'   => $transactionIdFirst
+            'transactionCode'   => $transactionId
         ];
         
         try {
