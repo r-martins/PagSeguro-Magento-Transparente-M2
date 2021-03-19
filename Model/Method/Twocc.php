@@ -157,15 +157,13 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
                 );
             }
 
-            $transactionId  = (string)$returnXmlFirst->code;
-            $data = $payment->getAdditionalInformation();
-            $amount = $data['credit_card_amount_first'];
-            $transactions[] = [$transactionId, $amount];
-
             /* process return result code status*/
             if ((int)$returnXmlFirst->status == 6 || (int)$returnXmlFirst->status == 7) {
                 throw new \Magento\Framework\Validator\Exception('An error occurred in your payment.');
             }
+
+            $transactionId  = (string)$returnXmlFirst->code;
+            $transactions[] = $transactionId;
             
             //Second Credit Card
             $params = $this->pagSeguroHelper->getCreditCardApiCallParams($order, $payment, '_second');
@@ -201,9 +199,8 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
                 throw new \Magento\Framework\Validator\Exception('An error occurred in your payment.');
             }
 
-            $transactionId  = (string)$returnXmlSecond->code;            
-            $amount = $data['credit_card_amount_second'];
-            $transactions[] = [$transactionId, $amount];
+            $transactionId  = (string)$returnXmlSecond->code;
+            $transactions[] = $transactionId;
 
             $payment->setSkipOrderProcessing(true);
 
@@ -258,7 +255,7 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
 
         } catch (\Exception $e) {
             foreach($transactions as $transaction) {
-                $this->TransactionCancel($payment, $transaction[0]);
+                $this->TransactionCancel($payment, $transaction);
             }
             throw new \Magento\Framework\Exception\LocalizedException(__($e->getMessage()));
         }
