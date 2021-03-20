@@ -3,3 +3,10 @@ plugins:
         enabled: true
         config:
             standard: "MEQP2"
+    phpmd:
+        enabled: true
+        config:
+            file_extensions:
+                - php
+                - phtml
+            rulesets: "ruleset-meqp2.xml"
