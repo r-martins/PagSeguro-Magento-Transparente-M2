@@ -131,6 +131,12 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Beta: this feature is in tests. You must enable your cronjob and the corresponding PagSeguro cache in the cache section to work properly. Currently available only for simple, digital and virtual products.</comment>
                 </field>
+                <field id="show_installments_product_page_interest_free_only" translate="label" type="select" sortOrder="13" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Only display interest free installment options</label>
+                    <depends><field id="show_installments_product_page">1</field></depends>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>If the configured value is Yes, only the maximum number of parcels without interest will be shown in the product page and, if there isn't more then 1 installment without interest, no message will be shown at all.</comment>
+                </field>
             </group>
              <!--Boleto / Bank billet-->
             <group id="rm_pagseguro_boleto" translate="label" sortOrder="21" showInDefault="1" showInWebsite="1" showInStore="1">

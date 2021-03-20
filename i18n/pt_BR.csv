@@ -258,3 +258,5 @@
 "YYYY","AAAA"
 "Order %1 not found on system. Unable to process return. A new attempt may happen in a few minutes.","Pedido %1 não encontrado. Impossível processar o retorno. Uma nova tentativa deve ocorrer em alguns minutos."
 "Failed to process PagSeguro response. A new attempt may happen in a few minutes.","Falha ao processar retorno do PagSeguro. Uma nova tentativa deve ocorrer em alguns minutos."
+"Only display interest free installment options","Exibir apenas parcelas sem juros"
+"If the configured value is Yes, only the maximum number of parcels without interest will be shown in the product page and, if there isn't more then 1 installment without interest, no message will be shown at all.","Caso o valor configurado seja Sim, o número máximo de parcelas mostrado na mensagem considerará somente as que não possuem juros. Caso não haja parcelamento sem juros disponível (somente à vista), a mensagem não será mostrada."
