@@ -5,6 +5,7 @@
     </legend><br />
     <!-- /ko -->
     <div class="first-card">
+        <h3>1º <!-- ko i18n: 'Credit Card'--><!-- /ko --></h3>
         <div class="field type">
             <div class="control">
                 <input type="hidden"
@@ -17,12 +18,29 @@
             </div>
         </div>
         <div class="field number required">
+            <label data-bind="attr: {for: getCode() + '_first_cc_amount'}" class="label">
+                <span><!-- ko i18n: 'Amount For This Credit Card'--><!-- /ko --></span>
+            </label>
+            <div class="control">
+                <input type="tel" name="payment[ps_first_cc_amount]" class="input-text money first" value=""
+                    data-bind="attr: {
+                                autocomplete: off,
+                                id: getCode() + '_first_cc_amount',
+                                title: $t('Amount For This Credit Card'),
+                                'data-container': getCode() + '-first-cc-value',
+                                'data-validate': JSON.stringify({'required':true})},
+                                value: creditCardFirstAmount,
+                                valueUpdate: 'keyup'"
+                                />
+            </div>
+        </div>
+        <div class="field number required">
             <label data-bind="attr: {for: getCode() + '_first_cc_number'}" class="label">
                 <span><!-- ko i18n: 'Credit Card Number'--><!-- /ko --></span>
             </label>
             <div class="control">
             <div class="cc-number-input">
-                <input type="text" class="input-text first_cc_number_visible" value=""
+                <input type="tel" class="input-text first_cc_number_visible" value=""
                     data-bind="attr: {
                                 autocomplete: off,
                                 id: getCode() + '_first_cc_number_visible'},
@@ -142,7 +160,7 @@
                 <span><!-- ko i18n: 'Date of Birth'--><!-- /ko --></span>
             </label>
             <div class="control">
-                <input type="text" name="payment[ps_first_cc_owner_birthday_day]" class="input-text ps_first_cc_birthdate" value="" maxlength="2" max="31"
+                <input type="tel" name="payment[ps_first_cc_owner_birthday_day]" class="input-text ps_first_cc_birthdate" value="" maxlength="2" max="31"
                     data-bind="attr: {
                                 autocomplete: off,
                                 placeholder: 'DD',
@@ -153,7 +171,7 @@
                                 value: creditCardFirstOwnerBirthDay,
                                 valueUpdate: 'keyup'"
                                 />
-                <input type="text" name="payment[ps_first_cc_owner_birthday_month]" class="input-text ps_first_cc_birthdate" value="" maxlength="2" max="12"
+                <input type="tel" name="payment[ps_first_cc_owner_birthday_month]" class="input-text ps_first_cc_birthdate" value="" maxlength="2" max="12"
                     data-bind="attr: {
                                 autocomplete: off,
                                 placeholder: 'MM',
@@ -164,7 +182,7 @@
                                 value: creditCardFirstOwnerBirthMonth,
                                 valueUpdate: 'keyup'"
                                 />
-                <input type="text" name="payment[ps_first_cc_owner_birthday_year]" class="input-text ps_first_cc_birthdate" value="" maxlength="4" max="2015"
+                <input type="tel" name="payment[ps_first_cc_owner_birthday_year]" class="input-text ps_first_cc_birthdate" value="" maxlength="4" max="2015"
                     data-bind="attr: {
                                 autocomplete: off,
                                 placeholder: 'YYYY',
@@ -197,24 +215,7 @@
             </div>
             <span id="card-cpf-msg"></span>
         </div>
-        <!-- /ko -->
-        <div class="field number required">
-            <label data-bind="attr: {for: getCode() + '_first_cc_amount'}" class="label">
-                <span><!-- ko i18n: 'Amount For This Credit Card'--><!-- /ko --></span>
-            </label>
-            <div class="control">
-                <input type="text" name="payment[ps_first_cc_amount]" class="input-text money first" value=""
-                    data-bind="attr: {
-                                autocomplete: off,
-                                id: getCode() + '_first_cc_amount',
-                                title: $t('Amount For This Credit Card'),
-                                'data-container': getCode() + '-first-cc-value',
-                                'data-validate': JSON.stringify({'required':true})},
-                                value: creditCardFirstAmount,
-                                valueUpdate: 'keyup'"
-                                />
-            </div>
-        </div>
+        <!-- /ko -->        
         <div class="field date required" data-bind="attr: {id: getCode() + '_first_cc_installments_div'}">
             <label data-bind="attr: {for: getCode() + '_first_cc_installments'}" class="label">
                 <span><!-- ko i18n: 'Installments'--><!-- /ko --></span>
@@ -239,6 +240,7 @@
         </div>
     </div>
     <div class="second-card">
+        <h3>2º <!-- ko i18n: 'Credit Card'--><!-- /ko --></h3>
         <div class="field type">
             <div class="control">
                 <input type="hidden"
@@ -249,6 +251,23 @@
                        value: creditCardSecondType
                        ">
             </div>
+        </div>        
+        <div class="field number required">
+            <label data-bind="attr: {for: getCode() + '_second_cc_amount'}" class="label">
+                <span><!-- ko i18n: 'Amount For This Credit Card'--><!-- /ko --></span>
+            </label>
+            <div class="control">
+                <input type="tel" name="payment[ps_second_cc_amount]" class="input-text money second" value=""
+                    data-bind="attr: {
+                                    autocomplete: off,
+                                    id: getCode() + '_second_cc_amount',
+                                    title: $t('Amount For This Credit Card'),
+                                    'data-container': getCode() + '-second-cc-value',
+                                    'data-validate': JSON.stringify({'required':true})},
+                                    value: creditCardSecondAmount,
+                                    valueUpdate: 'keyup'"
+                                    />
+            </div>
         </div>
         <div class="field number required">
             <label data-bind="attr: {for: getCode() + '_second_cc_number'}" class="label">
@@ -256,7 +275,7 @@
             </label>
             <div class="control">
               <div class="cc-number-input">
-                <input type="text" class="input-text second_cc_number_visible" value=""
+                <input type="tel" class="input-text second_cc_number_visible" value=""
                        data-bind="attr: {
                                     autocomplete: off,
                                     id: getCode() + '_second_cc_number_visible'},
@@ -375,7 +394,7 @@
                 <span><!-- ko i18n: 'Date of Birth'--><!-- /ko --></span>
             </label>
             <div class="control">
-                <input type="text" name="payment[ps_second_cc_owner_birthday_day]" class="input-text ps_second_cc_birthdate" value="" maxlength="2" max="31"
+                <input type="tel" name="payment[ps_second_cc_owner_birthday_day]" class="input-text ps_second_cc_birthdate" value="" maxlength="2" max="31"
                        data-bind="attr: {
                                     autocomplete: off,
                                     placeholder: 'DD',
@@ -386,7 +405,7 @@
                                     value: creditCardSecondOwnerBirthDay,
                                     valueUpdate: 'keyup'"
                                     />
-                 <input type="text" name="payment[ps_second_cc_owner_birthday_month]" class="input-text ps_second_cc_birthdate" value="" maxlength="2" max="12"
+                 <input type="tel" name="payment[ps_second_cc_owner_birthday_month]" class="input-text ps_second_cc_birthdate" value="" maxlength="2" max="12"
                        data-bind="attr: {
                                     autocomplete: off,
                                     placeholder: 'MM',
@@ -397,7 +416,7 @@
                                     value: creditCardSecondOwnerBirthMonth,
                                     valueUpdate: 'keyup'"
                                     />
-                   <input type="text" name="payment[ps_second_cc_owner_birthday_year]" class="input-text ps_second_cc_birthdate" value="" maxlength="4" max="2015"
+                   <input type="tel" name="payment[ps_second_cc_owner_birthday_year]" class="input-text ps_second_cc_birthdate" value="" maxlength="4" max="2015"
                        data-bind="attr: {
                                     autocomplete: off,
                                     placeholder: 'YYYY',
@@ -432,23 +451,6 @@
         </div>
         <!-- /ko -->
 
-        <div class="field number required">
-            <label data-bind="attr: {for: getCode() + '_second_cc_amount'}" class="label">
-                <span><!-- ko i18n: 'Amount For This Credit Card'--><!-- /ko --></span>
-            </label>
-            <div class="control">
-                <input type="text" name="payment[ps_second_cc_amount]" class="input-text money second" value=""
-                    data-bind="attr: {
-                                    autocomplete: off,
-                                    id: getCode() + '_second_cc_amount',
-                                    title: $t('Amount For This Credit Card'),
-                                    'data-container': getCode() + '-second-cc-value',
-                                    'data-validate': JSON.stringify({'required':true})},
-                                    value: creditCardSecondAmount,
-                                    valueUpdate: 'keyup'"
-                                    />
-            </div>
-        </div>
         <div class="field date required" data-bind="attr: {id: getCode() + '_second_cc_installments_div'}">
             <label data-bind="attr: {for: getCode() + '_second_cc_installments'}" class="label">
                 <span><!-- ko i18n: 'Installments'--><!-- /ko --></span>
