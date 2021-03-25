@@ -127,6 +127,9 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                 $payment = $_payment;
             } else {
                 $orderNo = (string)$resultXML->reference;
+                if (false !== $twoCard = strpos ( $orderNo , "-cc" )) {
+                    $orderNo = substr($orderNo,0, $twoCard);
+                }
 //                $order = $this->orderModel->loadByIncrementId($orderNo);
                 $searchCriteria = $this->searchCriteriaBuilder
                     ->addFilter('increment_id', $orderNo, 'eq')->create();
@@ -173,6 +176,13 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
             }
 
             $message = $processedState->getMessage();
+
+            if ($isFirst) {
+                $message = '1º ' . __('Credit Card') .' '. $message;
+            }
+            if ($isSecond) {
+                $message = '2º ' . __('Credit Card') .' '. $message;
+            }
 
             if ((int)$resultXML->status == 6) { //valor devolvido (gera credit memo e tenta cancelar o pedido)
 
