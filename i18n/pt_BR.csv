@@ -261,3 +261,4 @@
 "YYYY","AAAA"
 "Order %1 not found on system. Unable to process return. A new attempt may happen in a few minutes.","Pedido %1 não encontrado. Impossível processar o retorno. Uma nova tentativa deve ocorrer em alguns minutos."
 "Failed to process PagSeguro response. A new attempt may happen in a few minutes.","Falha ao processar retorno do PagSeguro. Uma nova tentativa deve ocorrer em alguns minutos."
+"Credit Card","Cartão de Crédito"
