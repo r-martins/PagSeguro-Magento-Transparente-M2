@@ -3,6 +3,7 @@ namespace RicardoMartins\PagSeguro\Helper;
 
 use Magento\Framework\Phrase;
 use Magento\Store\Model\ScopeInterface;
+use Magento\Sales\Model\Order\Email\Sender\OrderCommentSender;
 
 /**
  * Class Data Helper
@@ -71,11 +72,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     private $remoteAddress;
 
-        /**
+    /**
      * @var \Magento\Sales\Api\TransactionRepositoryInterface
      */
     protected $transactionRepository;
 
+    /**
+     * @var OrderCommentSender
+     */
+    protected $orderCommentSender;
 
     /**
      * @param \Magento\Store\Model\StoreManagerInterface        $storeManager
@@ -88,6 +93,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Magento\Framework\HTTP\Client\Curl               $curl
      * @param \Magento\Framework\Serialize\SerializerInterface  $serializer
      * @param \Magento\Sales\Api\TransactionRepositoryInterface $transactionRepository
+     * @param OrderCommentSender                                $orderCommentSender
      */
 
     public function __construct(
@@ -101,7 +107,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Framework\HTTP\Client\Curl $curl,
         \Magento\Framework\Serialize\SerializerInterface $serializer,
         \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress,
-        \Magento\Sales\Api\TransactionRepositoryInterface $transactionRepository
+        \Magento\Sales\Api\TransactionRepositoryInterface $transactionRepository,
+        OrderCommentSender $orderCommentSender
     ) {
         $this->storeManager = $storeManager;
         $this->checkoutSession = $checkoutSession;
@@ -112,9 +119,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->_curl = $curl;
         $this->serializer = $serializer;
         $this->remoteAddress = $remoteAddress;
-
+        $this->orderCommentSender = $orderCommentSender;
         $this->transactionRepository = $transactionRepository;
-
         parent::__construct($context);
     }
 
@@ -547,8 +553,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getCreditCardApiCallParams(\Magento\Sales\Model\Order $order, $payment, $cc = '')
     {
         $percent = 1.0;
+        $reference = $order->getIncrementId();
         if (!empty($cc)) {
             $percent = floatval(str_replace(",",".",$payment->getAdditionalInformation('credit_card_amount' . $cc))) / $order->getGrandTotal();
+            if ($cc == '_first') {
+                $reference .= '-cc1';
+            } else {
+                $reference .= '-cc2';
+            }
         }
         $params = [
             'email'             => $this->getMerchantEmail(),
@@ -558,7 +570,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'receiverEmail'     =>  $this->getMerchantEmail(),
             'currency'          => 'BRL',
             'creditCardToken'   => $payment->getAdditionalInformation('credit_card_token'. $cc),
-            'reference'         => $order->getIncrementId(),
+            'reference'         => $reference,
             'extraAmount'       => $this->getExtraAmount($order, $percent),
             'notificationURL'   => $this->getStoreUrl().'pseguro/notification/index',
             ];
@@ -1351,15 +1363,19 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         
         $transactionId = $payment->getAdditionalInformation('transaction_id');
         $transactionIdFirst = $payment->getAdditionalInformation('transaction_id_first');
-        $amountFirst = $payment->getAdditionalInformation('credit_card_amount_first');
+
         $transactionIdSecond = $payment->getAdditionalInformation('transaction_id_second');
-        $amountSecond = $payment->getAdditionalInformation('credit_card_amount_second');
 
         $transactionIdFirstObj = false;
         $transactionIdSecondObj = false;
 
         $token = $this->getToken();
         $email = $this->getMerchantEmail();
+
+        $order = $payment->getOrder();
+        if ($order->getState() == 'canceled') {
+            $this->orderCommentSender->send($order, true);
+        }
 
         if (isset($transactionIdFirst) && isset($transactionIdSecond)) {
             $errorMsg = [];
@@ -1368,9 +1384,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $transactionIdSecondObj = $this->getTransaction($transactionIdSecond, $payment);
 
             if (false !== $transactionIdFirstObj) {
+
                 $params = [
-                    'transactionCode'   => $transactionIdFirst,
-                    'refundValue'       => number_format(str_replace(",",".", $amountFirst), 2, '.', '')
+                    'transactionCode'   => $transactionIdFirst
                 ];
         
                 $params['token'] = $token;
@@ -1406,8 +1422,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                         $errorMsg[] = 'Impossível cancelar compra do 1º cartão. Aldo deu errado.';
                     }
                 } catch (\Exception $e) {                    
-                    $this->writeLog(__('Payment cancels error.'));
-                    $errorMsg[] = __('Payment cancels error.');
+                    if ($e->getMessage() !== "invalid transaction status to cancel.") {
+                        $this->writeLog(__('Payment cancels error.'));
+                        $errorMsg[] = __('Payment cancels error.');
+                    }
                 }
 
                 $payment
@@ -1418,9 +1436,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             }
             $payment->save();
             if (false !== $transactionIdSecondObj) {
+
                 $params = [
-                    'transactionCode'   => $transactionIdSecond,
-                    'refundValue'       => number_format(str_replace(",",".",$amountSecond), 2, '.', '')
+                    'transactionCode'   => $transactionIdSecond
                 ];
         
                 $params['token'] = $token;
@@ -1456,8 +1474,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                         $errorMsg[] = 'Impossível cancelar compra do 2º cartão. Aldo deu errado.';
                     }
                 } catch (\Exception $e) {
-                    $this->writeLog(__('Payment cancels error.'));
-                    $errorMsg[] = __('Payment cancels error.');
+                    if ($e->getMessage() !== "invalid transaction status to cancel.") {
+                        $this->writeLog(__('Payment cancels error.'));
+                        $errorMsg[] = __('Payment cancels error.');
+                    }
                 }
 
                 $payment
@@ -1471,7 +1491,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 $errorMsg = implode ( "\n", array_unique($errorMsg));
                 throw new \Magento\Framework\Validator\Exception(__($errorMsg));
             }
-
         }
     }
 
