@@ -282,7 +282,7 @@
 .fieldset > .first-card,
 .fieldset > .second-card {
     width: 45%;
-    float: left
+    float: left;
 }
 .checkout-payment-method .input-text.ps_first_cc_birthdate,
 .checkout-payment-method .input-text.ps_second_cc_birthdate {
@@ -291,4 +291,11 @@
 .checkout-payment-method .twoccard .fields .select-installments {
 	padding-left: 5px;
 	padding-right: 25px;
+}
+
+@media only screen and (max-width: 770px) {
+  .fieldset > .first-card,
+  .fieldset > .second-card {
+      width: 90%;
+  }
 }
