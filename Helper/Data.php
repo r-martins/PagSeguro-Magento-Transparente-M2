@@ -1404,11 +1404,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                     $errorMsg[] = __('Payment refunding error.');
                 }
 
-                $payment
-                    ->setTransactionId($transactionIdFirst . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND)
-                    ->setParentTransactionId($transactionIdFirst . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH)
-                    ->setIsTransactionClosed(1)
-                    ->setShouldCloseParentTransaction(1);
+                $payment->setTransactionId($transactionIdFirst . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND);
+                $transaction = $payment->addTransaction(
+                    \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND,
+                    null,
+                    true
+                );
             } else {
                 $params = [
                     'transactionCode'   => $transactionIdFirst
@@ -1428,11 +1429,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                     }
                 }
 
-                $payment
-                    ->setTransactionId($transactionIdFirst . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_VOID)
-                    ->setParentTransactionId($transactionIdFirst . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH)
-                    ->setIsTransactionClosed(1)
-                    ->setShouldCloseParentTransaction(1);
+                $payment->setTransactionId($transactionIdFirst . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_VOID);
+                $transaction = $payment->addTransaction(
+                    \Magento\Sales\Model\Order\Payment\Transaction::TYPE_VOID,
+                    null,
+                    true
+                );
             }
             $payment->save();
             if (false !== $transactionIdSecondObj) {
@@ -1456,11 +1458,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                     $errorMsg[] = __('Payment refunding error.');
                 }
     
-                $payment
-                    ->setTransactionId($transactionIdSecond . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND)
-                    ->setParentTransactionId($transactionIdSecond . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH)
-                    ->setIsTransactionClosed(1)
-                    ->setShouldCloseParentTransaction(1);
+                $payment->setTransactionId($transactionIdSecond . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND);
+                $transaction = $payment->addTransaction(
+                    \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND,
+                    null,
+                    true
+                );
             } else {
                 $params = [
                     'transactionCode'   => $transactionIdSecond
@@ -1480,11 +1483,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                     }
                 }
 
-                $payment
-                    ->setTransactionId($transactionIdSecond . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_VOID)
-                    ->setParentTransactionId($transactionIdSecond . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH)
-                    ->setIsTransactionClosed(1)
-                    ->setShouldCloseParentTransaction(1);
+                $payment->setTransactionId($transactionIdSecond . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_VOID);
+                $transaction = $payment->addTransaction(
+                    \Magento\Sales\Model\Order\Payment\Transaction::TYPE_VOID,
+                    null,
+                    true
+                );
             }
             $payment->save();
             if (count($errorMsg) > 0) {

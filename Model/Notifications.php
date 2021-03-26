@@ -267,7 +267,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                         \Magento\Sales\Model\Order\Payment\Transaction::TYPE_CAPTURE,
                         null,
                         true
-                    );                    
+                    );
 
                     $createInvoices = false;
 
