@@ -8,6 +8,13 @@ class InfoCc extends \Magento\Payment\Block\Info
     protected $_orderFactory;
     protected $_scopeConfig;
 
+    /**
+     * PagSeguro Helper
+     *
+     * @var RicardoMartins\PagSeguro\Helper\Data;
+     */
+    protected $pagSeguroHelper;
+
     protected $_template = 'RicardoMartins_PagSeguro::info/cc.phtml';
     /**
      * @var \Magento\Framework\Url
@@ -19,12 +26,14 @@ class InfoCc extends \Magento\Payment\Block\Info
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Sales\Model\OrderFactory $orderFactory,
         \Magento\Framework\Url $urlHelper,
+        \RicardoMartins\PagSeguro\Helper\Data $pagSeguroHelper,
         array $data = []
     ) {
 		parent::__construct($context, $data);
         $this->_checkoutSession = $checkoutSession;
         $this->_orderFactory = $orderFactory;
         $this->urlHelper = $urlHelper;
+        $this->pagSeguroHelper = $pagSeguroHelper;
     }
 
 
@@ -60,5 +69,17 @@ class InfoCc extends \Magento\Payment\Block\Info
         }
 
         return false;
+    }
+
+    public function getStatus($transactionId) {
+        $order = $this->getOrder();
+        $isRefund = $isCancel = $isPaid = false;
+        $isRefund = $this->pagSeguroHelper->getTransaction($transactionId. '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND, $order->getPayment());
+        if (false !== $isRefund) return 'Devolvido';
+        $isCancel = $this->pagSeguroHelper->getTransaction($transactionId. '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_VOID, $order->getPayment());
+        if (false !== $isCancel) return 'Cancelado';
+        $isPaid = $this->pagSeguroHelper->getTransaction($transactionId, $order->getPayment());
+        if (false !== $isPaid) return 'Pago';
+        return 'Processando';
     }
 }

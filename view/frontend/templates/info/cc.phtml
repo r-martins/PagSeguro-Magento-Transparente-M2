@@ -4,7 +4,7 @@ $info = $block->getPaymentInfo();
 ?>
 <p><strong><?= $block->escapeHtml($block->getMethod()->getTitle()) ?></strong></p>
 <?php if (isset($info['transaction_id_first']) && isset($info['transaction_id_second'])) : ?>
-    <p>1º cartão:</p>
+    <p><b>Cartão 1:</b></p>
     <?php if (isset($info['credit_card_type_first'])): ?>
     <p>Bandeira: <?php echo ucwords($info['credit_card_type_first']); ?></p>
     <?php endif?>
@@ -13,8 +13,9 @@ $info = $block->getPaymentInfo();
     <?php endif?>
     <?php if (isset($info['transaction_id_first'])) : ?>
         <p>Código da transação do 1º cartão: <?php echo $info['transaction_id_first']?></p>
+        <p>Status da transação do 1º cartão: <b><?= $block->getStatus($info['transaction_id_first'])?></b></p>
     <?php endif?>
-    <p>2º cartão:</p>
+    <p><b>Cartão 2:</b></p>
     <?php if (isset($info['credit_card_type_second'])): ?>
     <p>Bandeira: <?php echo ucwords($info['credit_card_type_second']); ?></p>
     <?php endif?>
@@ -23,6 +24,7 @@ $info = $block->getPaymentInfo();
     <?php endif?>
     <?php if (isset($info['transaction_id_second'])) : ?>
         <p>Código da transação do 2º cartão: <?php echo $info['transaction_id_second']?></p>
+        <p>Status da transação do 2º cartão: <b><?= $block->getStatus($info['transaction_id_second'])?></b></p>
     <?php endif?>
 <?php else:?>
     <?php if (isset($info['installment_quantity']) && isset($info['installment_value'])) : ?>
