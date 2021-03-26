@@ -198,25 +198,20 @@ define(
             getAmountInit: function() {
                 var orderAmount = quote.getTotals()().grand_total / 2;
                 var amount = orderAmount.toFixed(2);
-                var decimalSeparator = ',';
-                var separator = ".";
-                amount = amount.replace(separator, decimalSeparator);
-                var orderAmountOriginal =  amount.replace(decimalSeparator, separator);
+                var orderAmountOriginal =  amount;
                 this.amountTotal = quote.getTotals()().grand_total;
                 var amountBalance = (quote.getTotals()().grand_total - orderAmountOriginal).toFixed(2);
-                return amountBalance.replace(separator, decimalSeparator);
+                return amountBalance;
             },
 
             updAmount: function() {
                 if (this.amountTotal !== quote.getTotals()().grand_total) {
-                    var decimalSeparator = ',';
-                    var separator = ".";
-                    var percentFirst = $('input[name="payment[ps_first_cc_amount]"]').val().replace(',','.') / this.amountTotal;
+                    var percentFirst = $('input[name="payment[ps_first_cc_amount]"]').val() / this.amountTotal;
                     this.amountTotal = quote.getTotals()().grand_total;
                     var amountFirst = (this.amountTotal * percentFirst).toFixed(2);
                     var amountSecond = (this.amountTotal - amountFirst).toFixed(2);
-                    this.creditCardFirstAmount( amountFirst.toString().replace(separator, decimalSeparator) );
-                    this.creditCardSecondAmount( amountSecond.toString().replace(separator, decimalSeparator) );
+                    this.creditCardFirstAmount( amountFirst.toString());
+                    this.creditCardSecondAmount( amountSecond.toString());
                 }
             },
 

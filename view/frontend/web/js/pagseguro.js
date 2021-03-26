@@ -346,8 +346,8 @@ RMPagSeguro.prototype.updateAmount = function(cardLabel) {
         value = orderAmount - 1;
     }
 
-    if (isNaN(value) || value == 0) {
-        value = 1;
+    if (isNaN(value)) {
+        value = 0;
     }
 
     var remaining = orderAmount - value;
@@ -356,15 +356,15 @@ RMPagSeguro.prototype.updateAmount = function(cardLabel) {
     value = (value / 100).toFixed(2);
 
     if (cardLabel == 'first') {        
-        jQuery('input[name="payment[ps_second_cc_amount]"]').val(remaining.toString().replace('.', ','));
-        jQuery('input[name="payment[pagseguropro_second_cc_amount]"]').val(remaining.toString().replace('.', ','));
+        jQuery('input[name="payment[ps_second_cc_amount]"]').val(remaining.toString());
+        jQuery('input[name="payment[pagseguropro_second_cc_amount]"]').val(remaining.toString());
     }
     if (cardLabel == 'second') {
-        jQuery('input[name="payment[ps_first_cc_amount]"]').val(remaining.toString().replace('.', ','));
-        jQuery('input[name="payment[pagseguropro_first_cc_amount]"]').val(remaining.toString().replace('.', ','));
+        jQuery('input[name="payment[ps_first_cc_amount]"]').val(remaining.toString());
+        jQuery('input[name="payment[pagseguropro_first_cc_amount]"]').val(remaining.toString());
     }
-    jQuery('input[name="payment[ps_'+ cardLabel +'_cc_amount]"]').val(value.toString().replace('.', ','));
-    jQuery('input[name="payment[pagseguropro_'+ cardLabel +'_cc_amount]"]').val(value.toString().replace('.', ','));
+    jQuery('input[name="payment[ps_'+ cardLabel +'_cc_amount]"]').val(value.toString());
+    jQuery('input[name="payment[pagseguropro_'+ cardLabel +'_cc_amount]"]').val(value.toString());
 }
 
 RMPagSeguro.prototype.updateTwoCreditCardToken = function(cardLabel){

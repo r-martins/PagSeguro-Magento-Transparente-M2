@@ -28,7 +28,7 @@
                                 id: getCode() + '_first_cc_amount',
                                 title: $t('Amount For This Credit Card'),
                                 'data-container': getCode() + '-first-cc-value',
-                                'data-validate': JSON.stringify({'required':true})},
+                                'data-validate': JSON.stringify({'required':true, 'validate-no-empty':true, 'validate-number':true, 'min': 0.01})},
                                 value: creditCardFirstAmount,
                                 valueUpdate: 'keyup'"
                                 />
@@ -263,7 +263,7 @@
                                     id: getCode() + '_second_cc_amount',
                                     title: $t('Amount For This Credit Card'),
                                     'data-container': getCode() + '-second-cc-value',
-                                    'data-validate': JSON.stringify({'required':true})},
+                                    'data-validate': JSON.stringify({'required':true, 'validate-no-empty':true, 'validate-number':true, 'min': 0.01})},
                                     value: creditCardSecondAmount,
                                     valueUpdate: 'keyup'"
                                     />

@@ -555,7 +555,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $percent = 1.0;
         $reference = $order->getIncrementId();
         if (!empty($cc)) {
-            $percent = floatval(str_replace(",",".",$payment->getAdditionalInformation('credit_card_amount' . $cc))) / $order->getGrandTotal();
+            $percent = floatval($payment->getAdditionalInformation('credit_card_amount' . $cc)) / $order->getGrandTotal();
             if ($cc == '_first') {
                 $reference .= '-cc1';
             } else {
@@ -734,7 +734,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             ];
         } else {
             $value = ($cc == '')?$order->getGrandTotal():$payment->getAdditionalInformation('credit_card_amount' . $cc);
-            $value = floatval(str_replace(",",".",$value));
+            $value = floatval($value);
             $return = [
                 'installmentQuantity'   => '1',
                 'installmentValue'      => number_format($value, 2, '.', ''),
