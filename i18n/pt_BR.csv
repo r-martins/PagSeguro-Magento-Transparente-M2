@@ -265,3 +265,4 @@
 "Stored installments from PagSeguro to each product of the store","Informações de parcelamento do produtos obtidas na PagSeguro e armazenadas na loja virtual"
 "The product installments cache was flushed.","Cache de parcelas da PagSeguro para os produtos foi removido."
 "An error occurred while clearing the product installments cache.","Erro ao tentar remover cache de parcelas da PagSeguro para os produtos."
+"PagSeguro Products Installments Cache","Cache de parcelamento dos produtos - PagSeguro"

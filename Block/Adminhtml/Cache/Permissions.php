@@ -13,7 +13,7 @@ class Permissions implements ArgumentInterface
     /**
      * @var AuthorizationInterface
      */
-    private $authorization;
+    protected $authorization;
 
     /**
      * Permissions constructor.
