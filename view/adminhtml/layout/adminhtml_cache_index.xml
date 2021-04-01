@@ -2,7 +2,7 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceBlock name="cache.additional">
-            <block class="Magento\Framework\View\Element\Template" name="rm.pagseguro.product.installments.cache" template="RicardoMartins_PagSeguro::system/cache/product-installments.phtml">
+            <block class="RicardoMartins\PagSeguro\Block\Adminhtml\Cache\Installments" name="rm.pagseguro.installments.cache" template="RicardoMartins_PagSeguro::system/cache/installments.phtml">
                 <arguments>
                     <argument name="permissions" xsi:type="object">RicardoMartins\PagSeguro\Block\Adminhtml\Cache\Permissions</argument>
                 </arguments>
