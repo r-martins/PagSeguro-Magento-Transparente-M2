@@ -10,8 +10,8 @@ define(
         'use strict';
         rendererList.push(
             {
-                type: 'rm_pagseguro_pagar_no_pagseguro',
-                component: 'RicardoMartins_PagSeguro/js/view/payment/method-renderer/rm_pagseguro_pagar_no_pagseguro_method'
+                type: 'rm_pagseguro_twocc',
+                component: 'RicardoMartins_PagSeguro/js/view/payment/method-renderer/rm_pagseguro_twoccmethod'
             }
         );
         /** Add view logic here if needed */

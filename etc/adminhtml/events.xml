@@ -2,4 +2,7 @@
     <event name="sales_order_creditmemo_refund">
         <observer name="pagseg_credit_memo" instance="RicardoMartins\PagSeguro\Observer\CreditMemoObserver"  />
     </event>
+    <event name="order_cancel_after">
+		<observer instance="RicardoMartins\PagSeguro\Observer\Order\CancelAfter" name="pagseg_order_cancelafter"/>
+	</event>
 </config>
