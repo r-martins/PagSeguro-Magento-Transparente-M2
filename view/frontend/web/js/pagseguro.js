@@ -519,6 +519,7 @@ RMPagSeguro.prototype.updateTwoBrand = function(cardLabel){
         } else {
             this.cardSecondBin = currentBin;
         }
+        localStorage.removeItem('rm_pagseguro_twocc_'+cardLabel);
         PagSeguroDirectPayment.getBrand({
             cardBin: currentBin,
             success: function(psresponse){
@@ -708,7 +709,7 @@ RMPagSeguro.prototype.getTwoInstallments = function(grandTotal, selectedInstallm
         brand: brandName,
         success: function(response) {
             var parcelsDrop = jQuery('#rm_pagseguro_twocc_'+ cardLabel +'_cc_installments');
-            var value = localStorage.getItem(cardLabel, 0);
+            var value = localStorage.getItem('rm_pagseguro_twocc_'+cardLabel, 0);
             if (value < 0) { value = 0; }
             var b = response.installments[brandName];
             parcelsDrop.empty();
@@ -782,7 +783,7 @@ RMPagSeguro.prototype.updateTwoInstallments = function(cardLabel){
     var url = this.storeUrl + 'pseguro/ajax/updateInstallments';    
     ccInstallment = jQuery('select[name="payment[ps_'+ cardLabel +'_cc_installments]"] option:selected').val();
     var arr = ccInstallment.split("|");    
-    localStorage.setItem(cardLabel, arr[0]);
+    localStorage.setItem('rm_pagseguro_twocc_'+cardLabel, arr[0]);
 }
 
 RMPagSeguro.prototype.removeUnavailableBanks = function() {
