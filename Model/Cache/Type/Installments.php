@@ -7,7 +7,9 @@ use Magento\Catalog\Model\Product\Action as ProductAction;
 use Magento\Catalog\Model\ResourceModel\Product\Collection as ProductCollection;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductCollectionFactory;
 use Magento\Eav\Model\Config as EavConfig;
+use Magento\Framework\App\Cache\TypeListInterface as CacheTypeInterface;
 use Magento\Framework\Exception\LocalizedException;
+use RicardoMartins\PagSeguro\Model\ResourceModel\Cache\Type\Installments as CacheResourceModel;
 
 /**
  * PagSeguro installments cache
@@ -18,33 +20,25 @@ class Installments
     const ATTR_LAST_UPDATE = "rm_pagseguro_last_update";
 
     /**
-     * @var ProductCollectionFactory
+     * @var CacheResourceModel
      */
-    protected $productCollectionFactory;
+    protected $resource;
 
     /**
-     * @var ProductAction
+     * @var CacheTypeInterface
      */
-    protected $productAction;
+    protected $cacheType;
 
     /**
-     * @var EavConfig
-     */
-    protected $eavConfig;
-
-    /**
-     * @param ProductCollectionFactory $productCollectionFactory
-     * @param ProductAction $productAction
-     * @param EavConfig $eavConfig
+     * @param CacheResourceModel $resource
+     * @param CacheTypeInterface $cacheType
      */
     public function __construct(
-        ProductCollectionFactory $productCollectionFactory,
-        ProductAction $productAction,
-        EavConfig $eavConfig
+        CacheResourceModel $resource,
+        CacheTypeInterface $cacheType
     ) {
-        $this->productCollectionFactory = $productCollectionFactory;
-        $this->productAction = $productAction;
-        $this->eavConfig = $eavConfig;
+        $this->resource = $resource;
+        $this->cacheType = $cacheType;
     }
 
     /**
@@ -52,41 +46,10 @@ class Installments
      */
     public function flush()
     {
-        if( !$this->_productAttributeExists(self::ATTR_OPTIONS) || 
-            !$this->_productAttributeExists(self::ATTR_LAST_UPDATE)) {
-            return;
-        }
-
-        $productCollection = $this->productCollectionFactory->create();
-        
-        if($productCollection->getSize() <= 0)
-        {
-            return;
-        }
-
-        $productIds = [];
-
-        foreach($productCollection as $product) {
-            $productIds[] = $product->getId();
-        }
-
-        $this->productAction->updateAttributes($productIds, array(self::ATTR_OPTIONS => ""), 0);
-        $this->productAction->updateAttributes($productIds, array(self::ATTR_LAST_UPDATE => 0), 0);
-    }
-
-    /**
-     * Checks if the product attribute exists on Magento
-     * @param String $attributeCode
-     * @return bool
-     */
-    protected function _productAttributeExists($attributeCode)
-    {
-        try {
-            $attr = $this->eavConfig->getAttribute(Product::ENTITY, $attributeCode);
-        } catch (LocalizedException $e) {
-            return false;
-        }
-        return ($attr && $attr->getId());
+        $this->resource->flushAttribute(self::ATTR_OPTIONS);
+        $this->resource->flushAttribute(self::ATTR_LAST_UPDATE);
+        $this->cacheType->invalidate("full_page");
+        $this->cacheType->invalidate("block_html");
+        $this->cacheType->invalidate("eav");
     }
 }
-   
