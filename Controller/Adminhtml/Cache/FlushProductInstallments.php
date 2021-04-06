@@ -11,7 +11,9 @@ use RicardoMartins\PagSeguro\Model\Cache\Type\Installments as InstallmentsCache;
 
 class FlushProductInstallments extends Action implements HttpGetActionInterface
 {
-    /** 
+    const ADMIN_RESOURCE = "RicardoMartins_PagSeguro::flush_pagseguro_installments";
+
+    /**
      * @var InstallmentsCache
      * */
     protected $installmentsCache;
@@ -41,7 +43,10 @@ class FlushProductInstallments extends Action implements HttpGetActionInterface
         } catch (LocalizedException $e) {
             $this->messageManager->addErrorMessage($e->getMessage());
         } catch (\Exception $e) {
-            $this->messageManager->addExceptionMessage($e, __('An error occurred while clearing the product installments cache.'));
+            $this->messageManager->addExceptionMessage(
+                $e,
+                __('An error occurred while clearing the product installments cache.')
+            );
         }
 
         $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);

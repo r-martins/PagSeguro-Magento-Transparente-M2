@@ -20,8 +20,8 @@ class Installments extends Template
     public function __construct(
         Context $context,
         ScopeConfigInterface $scopeConfig,
-        array $data = [] )
-    {
+        array $data = []
+    ) {
         parent::__construct($context, $data);
         $this->scopeConfig = $scopeConfig;
     }
@@ -29,7 +29,7 @@ class Installments extends Template
     /**
      * Verifies if the functionality is enable on admin configuration
      */
-    public function isInstallmentsConfigEnable()
+    public function isInstallmentsConfigEnabled()
     {
         return $this->scopeConfig->isSetFlag('payment/rm_pagseguro_cc/show_installments_product_page');
     }

@@ -6,7 +6,7 @@ use Magento\Framework\AuthorizationInterface;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
 
 /**
- * Class Permissions
+ * Installments cache permissions block
  */
 class Permissions implements ArgumentInterface
 {
@@ -26,6 +26,7 @@ class Permissions implements ArgumentInterface
     }
 
     /**
+     * Checks if the user has access to flush cache action
      * @return bool
      */
     public function hasAccessToFlushPagSeguroInstallments()
