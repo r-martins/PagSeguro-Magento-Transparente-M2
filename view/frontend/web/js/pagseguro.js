@@ -781,9 +781,8 @@ RMPagSeguro.prototype.updateInstallments = function(){
 
 RMPagSeguro.prototype.updateTwoInstallments = function(cardLabel){
     var url = this.storeUrl + 'pseguro/ajax/updateInstallments';    
-    ccInstallment = jQuery('select[name="payment[ps_'+ cardLabel +'_cc_installments]"] option:selected').val();
-    var arr = ccInstallment.split("|");    
-    localStorage.setItem('rm_pagseguro_twocc_'+cardLabel, arr[0]);
+    ccInstallment = document.querySelector('#rm_pagseguro_twocc_'+ cardLabel +'_cc_installments').selectedIndex;
+    localStorage.setItem('rm_pagseguro_twocc_'+cardLabel, ccInstallment);
 }
 
 RMPagSeguro.prototype.removeUnavailableBanks = function() {
