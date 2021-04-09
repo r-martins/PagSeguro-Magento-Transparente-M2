@@ -185,9 +185,9 @@
                 <input type="tel" name="payment[ps_first_cc_owner_birthday_year]" class="input-text ps_first_cc_birthdate" value="" maxlength="4" max="2015"
                     data-bind="attr: {
                                 autocomplete: off,
-                                placeholder: 'YYYY',
+                                placeholder: 'AAAA',
                                 id: getCode() + '_first_cc_owner_birthday_year',
-                                title: $t('YYYY'),
+                                title: $t('AAAA'),
                                 'data-container': getCode() + '-first-cc-owner-birthday-year',
                                 'data-validate': JSON.stringify({'required':true})},
                                 value: creditCardFirstOwnerBirthYear,
@@ -419,9 +419,9 @@
                    <input type="tel" name="payment[ps_second_cc_owner_birthday_year]" class="input-text ps_second_cc_birthdate" value="" maxlength="4" max="2015"
                        data-bind="attr: {
                                     autocomplete: off,
-                                    placeholder: 'YYYY',
+                                    placeholder: 'AAAA',
                                     id: getCode() + '_second_cc_owner_birthday_year',
-                                    title: $t('YYYY'),
+                                    title: $t('AAAA'),
                                     'data-container': getCode() + '-second-cc-owner-birthday-year',
                                     'data-validate': JSON.stringify({'required':true})},
                                     value: creditCardSecondOwnerBirthYear,
@@ -480,9 +480,11 @@
 <input type="hidden" name="payment[pagseguropro_cc_isadmin]" class="ccisadmin" value="" />
 
 <input type="hidden" name="payment[pagseguropro_first_cc_amount]" value="" />
+<input type="hidden" name="payment[pagseguropro_first_cc_installments]" class="first_cc_installments" value="" />
 <input type="hidden" name="payment[pagseguropro_first_cc_cctoken]" class="cctoken" value="" />
 <input type="hidden" name="payment[pagseguropro_first_cc_cctype]" class="cctype" value="" />
 
 <input type="hidden" name="payment[pagseguropro_second_cc_amount]" value="" />
+<input type="hidden" name="payment[pagseguropro_second_cc_installments]" class="second_cc_installments" value="" />
 <input type="hidden" name="payment[pagseguropro_second_cc_cctoken]" class="cctoken" value="" />
 <input type="hidden" name="payment[pagseguropro_second_cc_cctype]" class="cctype" value="" />
