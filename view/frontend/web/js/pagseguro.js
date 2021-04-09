@@ -729,6 +729,9 @@ RMPagSeguro.prototype.getTwoInstallments = function(grandTotal, selectedInstallm
                 optionVal = b[x].quantity + "|" + b[x].installmentAmount;
                 isSelected = (Number(value) == x)?" selected=\"selected\"":""
                 parcelsDrop.append('<option value="'+optionVal+'"'+isSelected+'>'+optionText+'</option>');
+                if (isSelected) {
+                    document.querySelector('.'+ cardLabel +'_cc_installments').value = document.querySelector('#rm_pagseguro_twocc_'+ cardLabel +'_cc_installments').value;
+                }
             }
             parcelsDrop.prop('selectedIndex', value);
             let cardOld = 'second';
@@ -783,6 +786,7 @@ RMPagSeguro.prototype.updateTwoInstallments = function(cardLabel){
     var url = this.storeUrl + 'pseguro/ajax/updateInstallments';    
     ccInstallment = document.querySelector('#rm_pagseguro_twocc_'+ cardLabel +'_cc_installments').selectedIndex;
     localStorage.setItem('rm_pagseguro_twocc_'+cardLabel, ccInstallment);
+    document.querySelector('.'+ cardLabel +'_cc_installments').value = document.querySelector('#rm_pagseguro_twocc_'+ cardLabel +'_cc_installments').value;
 }
 
 RMPagSeguro.prototype.removeUnavailableBanks = function() {
