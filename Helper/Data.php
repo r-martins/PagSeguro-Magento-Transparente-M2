@@ -83,6 +83,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     protected $orderCommentSender;
 
     /**
+     * @var float
+     */
+    protected $twoAmount = 0;
+
+    /**
      * @param \Magento\Store\Model\StoreManagerInterface        $storeManager
      * @param \Magento\Checkout\Model\Session                   $checkoutSession
      * @param \Magento\Customer\Model\Customer                  $customer
@@ -555,7 +560,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $percent = 1.0;
         $reference = $order->getIncrementId();
         if (!empty($cc)) {
-            $percent = floatval($payment->getAdditionalInformation('credit_card_amount' . $cc)) / $order->getGrandTotal();
+            $percent = round( floatval($payment->getAdditionalInformation('credit_card_amount' . $cc)) / $order->getGrandTotal(), 4);
             if ($cc == '_first') {
                 $reference .= '-cc1';
             } else {
@@ -574,13 +579,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'extraAmount'       => $this->getExtraAmount($order, $percent),
             'notificationURL'   => $this->getStoreUrl().'pseguro/notification/index',
             ];
-         
+        
         $params = array_merge($params, $this->getItemsParams($order, $percent));
         $params = array_merge($params, $this->getSenderParams($order, $payment, $cc));
         $params = array_merge($params, $this->getAddressParams($order, 'shipping', $percent));
         $params = array_merge($params, $this->getAddressParams($order, 'billing'));
         $params = array_merge($params, $this->getCreditCardHolderParams($order, $payment, $cc));
         $params = array_merge($params, $this->getCreditCardInstallmentsParams($order, $payment, $cc));
+
+        $value = round (floatval($payment->getAdditionalInformation('credit_card_amount' . $cc)) - $this->twoAmount, 2);
+        if (abs($value) == 0.01) {
+            $params['shippingCost'] += $value;
+        }
 
         return $params;
     }
@@ -625,8 +635,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $items = $this->getAllVisibleItems($order);
         if ($items) {
             $itemsCount = count($items);
+            $this->twoAmount = 0;
             for ($x=1, $y=0; $x <= $itemsCount; $x++, $y++) {
-                $itemPrice = $items[$y]->getPrice()*$percent;
+                $itemPrice = round ( $items[$y]->getPrice()*$percent,2);
+                $this->twoAmount += $itemPrice;
                 $qtyOrdered = $items[$y]->getQtyOrdered();
                 $return['itemId'.$x] = $items[$y]->getId()? $items[$y]->getId() : $items[$y]->getData('quote_item_id');
                 $return['itemDescription'.$x] = substr($items[$y]->getName(), 0, 100);
@@ -798,7 +810,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         //shipping specific
         if ($type == 'shipping') {
             $shippingType = $this->getShippingType($order);
-            $shippingCost = $order->getShippingAmount()*$percent;
+            $shippingCost = round ( $order->getShippingAmount()*$percent , 2);
+            $this->twoAmount += $shippingCost;
             $return['shippingType'] = $shippingType;
             if ($shippingCost > 0) {
                 if ($this->shouldSplit($order)) {
