@@ -72,8 +72,8 @@ class Cc extends \Magento\Payment\Model\Method\Cc
         \RicardoMartins\PagSeguro\Model\Notifications $pagSeguroAbModel,
         \Magento\Backend\Model\Auth\Session $adminSession,
         \Magento\Framework\Message\ManagerInterface $messageManager,
-        array $data = [],
-        \Magento\Framework\App\Request\Http $request
+        \Magento\Framework\App\Request\Http $request,
+        array $data = []
     ) {
         parent::__construct(
             $context,
@@ -98,7 +98,6 @@ class Cc extends \Magento\Payment\Model\Method\Cc
         $this->messageManager = $messageManager;
         $this->request = $request;
     }
-
 
     public function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
@@ -166,7 +165,7 @@ class Cc extends \Magento\Payment\Model\Method\Cc
                 }
                 $payment->setAdditionalInformation($additional);
                 $invoices = $order->getInvoiceCollection();
-                foreach($invoices as $invoice){
+                foreach ($invoices as $invoice) {
                     $invoice->setTransactionId((string)$returnXml->code);
                     $invoice->save();
                 }
@@ -341,8 +340,8 @@ class Cc extends \Magento\Payment\Model\Method\Cc
      */
     public function validate()
     {
-        if( stristr($this->request->getUriString(),"/set-payment-information") || 
-            stristr($this->request->getUriString(),"/selected-payment-method")
+        if (stristr($this->request->getUriString(), "/set-payment-information") ||
+            stristr($this->request->getUriString(), "/selected-payment-method")
         ) {
             return $this;
         }
