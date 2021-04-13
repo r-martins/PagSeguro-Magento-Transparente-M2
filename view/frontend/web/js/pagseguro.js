@@ -1,11 +1,11 @@
-/**
+    /**
  * PagSeguro Transparente para Magento
  * @author Ricardo Martins <pagseguro-transparente@ricardomartins.net.br>
  * @link http://bit.ly/pagseguromagento
  * @version 2.8.1
  */
 
-function RMPagSeguro(config) {
+     function RMPagSeguro(config) {
         if(config.PagSeguroSessionId == false){
             console.error('Unable to get PagSeguro SessionId. Check your token, key and settings.');
         }
@@ -154,6 +154,18 @@ RMPagSeguro.prototype.updateCreditCardToken = function(){
 
     if(ccNum.length > 6 && ccExpMo != "" && ccExpYr != "" && ccCvv.length >= 3)
     {
+        var url = this.storeUrl + 'pseguro/ajax/getGrandTotal';
+		jQuery.ajax({
+			url: url,
+			success: function(response){
+				self.getInstallments(response.total, self.installmentsQty);
+			},
+			error: function(response){
+                console.log(response);
+				return false;
+			}
+		});
+
         PagSeguroDirectPayment.createCardToken({
             cardNumber: ccNum,
             brand: brandName,
@@ -164,7 +176,6 @@ RMPagSeguro.prototype.updateCreditCardToken = function(){
                 console.log(psresponse);
                 self.creditCardToken = psresponse.card.token;
                 self.updatePaymentHashes();
-                self.getInstallments(self.grandTotal, self.installmentsQty);
                 jQuery('#card-msg').html('');
             },
             error: function(psresponse){
