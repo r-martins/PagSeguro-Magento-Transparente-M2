@@ -31,7 +31,7 @@
                 <active>1</active>
                 <payment_action>order</payment_action>
                 <title>Boleto - via PagSeguro UOL</title>
-                <order_status>holded</order_status>
+                <order_status>pending_payment</order_status>
                 <sort_order>2</sort_order>
                 <model>RicardoMartins\PagSeguro\Model\Method\Boleto</model>
                 <allowspecific>0</allowspecific>
@@ -40,7 +40,7 @@
                 <active>1</active>
                 <payment_action>order</payment_action>
                 <title>PagSeguro - TEF - Ricardo Martins</title>
-                <order_status>holded</order_status>
+                <order_status>pending_payment</order_status>
                 <sort_order>3</sort_order>
                 <model>RicardoMartins\PagSeguro\Model\Method\Tef</model>
                 <allowspecific>0</allowspecific>
@@ -49,7 +49,7 @@
                 <active>1</active>
                 <title>PagSeguro - Pagar no PagSeguro</title>
                 <redirectURL>checkout/onepage/success</redirectURL>
-                <order_status>pending</order_status>
+                <order_status>pending_payment</order_status>
                 <description><![CDATA[Você será redirecionado para o PagSeguro onde poderá escolher a forma de pagamento desejada.]]></description>
                 <payment_action>order</payment_action>
                 <sort_order>4</sort_order>
