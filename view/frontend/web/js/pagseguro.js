@@ -43,6 +43,7 @@ function RMPagSeguro(config) {
         parcelsFirstDrop.append('<option value="">Informe os dados do cartão para calcular</option>');
         parcelsSecondDrop.append('<option value="">Informe os dados do cartão para calcular</option>');
 
+        localStorage.setItem('rm_pagseguro_twocc_installments', false);
 }
 
 RMPagSeguro.prototype.updateSenderHash = function(){
@@ -331,7 +332,8 @@ RMPagSeguro.prototype.updateOneCreditCardToken = function() {
 }
 
 RMPagSeguro.prototype.updateAmount = function(cardLabel) {
-    
+
+    localStorage.setItem('rm_pagseguro_twocc_installments', false);
     var orginalValue = parseFloat(this.grandTotal).toFixed(2);
     var orderAmount = String(orginalValue).replace(/\d(?=(\d{3})+\.)/g, '$&,');
     orderAmount = orderAmount.replace(/[^0-9]/g, '');
@@ -737,6 +739,7 @@ RMPagSeguro.prototype.getTwoInstallments = function(grandTotal, selectedInstallm
             let cardOld = 'second';
             if (cardLabel != cardOld) {
                 self.setTwoInstallments(cardOld);
+                localStorage.setItem('rm_pagseguro_twocc_installments', true);
             }
         },
         error: function(response) {

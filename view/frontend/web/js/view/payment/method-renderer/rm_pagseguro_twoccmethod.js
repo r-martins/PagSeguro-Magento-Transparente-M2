@@ -6,13 +6,14 @@ define(
         'Magento_Payment/js/model/credit-card-validation/credit-card-data',
         'Magento_Payment/js/model/credit-card-validation/credit-card-number-validator',
         'Magento_Checkout/js/model/quote',
+        'Magento_Checkout/js/action/redirect-on-success',
         'Magento_Checkout/js/action/place-order',
         'Magento_Checkout/js/model/full-screen-loader',
         'Magento_Checkout/js/model/payment/additional-validators',
         'Magento_Payment/js/model/credit-card-validation/validator',
         'PagseguroDirectMethod'
     ],
-    function (Component, $, creditCardSecondData, creditCardData, cardNumberValidator, quote) {
+    function (Component, $, creditCardSecondData, creditCardData, cardNumberValidator, quote, redirectOnSuccessAction) {
         'use strict';
 
         return Component.extend({
@@ -215,8 +216,40 @@ define(
                 }
             },
 
+            /**
+            * Place order.
+            */
+             placeOrder: function (data, event) {
+                var self = this;
+
+                if (event) {
+                    event.preventDefault();
+                }
+                var isInstallments = localStorage.getItem('rm_pagseguro_twocc_installments', false);                
+
+                if (this.validate() &&                    
+                    isInstallments == "true"
+                ) {
+                    this.getPlaceOrderDeferredObject()
+                        .done(
+                            function () {
+                                self.afterPlaceOrder();
+                                if (self.redirectAfterPlaceOrder) {
+                                    redirectOnSuccessAction.execute();
+                                }
+                            }
+                        );
+
+                    return true;
+                }
+                if (isInstallments == "false") {
+                    alert("A parcela ainda não foi recalculada! Clique fora do form para atualizar as parcelas");
+                }
+                return false;
+            },
+
             getData: function () {
-            return {
+                return {
                     'method': this.item.method,
                     'additional_data': {
                         'first_cc_cid': this.creditCardFirstVerificationNumber(),
