@@ -27,6 +27,7 @@ $isSandbox = $helper->isSandbox() ? 1 : 0;
             var RMPagSeguroObj = new RMPagSeguro(<?php echo $helper->getConfigJs()?>);
             console.info('PagSeguro ready');
             RMPagSeguroObj.addCardFieldsObserver(RMPagSeguroObj);
+            RMPagSeguroObj.setupGrandTotalListener(RMPagSeguroObj);
             RMPagSeguroObj.setStoreUrl("<?php echo $storeUrl ?>");
             RMPagSeguroObj.updateBrand();
             RMPagSeguroObj.setInstallmentsQty(<?php echo $installments;?>);
