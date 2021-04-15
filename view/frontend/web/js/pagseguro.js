@@ -51,6 +51,40 @@ RMPagSeguro.prototype.updateSenderHash = function(){
     return false;
 }
 
+RMPagSeguro.prototype.setupGrandTotalListener = function(obj){
+    // avoids concurrent listeners (object could be instantiated more 
+    // than one time in checkout)
+    if(obj.grandTotalListener) {
+        jQuery(document).unbind('ajaxComplete', obj.grandTotalListener);
+    }
+    
+    // observed endpoints
+    var observedEndpoints = [
+        /\/V1\/carts\/mine\/shipping-information/,
+        /\/V1\/carts\/mine\/coupons/,
+        /\/V1\/guest-carts\/(.)+\/shipping-information/,
+        /\/V1\/guest-carts\/(.)+\/coupons/
+    ];
+    
+    // 'update installments' listener
+    obj.grandTotalListener = function (event, xhr, settings) {
+        if (settings.type.match(/post|put|delete/i)) {
+            for(var i = 0; i < observedEndpoints.length; i++) {
+                if (observedEndpoints[i].test((settings.url)) &&
+                    xhr.responseJSON && xhr.responseJSON.totals &&
+                    xhr.responseJSON.totals.grand_total != obj.grandTotal
+                ) {
+                   obj.setGrandTotal(xhr.responseJSON.totals.grand_total);
+                   obj.getInstallments(xhr.responseJSON.totals.grand_total);
+                }
+            }
+        }
+    };
+
+    // binding
+    jQuery(document).on('ajaxComplete', obj.grandTotalListener);
+}
+
 RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
     try {
         var ccNumElm = jQuery('input[name="payment[ps_cc_number]"]');

@@ -322,6 +322,11 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                 . $return);
         }
 
+        $this->_eventManager->dispatch('rm_pagseguro_status_notification_received', [
+            'responseText' => $return,
+            'responseXml'  => $xml,
+        ]);
+
         curl_close($ch);
         return $xml;
     }
