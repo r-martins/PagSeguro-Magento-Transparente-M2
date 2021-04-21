@@ -380,27 +380,55 @@ RMPagSeguro.prototype.updateTwoCreditCardToken = function(cardLabel){
     var ccExpMo = jQuery('input[name="payment[ps_'+ cardLabel +'_cc_exp_month]"]').val().replace(/[^0-9\.]+/g, '');
     var ccExpYr = jQuery('input[name="payment[ps_'+ cardLabel +'_cc_exp_year]"]').val().replace(/[^0-9\.]+/g, '');
     var ccCvv = jQuery('input[name="payment[ps_'+ cardLabel +'_cc_cid]"]').val().replace(/[^0-9\.]+/g, '');
-    var brandName = '';
+    var brandName = "";
     var self = this;
 
-    if (cardLabel === 'first') {
-        if(typeof this.lastFirstCcNum != "undefined" || ccNum != this.lastFirstCcNum){
-            this.updateTwoBrand(cardLabel);
-            if(typeof this.firstBrand != "undefined"){
-                brandName = this.firstBrand.name;
+    if(ccNum.length > 6 ) {
+        if (cardLabel === 'first') {
+            if(typeof this.lastFirstCcNum != "undefined" || ccNum != this.lastFirstCcNum){
+                this.updateTwoBrand(cardLabel);
+                if(typeof this.firstBrand != "undefined"){
+                    brandName = this.firstBrand.name;
+                }
+            } else {
+                if(typeof this.firstBrand != "undefined"){
+                    brandName = this.firstBrand.name;
+                }
+            }
+        } else {
+            if(typeof this.lastSecondCcNum != "undefined" || ccNum != this.lastSecondCcNum){
+                this.updateTwoBrand(cardLabel);
+                if(typeof this.secondBrand != "undefined"){
+                    brandName = this.secondBrand.name;
+                }
+            } else {
+                if(typeof this.secondBrand != "undefined"){
+                    brandName = this.secondBrand.name;
+                }
             }
         }
     } else {
-        if(typeof this.lastSecondCcNum != "undefined" || ccNum != this.lastSecondCcNum){
-            this.updateTwoBrand(cardLabel);
-            if(typeof this.secondBrand != "undefined"){
-                brandName = this.secondBrand.name;
-            }
-        }
+        return;
     }
 
-    if(ccNum.length > 6 && ccExpMo != "" && ccExpYr != "" && ccCvv.length >= 3)
+    if(brandName != "" && ccExpMo != "" && ccExpMo.length == 2 && ccExpYr != "" && ccExpYr.length == 4 && ccCvv.length >= 3)
     {
+
+        if (cardLabel === 'first') {
+            if (typeof self.lastExpMoFirst != "undefined" && ccExpMo == self.lastExpMoFirst && self.lastExpYrFirst == ccExpYr) return
+        } else {
+            if (typeof self.lastExpMoSecond != "undefined" && ccExpMo == self.lastExpMoSecond && self.lastExpYrSecond == ccExpYr) return
+        }
+
+        if (cardLabel === 'first') {
+            self.lastExpMoFirst = ccExpMo;
+            self.lastExpYrFirst = ccExpYr;
+        } else {
+            self.lastExpMoSecond = ccExpMo;
+            self.lastExpYrSecond = ccExpYr;
+        }
+
+
         PagSeguroDirectPayment.createCardToken({
             cardNumber: ccNum,
             brand: brandName,
@@ -414,6 +442,7 @@ RMPagSeguro.prototype.updateTwoCreditCardToken = function(cardLabel){
                 } else {
                     self.creditCardTokenSecond = psresponse.card.token;
                 }
+                jQuery('#'+cardLabel+'-card-msg').html('');
                 self.updatePaymentHashes();                
             },
             error: function(psresponse){
