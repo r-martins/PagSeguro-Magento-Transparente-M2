@@ -73,7 +73,7 @@
                                 autocomplete: off,
                                 id: getCode() + '_first_expiration',
                                 'data-container': getCode() + '-first-cc-month',
-                                'data-validate': JSON.stringify({'required-number':true, 'validate-length':true, 'validate-cc-exp':'#' + getCode() + '_expiration_yr'})},
+                                'data-validate': JSON.stringify({'required-number':true, 'validate-length':true, 'validate-cc-exp':'#' + getCode() + '_first_expiration_yr'})},
                                 enable: isActive($parents),
                                 value: creditCardFirstExpMonth,
                                 valueUpdate: 'keyup',
@@ -94,7 +94,7 @@
                 <input type="hidden" placeholder="AA" name="payment[ps_first_cc_exp_year]" class="input-text cc-exp-date" maxlength="4" value=""
                         data-bind="attr: {
                                 autocomplete: off,
-                                id: getCode() + '_expiration_yr',
+                                id: getCode() + '_first_expiration_yr',
                                 'data-container': getCode() + '-first-cc-year',
                                 'data-validate': JSON.stringify({'required-number':true, 'validate-length':true})},
                                 enable: isActive($parents),
@@ -308,7 +308,7 @@
                                     autocomplete: off,
                                     id: getCode() + '_second_expiration',
                                     'data-container': getCode() + '-second-cc-month',
-                                    'data-validate': JSON.stringify({'required-number':true, 'validate-length':true, 'validate-cc-exp':'#' + getCode() + '_expiration_yr'})},
+                                    'data-validate': JSON.stringify({'required-number':true, 'validate-length':true, 'validate-cc-exp':'#' + getCode() + '_second_expiration_yr'})},
                                     enable: isActive($parents),
                                     value: creditCardSecondExpMonth,
                                     valueUpdate: 'keyup',
@@ -328,7 +328,7 @@
                 <input type="hidden" placeholder="AA" name="payment[ps_second_cc_exp_year]" class="input-text cc-exp-date" maxlength="4" value=""
                         data-bind="attr: {
                                     autocomplete: off,
-                                    id: getCode() + '_expiration_yr',
+                                    id: getCode() + '_second_expiration_yr',
                                     'data-container': getCode() + '-second-cc-year',
                                     'data-validate': JSON.stringify({'required-number':true, 'validate-length':true})},
                                     enable: isActive($parents),
