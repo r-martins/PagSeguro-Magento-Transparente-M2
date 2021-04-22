@@ -747,6 +747,7 @@ RMPagSeguro.prototype.getTwoInstallments = function(grandTotal, selectedInstallm
 
             if(window.rmconfig.force_installments_selection == 1){
                 parcelsDrop.append('<option value="" selected="selected">Selecione a quantidade de parcelas</option>');
+                value--;
             }
 
             for(var x=0; x < b.length; x++){
@@ -763,6 +764,9 @@ RMPagSeguro.prototype.getTwoInstallments = function(grandTotal, selectedInstallm
                 if (isSelected) {
                     document.querySelector('.'+ cardLabel +'_cc_installments').value = document.querySelector('#rm_pagseguro_twocc_'+ cardLabel +'_cc_installments').value;
                 }
+            }
+            if(window.rmconfig.force_installments_selection == 1){
+                value++;
             }
             parcelsDrop.prop('selectedIndex', value);
             let cardOld = 'second';
