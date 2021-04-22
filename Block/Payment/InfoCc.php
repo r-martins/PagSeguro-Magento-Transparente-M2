@@ -80,6 +80,6 @@ class InfoCc extends \Magento\Payment\Block\Info
         if (false !== $isCancel) return 'Cancelado';
         $isPaid = $this->pagSeguroHelper->getTransaction($transactionId, $order->getPayment());
         if (false !== $isPaid) return 'Pago';
-        return 'Processando';
+        return 'Pendente';
     }
 }
