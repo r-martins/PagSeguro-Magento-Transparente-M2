@@ -97,6 +97,9 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
         jQuery(ccNumElm).keyup(function( event ) {
             obj.updateCreditCardToken();
         });
+        jQuery(ccNumVisibleElm).change(function() {
+            jQuery(ccNumVisibleElm).keyup();
+        });
         jQuery(ccNumVisibleElm).keyup(function( event ) {
 
             jQuery(this).val(function (index, value) {
