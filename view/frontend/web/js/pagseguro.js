@@ -130,7 +130,7 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
         jQuery(ccExpYrElm).keyup(function( event ) {
             obj.updateCreditCardToken();
         });
-        jQuery(ccCvvElm).change(function( event ) {
+        jQuery(ccCvvElm).keyup(function( event ) {
             obj.updateCreditCardToken();
         });
         /*jQuery(cpf).keyup(function( event ) {
