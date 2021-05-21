@@ -97,6 +97,9 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
         jQuery(ccNumElm).keyup(function( event ) {
             obj.updateCreditCardToken();
         });
+        jQuery(ccNumVisibleElm).change(function() {
+            jQuery(ccNumVisibleElm).keyup();
+        });
         jQuery(ccNumVisibleElm).keyup(function( event ) {
 
             jQuery(this).val(function (index, value) {
@@ -143,6 +146,14 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
                 ccExpYr = '20' + jQuery(ccExpYrVisibileElm).val();
             }
             jQuery(ccExpYrElm).val(ccExpYr);
+        });
+
+        jQuery(ccExpMoElm).change(function() {
+            obj.updateCreditCardToken();
+        });
+
+        jQuery(ccExpYrVisibileElm).change(function() {
+            obj.updateCreditCardToken();
         });
 
         jQuery( "#pagseguro_cc_method .actions-toolbar .checkout" ).on("click", function() {
@@ -255,6 +266,7 @@ RMPagSeguro.prototype.updateBrand = function(){
                 self.brand = psresponse.brand;
                 if(flag != ''){
                     jQuery('.cc_number_visible').attr('style','background-image:url("https://stc.pagseguro.uol.com.br/public/img/payment-methods-flags/' +flag + '/' + psresponse.brand.name + '.png") !important');
+                    self.getInstallments(self.grandTotal, self.installmentsQty);
                 }
             },
             error: function(psresponse){
