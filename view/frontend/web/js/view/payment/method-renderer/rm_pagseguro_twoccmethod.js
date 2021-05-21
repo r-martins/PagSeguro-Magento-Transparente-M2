@@ -185,8 +185,9 @@ define(
                     creditCardSecondData.cvvSecondCode = value;
                 });
 
-                this.creditCardFirstAmount(this.getAmountInit());
-                this.creditCardSecondAmount(this.getAmountInit());
+                var amount_init = this.getAmountInit();
+                this.creditCardFirstAmount(amount_init);
+                this.creditCardSecondAmount(amount_init);
 
                 setInterval(this.updAmount.bind(this, quote), 3000);
 
@@ -249,6 +250,8 @@ define(
             },
 
             getData: function () {
+                var first_cc_amount = $('input[name="payment[ps_first_cc_amount]"]').val();
+                var second_cc_amount = $('input[name="payment[ps_second_cc_amount]"]').val();
                 return {
                     'method': this.item.method,
                     'additional_data': {
@@ -261,7 +264,7 @@ define(
                         'first_cc_exp_month': this.creditCardFirstExpMonth(),
                         'first_cc_number': this.creditCardFirstNumber(),
                         'first_cc_owner_name' : this.creditCardFirstOwnerName(),
-                        'first_cc_amount' : $('input[name="payment[pagseguropro_first_cc_amount]"]').val(),
+                        'first_cc_amount' : first_cc_amount,
                         'first_cc_owner_birthday_day' : this.creditCardFirstOwnerBirthDay(),
                         'first_cc_owner_birthday_month' : this.creditCardFirstOwnerBirthMonth(),
                         'first_cc_owner_birthday_year' : this.creditCardFirstOwnerBirthYear(),
@@ -276,7 +279,7 @@ define(
                         'second_cc_exp_month': this.creditCardSecondExpMonth(),
                         'second_cc_number': this.creditCardSecondNumber(),
                         'second_cc_owner_name' : this.creditCardSecondOwnerName(),
-                        'second_cc_amount' : $('input[name="payment[pagseguropro_second_cc_amount]"]').val(),
+                        'second_cc_amount' : second_cc_amount,
                         'second_cc_owner_birthday_day' : this.creditCardSecondOwnerBirthDay(),
                         'second_cc_owner_birthday_month' : this.creditCardSecondOwnerBirthMonth(),
                         'second_cc_owner_birthday_year' : this.creditCardSecondOwnerBirthYear(),

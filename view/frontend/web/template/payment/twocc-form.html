@@ -1,3 +1,16 @@
+<input type="hidden" name="payment[pagseguropro_cc_senderhash]" class="ccsenderhash" value="" />
+<input type="hidden" name="payment[pagseguropro_cc_isadmin]" class="ccisadmin" value="" />
+
+<input type="hidden" name="payment[pagseguropro_first_cc_amount]" value="" />
+<input type="hidden" name="payment[pagseguropro_first_cc_installments]" class="first_cc_installments" value="" />
+<input type="hidden" name="payment[pagseguropro_first_cc_cctoken]" class="cctoken" value="" />
+<input type="hidden" name="payment[pagseguropro_first_cc_cctype]" class="cctype" value="" />
+
+<input type="hidden" name="payment[pagseguropro_second_cc_amount]" value="" />
+<input type="hidden" name="payment[pagseguropro_second_cc_installments]" class="second_cc_installments" value="" />
+<input type="hidden" name="payment[pagseguropro_second_cc_cctoken]" class="cctoken" value="" />
+<input type="hidden" name="payment[pagseguropro_second_cc_cctype]" class="cctype" value="" />
+
 <fieldset data-bind="attr: {class: 'fieldset payment items twoccard ' + getCode(), id: 'payment_form_' + getCode()}">
     <!-- ko if: (isShowLegend())-->
     <legend class="legend">
@@ -476,15 +489,3 @@
     </div>
 </fieldset>
 <div data-bind="afterRender: preparePagSeguro()"></div>
-<input type="hidden" name="payment[pagseguropro_cc_senderhash]" class="ccsenderhash" value="" />
-<input type="hidden" name="payment[pagseguropro_cc_isadmin]" class="ccisadmin" value="" />
-
-<input type="hidden" name="payment[pagseguropro_first_cc_amount]" value="" />
-<input type="hidden" name="payment[pagseguropro_first_cc_installments]" class="first_cc_installments" value="" />
-<input type="hidden" name="payment[pagseguropro_first_cc_cctoken]" class="cctoken" value="" />
-<input type="hidden" name="payment[pagseguropro_first_cc_cctype]" class="cctype" value="" />
-
-<input type="hidden" name="payment[pagseguropro_second_cc_amount]" value="" />
-<input type="hidden" name="payment[pagseguropro_second_cc_installments]" class="second_cc_installments" value="" />
-<input type="hidden" name="payment[pagseguropro_second_cc_cctoken]" class="cctoken" value="" />
-<input type="hidden" name="payment[pagseguropro_second_cc_cctype]" class="cctype" value="" />
