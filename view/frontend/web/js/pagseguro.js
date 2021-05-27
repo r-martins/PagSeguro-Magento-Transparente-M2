@@ -57,6 +57,40 @@ RMPagSeguro.prototype.updateSenderHash = function(){
     return false;
 }
 
+RMPagSeguro.prototype.setupGrandTotalListener = function(obj){
+    // avoids concurrent listeners (object could be instantiated more 
+    // than one time in checkout)
+    if(obj.grandTotalListener) {
+        jQuery(document).unbind('ajaxComplete', obj.grandTotalListener);
+    }
+    
+    // observed endpoints
+    var observedEndpoints = [
+        /\/V1\/carts\/mine\/shipping-information/,
+        /\/V1\/carts\/mine\/coupons/,
+        /\/V1\/guest-carts\/(.)+\/shipping-information/,
+        /\/V1\/guest-carts\/(.)+\/coupons/
+    ];
+    
+    // 'update installments' listener
+    obj.grandTotalListener = function (event, xhr, settings) {
+        if (settings.type.match(/post|put|delete/i)) {
+            for(var i = 0; i < observedEndpoints.length; i++) {
+                if (observedEndpoints[i].test((settings.url)) &&
+                    xhr.responseJSON && xhr.responseJSON.totals &&
+                    xhr.responseJSON.totals.grand_total != obj.grandTotal
+                ) {
+                   obj.setGrandTotal(xhr.responseJSON.totals.grand_total);
+                   obj.getInstallments(xhr.responseJSON.totals.grand_total);
+                }
+            }
+        }
+    };
+
+    // binding
+    jQuery(document).on('ajaxComplete', obj.grandTotalListener);
+}
+
 RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
     try {
         var ccNumElm = jQuery('input[name="payment[ps_cc_number]"]');
@@ -85,6 +119,9 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
         jQuery(ccNumElm).keyup(function( event ) {
             obj.updateOneCreditCardToken();
         });
+        jQuery(ccNumVisibleElm).change(function() {
+            jQuery(ccNumVisibleElm).keyup();
+        });
         jQuery(ccNumVisibleElm).keyup(function( event ) {
 
             jQuery(this).val(function (index, value) {
@@ -109,12 +146,19 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
             });
             obj.updateOneCreditCardToken();
         });
-        jQuery(ccExpMoElm).keyup(function( event ) {
-            obj.updateOneCreditCardToken();
+
+        jQuery(ccExpMoElm).change(function() {
+            obj.updateCreditCardToken();
         });
-        jQuery(ccExpYrElm).keyup(function( event ) {
-            obj.updateOneCreditCardToken();
+
+        jQuery(ccExpYrVisibileElm).change(function() {
+            obj.updateCreditCardToken();
         });
+
+        jQuery( "#pagseguro_cc_method .actions-toolbar .checkout" ).on("click", function() {
+                obj.updateCreditCardToken();
+        });
+
         jQuery(ccCvvElm).keyup(function( event ) {
             obj.updateOneCreditCardToken();
         });
@@ -235,9 +279,6 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
                 ccExpYr = '20' + jQuery(ccSecondExpYrVisibileElm).val();
             }
             jQuery(ccSecondExpYrElm).val(ccExpYr);
-        });
-        jQuery( "#pagseguro_cc_method .actions-toolbar .checkout" ).on("click", function() {
-                obj.updateOneCreditCardToken();
         });
         jQuery( "#pagseguro_tef_method .actions-toolbar .checkout" ).on("click", function() {
                 obj.updatePaymentHashes();
@@ -507,6 +548,7 @@ RMPagSeguro.prototype.updateOneBrand = function(){
                 self.brand = psresponse.brand;
                 if(flag != ''){
                     jQuery('.cc_number_visible').attr('style','background-image:url("https://stc.pagseguro.uol.com.br/public/img/payment-methods-flags/' +flag + '/' + psresponse.brand.name + '.png") !important');
+                    self.getInstallments(self.grandTotal, self.installmentsQty);
                 }
             },
             error: function(psresponse){
