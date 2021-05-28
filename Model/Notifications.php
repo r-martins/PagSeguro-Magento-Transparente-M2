@@ -190,7 +190,13 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                     $order->setState(\Magento\Sales\Model\Order::STATE_HOLDED);
                     $order->setStatus(\Magento\Sales\Model\Order::STATE_HOLDED);
                 }
-
+                if ($this->_code == \RicardoMartins\PagSeguro\Model\Method\Twocc::CODE && $order->hasInvoices()) {
+                    foreach($order->getInvoiceCollection() as $invoice) {
+                        if ($invoice->canCancel()) {
+                            $invoice->cancel();
+                        }
+                    }
+                }
                 if ($order->canCancel()) {
                     $order->setState(\Magento\Sales\Model\Order::STATE_CANCELED);
                     $order->setStatus(\Magento\Sales\Model\Order::STATE_CANCELED);
@@ -199,7 +205,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                     $payment->registerRefundNotification(floatval($resultXML->grossAmount));
                     $order->addStatusHistoryComment(
                         'Returned: Amount returned to buyer.'
-                    );
+                    );                    
                 }
                 if ($this->_code == \RicardoMartins\PagSeguro\Model\Method\Twocc::CODE) {
                     $this->pagSeguroHelper->TwoCardCancel($payment);

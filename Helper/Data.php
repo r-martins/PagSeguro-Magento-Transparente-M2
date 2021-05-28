@@ -461,24 +461,26 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $xml = \simplexml_load_string(trim($response));
 
         if (false !== $xml && $xml->error->code) {
+            if ($type !== "transactions/refunds" && $xml->error->code != '14007') {
                 $errArray = [];
-            $xmlError = json_decode(json_encode($xml), true);
-            $xmlError = $xmlError['error'];
-
-            if (isset($xmlError['code'])) {
-                $errArray[] = $this->translateError($xmlError['message']);
-            } else {
-                foreach ($xmlError as $xmlErr) {
-                    $errArray[] = $this->translateError($xmlErr['message']);
+                $xmlError = json_decode(json_encode($xml), true);
+                $xmlError = $xmlError['error'];
+    
+                if (isset($xmlError['code'])) {
+                    $errArray[] = $this->translateError($xmlError['message']);
+                } else {
+                    foreach ($xmlError as $xmlErr) {
+                        $errArray[] = $this->translateError($xmlErr['message']);
+                    }
                 }
+    
+                $errArray = implode(" / ", $errArray);
+                if ($errArray) {
+                    throw new \Magento\Framework\Validator\Exception(new Phrase($errArray));
+                }
+    
+                $this->setSessionVl($errArray);
             }
-
-            $errArray = implode(" / ", $errArray);
-            if ($errArray) {
-                throw new \Magento\Framework\Validator\Exception(new Phrase($errArray));
-            }
-
-            $this->setSessionVl($errArray);
         }
 
         if (false === $xml) {
