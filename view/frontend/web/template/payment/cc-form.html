@@ -209,7 +209,11 @@
                     <div class="control">
                         <select  name="payment[ps_cc_installments]"
                                  class="select select-installments"
-                                 data-bind="attr: {id: getCode() + '_cc_installments', 'data-container': getCode() + '-cc-installments',},
+                                 data-bind="attr: {
+                                                id: getCode() + '_cc_installments',
+                                                'data-container': getCode() + '-cc-installments',
+                                                'data-validate': JSON.stringify({ 'validate-select': true })
+                                            },
                                             enable: isActive($parents),
                                             optionsValue: 'value',
                                             optionsText: 'Installments',
