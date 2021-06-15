@@ -8,7 +8,7 @@ use Magento\Framework\App\Action\HttpGetActionInterface;
 
 class Index extends Action implements HttpGetActionInterface
 {
-    public const ADMIN_RESOURCE = 'RicardoMartins::pagseguro_manual_update';
+    public const ADMIN_RESOURCE = 'RicardoMartins_PagSeguro::pagseguro_manual_update';
 
     /**
      * @var \Magento\Framework\HTTP\Client\Curl
