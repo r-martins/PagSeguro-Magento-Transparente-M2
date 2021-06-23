@@ -189,8 +189,8 @@ define(
                 this.creditCardFirstAmount(amount_init);
                 this.creditCardSecondAmount(amount_init);
 
-                setInterval(this.updAmount.bind(this, quote), 3000);
-
+                // updates grand total on component when magento changes its value
+                quote.totals.subscribe(this.updAmount.bind(this));
             },
 
             getCode: function() {

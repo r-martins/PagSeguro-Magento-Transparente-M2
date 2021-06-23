@@ -21,8 +21,8 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
 
     protected $_code = self::CODE;
     protected $_isGateway                   = true;
-    protected $_canCapture                  = true;
-    protected $_canCapturePartial           = true;
+    protected $_canCapture                  = false;
+    protected $_canCapturePartial           = false;
     protected $_canRefund                   = true;
     protected $_canRefundInvoicePartial     = true;
     protected $_countryFactory;
@@ -106,13 +106,6 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
         $this->transactionBuilder = $transactionBuilder;
     }
 
-
-    public function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount)
-    {
-        //@TODO Review. Necessary?
-        $this->pagSeguroHelper->writeLog('Inside Auth');
-    }
-
     /**
      * Payment capturing
      *
@@ -130,7 +123,7 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
 
         try {
 
-            //will grab data to be send via POST to API inside $params
+            // will grab data to be sent via POST to API inside $params
 
             //First Credit Card
             $params = $this->pagSeguroHelper->getCreditCardApiCallParams($order, $payment, '_first');

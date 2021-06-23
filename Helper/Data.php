@@ -83,11 +83,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     protected $orderCommentSender;
 
     /**
-     * @var float
-     */
-    protected $twoAmount = 0;
-
-    /**
      * @param \Magento\Store\Model\StoreManagerInterface        $storeManager
      * @param \Magento\Checkout\Model\Session                   $checkoutSession
      * @param \Magento\Customer\Model\Customer                  $customer
@@ -559,29 +554,34 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getCreditCardApiCallParams(\Magento\Sales\Model\Order $order, $payment, $cc = '')
     {
-        $percent = 1.0;
         $reference = $order->getIncrementId();
+        $cardAmount = $order->getGrandTotal();
+        $percent = 1.0;
+        
         if (!empty($cc)) {
-            $percent = round( floatval($payment->getAdditionalInformation('credit_card_amount' . $cc)) / $order->getGrandTotal(), 4);
+            $cardAmount = floatval($payment->getAdditionalInformation('credit_card_amount' . $cc));
+            $percent = $cardAmount / $order->getGrandTotal();
+        
             if ($cc == '_first') {
                 $reference .= '-cc1';
             } else {
                 $reference .= '-cc2';
             }
         }
+
         $params = [
             'email'             => $this->getMerchantEmail(),
             'token'             => $this->getToken(),
             'paymentMode'       => 'default',
-            'paymentMethod'     =>  'creditCard',
+            'paymentMethod'     => 'creditCard',
             'receiverEmail'     =>  $this->getMerchantEmail(),
             'currency'          => 'BRL',
             'creditCardToken'   => $payment->getAdditionalInformation('credit_card_token'. $cc),
             'reference'         => $reference,
             'extraAmount'       => $this->getExtraAmount($order, $percent),
-            'notificationURL'   => $this->getStoreUrl().'pseguro/notification/index',
-            ];
-        
+            'notificationURL'   => $this->getStoreUrl() . 'pseguro/notification/index',
+        ];
+
         $params = array_merge($params, $this->getItemsParams($order, $percent));
         $params = array_merge($params, $this->getSenderParams($order, $payment, $cc));
         $params = array_merge($params, $this->getAddressParams($order, 'shipping', $percent));
@@ -589,16 +589,42 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $params = array_merge($params, $this->getCreditCardHolderParams($order, $payment, $cc));
         $params = array_merge($params, $this->getCreditCardInstallmentsParams($order, $payment, $cc));
 
-        $value = round (floatval($payment->getAdditionalInformation('credit_card_amount' . $cc)) - $this->twoAmount, 2);
-        if (abs($value) == 0.01) {
-            $params['shippingCost'] += $value;
+        if (!empty($cc)) {
+            $params = array_merge($params, $this->fixRoundErrors($order, $cardAmount, $params));
         }
 
         return $params;
     }
 
     /**
-     * Calculates the "Exta" value that corresponds to Tax values minus Discount given
+     * Fixes possible erros on totals because of the percentual partioning of values
+     * between two cards
+     * @param \Magento\Sales\Model\Order $order
+     * @param float $cardAmount
+     * @param array $params
+     *
+     * @return array
+     */
+    public function fixRoundErrors($order, $cardAmount, $params)
+    {
+        $itemsCalculatedTotal = 0;
+        $itemsCount = count($this->getAllVisibleItems($order));
+        for ($i = 1; $i <= $itemsCount; $i++) {
+            $itemsCalculatedTotal += $params['itemAmount' . $i];
+        }
+
+        $calculatedShippingTotal = $params['shippingCost'];
+        $roundDiff = $cardAmount - ($itemsCalculatedTotal + $calculatedShippingTotal);
+
+        if ($roundDiff != 0) {
+            return ['extraAmount' => $params['extraAmount'] + $roundDiff];
+        }
+
+        return [];
+    }
+
+    /**
+     * Calculates the "Extra" value that corresponds to Tax values minus Discount given
      * It makes the correct discount to be shown correctly on PagSeguro
      * @param Mage_Sales_Model_Order $order
      *
@@ -606,8 +632,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getExtraAmount($order, $percent = 1.0)
     {
-        $discount = $order->getDiscountAmount();
-        $taxAmount = $order->getTaxAmount();
+        $discount = $order->getDiscountAmount() * $percent;
+        $taxAmount = $order->getTaxAmount() * $percent;
         $extra = $discount + $taxAmount;
 
         if ($this->shouldSplit($order)) {
@@ -621,7 +647,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 $extra -= 0.01 * $item->getQtyOrdered();
             }
         }
-        $extra *= $percent;
+        
         return number_format($extra, 2, '.', '');
     }
 
@@ -637,20 +663,19 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $items = $this->getAllVisibleItems($order);
         if ($items) {
             $itemsCount = count($items);
-            $this->twoAmount = 0;
             for ($x=1, $y=0; $x <= $itemsCount; $x++, $y++) {
-                $itemPrice = round ( $items[$y]->getPrice()*$percent,2);
-                $this->twoAmount += $itemPrice;
+                $itemPrice = $items[$y]->getPrice() * $percent;
                 $qtyOrdered = $items[$y]->getQtyOrdered();
-                $return['itemId'.$x] = $items[$y]->getId()? $items[$y]->getId() : $items[$y]->getData('quote_item_id');
-                $return['itemDescription'.$x] = substr($items[$y]->getName(), 0, 100);
-                $return['itemAmount'.$x] = number_format($itemPrice, 2, '.', '');
-                $return['itemQuantity'.$x] = (int)$qtyOrdered;
 
                 //We can't send 0.00 as value to PagSeguro. Will be discounted on extraAmount.
                 if ($itemPrice == 0) {
-                    $return['itemAmount'.$x] = 0.01;
+                    $itemPrice = 0.01;
                 }
+
+                $return['itemId'.$x] = $items[$y]->getId()? $items[$y]->getId() : $items[$y]->getData('quote_item_id');
+                $return['itemDescription'.$x] = substr($items[$y]->getName(), 0, 100);
+                $return['itemAmount'.$x] = number_format($itemPrice, 2, '.', '');
+                $return['itemQuantity'.$x] = (int) $qtyOrdered;
             }
         }
         return $return;
@@ -812,18 +837,20 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         //shipping specific
         if ($type == 'shipping') {
             $shippingType = $this->getShippingType($order);
-            $shippingCost = round ( $order->getShippingAmount()*$percent , 2);
-            $this->twoAmount += $shippingCost;
+            $shippingCost = $order->getShippingAmount() * $percent;
             $return['shippingType'] = $shippingType;
+            
             if ($shippingCost > 0) {
                 if ($this->shouldSplit($order)) {
                     $shippingCost -= 0.01;
                 }
+
                 $return['shippingCost'] = number_format($shippingCost, 2, '.', '');
             } else {
                 $return['shippingCost'] = '0.00';
             }
         }
+
         return $return;
     }
 
