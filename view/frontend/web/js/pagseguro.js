@@ -181,7 +181,6 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
         });
         jQuery(ccFirstNumElm).keyup(function( event ) {
             obj.updateTwoCreditCardToken('first');
-            obj.setTwoInstallments('first');
         });
         jQuery(ccFirstNumVisibleElm).keyup(function( event ) {
 
@@ -422,6 +421,7 @@ RMPagSeguro.prototype.updateTwoCreditCardToken = function(cardLabel){
     var ccExpYr = jQuery('input[name="payment[ps_'+ cardLabel +'_cc_exp_year]"]').val().replace(/[^0-9\.]+/g, '');
     var ccCvv = jQuery('input[name="payment[ps_'+ cardLabel +'_cc_cid]"]').val().replace(/[^0-9\.]+/g, '');
     var brandName = "";
+    var validationAlgorithm = "";
     var self = this;
 
     if(ccNum.length > 6 ) {
@@ -430,10 +430,12 @@ RMPagSeguro.prototype.updateTwoCreditCardToken = function(cardLabel){
                 this.updateTwoBrand(cardLabel);
                 if(typeof this.firstBrand != "undefined"){
                     brandName = this.firstBrand.name;
+                    validationAlgorithm = this.firstBrand.validationAlgorithm;
                 }
             } else {
                 if(typeof this.firstBrand != "undefined"){
                     brandName = this.firstBrand.name;
+                    validationAlgorithm = this.firstBrand.validationAlgorithm;
                 }
             }
         } else {
@@ -441,10 +443,12 @@ RMPagSeguro.prototype.updateTwoCreditCardToken = function(cardLabel){
                 this.updateTwoBrand(cardLabel);
                 if(typeof this.secondBrand != "undefined"){
                     brandName = this.secondBrand.name;
+                    validationAlgorithm = this.secondBrand.validationAlgorithm;
                 }
             } else {
                 if(typeof this.secondBrand != "undefined"){
                     brandName = this.secondBrand.name;
+                    validationAlgorithm = this.secondBrand.validationAlgorithm;
                 }
             }
         }
@@ -454,19 +458,44 @@ RMPagSeguro.prototype.updateTwoCreditCardToken = function(cardLabel){
 
     if(brandName != "" && ccExpMo != "" && ccExpMo.length == 2 && ccExpYr != "" && ccExpYr.length == 4 && ccCvv.length >= 3)
     {
-
         if (cardLabel === 'first') {
-            if (typeof self.lastExpMoFirst != "undefined" && ccExpMo == self.lastExpMoFirst && self.lastExpYrFirst == ccExpYr) return
+            // ensures that card data is fulfilled and changed
+            if (
+                typeof self.lastExpMoFirst != "undefined" &&
+                ccExpMo == self.lastExpMoFirst &&
+                self.lastExpYrFirst == ccExpYr &&
+                self.lastFirstCcNum == ccNum
+            ) {
+                return;
+            }
         } else {
-            if (typeof self.lastExpMoSecond != "undefined" && ccExpMo == self.lastExpMoSecond && self.lastExpYrSecond == ccExpYr) return
+            // ensures that card data is fulfilled and changed
+            if (
+                typeof self.lastExpMoSecond != "undefined" &&
+                ccExpMo == self.lastExpMoSecond &&
+                self.lastExpYrSecond == ccExpYr &&
+                self.lastSecondCcNum == ccNum
+            ) {
+                return;
+            }
+        }
+
+        // checks if there is a validation for the card number and validates it
+        if (
+            validationAlgorithm == 'LUHN' &&
+            !self.validateLuhn(ccNum)
+        ) {
+            return;
         }
 
         if (cardLabel === 'first') {
             self.lastExpMoFirst = ccExpMo;
             self.lastExpYrFirst = ccExpYr;
+            self.lastFirstCcNum = ccNum;
         } else {
             self.lastExpMoSecond = ccExpMo;
             self.lastExpYrSecond = ccExpYr;
+            self.lastSecondCcNum = ccNum;
         }
 
 
@@ -522,6 +551,33 @@ RMPagSeguro.prototype.updateBrand = function(){
     } else {
         this.updateOneBrand();
     }
+}
+
+/**
+ * Tests if a number passes the Luhn algorithm test
+ * @param string num
+ * @return boolean
+ */
+ RMPagSeguro.prototype.validateLuhn = function(num) {
+    var digit, digits, j, len, odd, sum;
+    odd = true;
+    sum = 0;
+    digits = (num + '').split('').reverse();
+    for (j = 0, len = digits.length; j < len; j++) {
+       digit = digits[j];
+       digit = parseInt(digit, 10);
+       if ((odd = !odd))
+       {
+           digit *= 2;
+       }
+       if (digit > 9)
+       {
+           digit -= 9;
+       }
+       sum += digit;
+   }
+
+   return sum % 10 === 0;
 }
 
 RMPagSeguro.prototype.updateOneBrand = function(){
