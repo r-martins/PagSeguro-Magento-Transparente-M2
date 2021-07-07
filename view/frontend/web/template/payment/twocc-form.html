@@ -53,13 +53,13 @@
             </label>
             <div class="control">
             <div class="cc-number-input">
-                <input type="tel" class="input-text first_cc_number_visible" value=""
+                <input type="tel" name="payment[ps_first_cc_number_visible]" class="input-text first_cc_number_visible" data-validate="{required: true}" value=""
                     data-bind="attr: {
                                 autocomplete: off,
                                 id: getCode() + '_first_cc_number_visible'},
                                 enable: isActive($parents),
                                 valueUpdate: 'keyup',
-                                value: creditCardFirstNumber
+                                value: creditCardFirstNumber,
                                 event: {keypress: numbervalidation} "/>
 
                 <input type="hidden" name="payment[ps_first_cc_number]" class="input-text" value=""
@@ -239,12 +239,16 @@
                         <div class="control">
                             <select  name="payment[ps_first_cc_installments]"
                                     class="select select-installments"
-                                    data-bind="attr: {id: getCode() + '_first_cc_installments', 'data-container': getCode() + '-first-cc-installments',},
-                                                enable: isActive($parents),
-                                                optionsValue: 'value',
-                                                optionsText: 'Installments',
-                                                optionsCaption: $t('Installments'),
-                                                value: creditCardFirstInstallments">
+                                    data-validate="{required: true}"
+                                    data-bind="attr: {
+                                                id: getCode() + '_first_cc_installments',
+                                                'data-container': getCode() + '-first-cc-installments'
+                                            },
+                                            enable: isActive($parents),
+                                            optionsValue: 'value',
+                                            optionsText: 'Installments',
+                                            optionsCaption: $t('Installments'),
+                                            value: creditCardFirstInstallments">
                             </select>
                         </div>
                     </div>
@@ -288,7 +292,7 @@
             </label>
             <div class="control">
               <div class="cc-number-input">
-                <input type="tel" class="input-text second_cc_number_visible" value=""
+                <input type="tel" name="payment[ps_second_cc_number_visible]" class="input-text second_cc_number_visible" data-validate="{required: true}" value=""
                        data-bind="attr: {
                                     autocomplete: off,
                                     id: getCode() + '_second_cc_number_visible'},
@@ -327,12 +331,12 @@
                                     valueUpdate: 'keyup',
                                     event: {keypress: limitvalue} "/>
         
-                <input type="number" placeholder="AA" class="input-text cc-exp-date" maxlength="2" value=""
+                <input type="number" placeholder="AA" name="payment[ps_second_cc_year_visible]" class="input-text cc-exp-date" maxlength="2" value=""
                         data-bind="attr: {
                                     autocomplete: off,
                                     id: getCode() + '_second_cc_year_visible',
                                     'data-container': getCode() + '-second-cc-year',
-                                    'data-validate': JSON.stringify({'required-number':true})},
+                                    'data-validate': JSON.stringify({'required-number':true, 'validate-length':true})},
                                     enable: isActive($parents),
                                     value: creditCardSecondExpYear,
                                     valueUpdate: 'keyup',
@@ -474,7 +478,11 @@
                         <div class="control">
                             <select  name="payment[ps_second_cc_installments]"
                                      class="select select-installments"
-                                     data-bind="attr: {id: getCode() + '_second_cc_installments', 'data-container': getCode() + '-second-cc-installments',},
+                                     data-validate="{required: true}"
+                                     data-bind="attr: {
+                                                    id: getCode() + '_second_cc_installments',
+                                                    'data-container': getCode() + '-second-cc-installments'
+                                                },
                                                 enable: isActive($parents),
                                                 optionsValue: 'value',
                                                 optionsText: 'Installments',

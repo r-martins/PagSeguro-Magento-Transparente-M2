@@ -152,7 +152,7 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
         });
 
         jQuery(ccExpYrVisibileElm).change(function() {
-            obj.updateCreditCardToken();
+            jQuery(ccExpYrVisibileElm).keyup();
         });
 
         jQuery( "#pagseguro_cc_method .actions-toolbar .checkout" ).on("click", function() {
@@ -225,6 +225,10 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
                 ccExpYr = '20' + jQuery(ccFirstExpYrVisibileElm).val();
             }
             jQuery(ccFirstExpYrElm).val(ccExpYr);
+            obj.updateTwoCreditCardToken('first');
+        });
+        jQuery(ccFirstExpYrVisibileElm).change(function( event ) {
+            jQuery(ccFirstExpYrVisibileElm).keyup();
         });
         jQuery(ccSecondAmount).keyup(function( event ) {
             obj.updateAmount('second');
@@ -278,6 +282,10 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
                 ccExpYr = '20' + jQuery(ccSecondExpYrVisibileElm).val();
             }
             jQuery(ccSecondExpYrElm).val(ccExpYr);
+            obj.updateTwoCreditCardToken('second');
+        });
+        jQuery(ccSecondExpYrVisibileElm).change(function( event ) {
+            obj.updateTwoCreditCardToken('second');
         });
         jQuery( "#pagseguro_tef_method .actions-toolbar .checkout" ).on("click", function() {
                 obj.updatePaymentHashes();

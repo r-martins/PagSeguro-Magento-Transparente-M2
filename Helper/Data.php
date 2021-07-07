@@ -614,12 +614,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         $calculatedShippingTotal = $params['shippingCost'];
-        $roundDiff = $cardAmount - ($itemsCalculatedTotal + $calculatedShippingTotal);
-
-        $this->writeLog('Extra amount anterior: ' . $params['extraAmount']);
-        $this->writeLog('Total Itens: ' . $itemsCalculatedTotal);
-        $this->writeLog('Entrega: ' . $calculatedShippingTotal);
-        $this->writeLog('Diferenca: ' . $roundDiff);
+        $roundDiff = round($cardAmount - ($itemsCalculatedTotal + $calculatedShippingTotal), 2);
 
         if ($roundDiff != 0 && $roundDiff != $params['extraAmount']) {
             return ['extraAmount' => $roundDiff];
