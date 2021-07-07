@@ -288,7 +288,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                         $invoice = $this->invoiceService->prepareInvoice($order);
                         $msg = sprintf('Captured payment. Transaction Identifier: %s', (string)$resultXML->code);
                         $invoice->addComment($msg);
-                        $invoice->setRequestedCaptureCase(\Magento\Sales\Model\Order\Invoice::CAPTURE_ONLINE);
+                        $invoice->setRequestedCaptureCase(\Magento\Sales\Model\Order\Invoice::CAPTURE_OFFLINE);
                         $invoice->register();
     
                         if ($this->pagSeguroHelper->getStoreConfigValue('payment/rm_pagseguro/send_invoice_email')) {
