@@ -4,7 +4,7 @@
         <arguments>
             <argument name="methodCodes" xsi:type="array">
                 <item name="rm_pagseguro_cc" xsi:type="const">RicardoMartins\PagSeguro\Model\Payment::CODE</item>
-                <item name="rm_pagseguro_twocc" xsi:type="const">RicardoMartins\PagSeguro\Model\TwoPayment::CODE</item>
+                <item name="rm_pagseguro_twocc" xsi:type="const">RicardoMartins\PagSeguro\Model\Method\Twocc::CODE</item>
             </argument>
         </arguments>
     </virtualType>    
