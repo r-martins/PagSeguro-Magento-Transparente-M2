@@ -217,10 +217,6 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
         });
         jQuery(ccFirstExpYrVisibileElm).keyup(function( event ) {
             var ccExpYr = '';
-            if(jQuery(this).val().length == 1) {
-                ccExpYr = '200' + jQuery(ccFirstExpYrVisibileElm).val();
-            }
-
             if(jQuery(this).val().length == 2) {
                 ccExpYr = '20' + jQuery(ccFirstExpYrVisibileElm).val();
             }
@@ -274,10 +270,6 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
         });
         jQuery(ccSecondExpYrVisibileElm).keyup(function( event ) {
             var ccExpYr = '';
-            if(jQuery(this).val().length == 1) {
-                ccExpYr = '200' + jQuery(ccSecondExpYrVisibileElm).val();
-            }
-
             if(jQuery(this).val().length == 2) {
                 ccExpYr = '20' + jQuery(ccSecondExpYrVisibileElm).val();
             }
