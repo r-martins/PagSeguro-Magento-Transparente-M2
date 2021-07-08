@@ -1,0 +1,18 @@
+<?php $permissions = $block->getData('permissions'); ?>
+<?php if ($block->isInstallmentsConfigEnabled() && $permissions->hasAccessToFlushPagSeguroInstallments()): ?>
+    <?php
+        $cleanCacheMessage = __(
+            "Do You really want to clean the installments cache? " .
+            "This action will remove the stored installments information for all products on store."
+        );
+        $cleanCacheUrl = $block->getFlushCacheUrl();
+    ?>
+    <p>
+        <button type="button" data-mage-init='{"RicardoMartins_PagSeguro/js/system/cache":{}}'
+                data-flush-cache-url="<?= $block->escapeUrl($cleanCacheUrl) ?>"
+                data-confirm-msg="<?= $block->escapeHtml($cleanCacheMessage) ?>">
+            <?= $block->escapeHtml(__('Flush Product Installments Cache')); ?>
+        </button>
+        <span><?= $block->escapeHtml(__('Stored installments from PagSeguro to each product of the store')); ?></span>
+    </p>
+<?php endif; ?>

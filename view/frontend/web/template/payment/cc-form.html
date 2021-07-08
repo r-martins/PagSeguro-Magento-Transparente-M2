@@ -21,7 +21,7 @@
         </label>
         <div class="control">
           <div class="cc-number-input">
-            <input type="text" class="input-text cc_number_visible" value=""
+            <input type="tel" class="input-text cc_number_visible" value=""
                    data-bind="attr: {
                                     autocomplete: off,
                                     id: getCode() + '_cc_number_visible'},
@@ -49,7 +49,7 @@
             <span><!-- ko i18n: 'Expiration Date'--><!-- /ko --></span>
         </label>
         <div class="control">
-            <input type="number" name="payment[ps_cc_exp_month]" class="input-text cc-exp-date" placeholder="MM" maxlength="2" value=""
+            <input type="tel" name="payment[ps_cc_exp_month]" class="input-text cc-exp-date" placeholder="MM" maxlength="2" value=""
                    data-bind="attr: {
                                     autocomplete: off,
                                     id: getCode() + '_expiration',
@@ -60,7 +60,7 @@
                               valueUpdate: 'keyup',
                               event: {keypress: limitvalue} "/>
 
-            <input type="number" placeholder="AA" class="input-text cc-exp-date" maxlength="2" value=""
+            <input type="tel" placeholder="AA" class="input-text cc-exp-date" maxlength="2" value=""
                     data-bind="attr: {
                                     autocomplete: off,
                                     id: getCode() + '_cc_year_visible',
@@ -90,7 +90,7 @@
             <span><!-- ko i18n: 'Card Verification Number'--><!-- /ko --></span>
         </label>
         <div class="control _with-tooltip">
-            <input type="number"
+            <input type="tel"
                    autocomplete="off"
                    class="input-text cvv"
                    name="payment[ps_cc_cid]"
@@ -140,7 +140,7 @@
             <span><!-- ko i18n: 'Date of Birth'--><!-- /ko --></span>
         </label>
         <div class="control">
-            <input type="text" name="payment[ps_cc_owner_birthday_day]" class="input-text ps_cc_birthdate" value="" maxlength="2" max="31"
+            <input type="tel" name="payment[ps_cc_owner_birthday_day]" class="input-text ps_cc_birthdate" value="" maxlength="2" max="31"
                    data-bind="attr: {
                                     autocomplete: off,
                                     placeholder: 'DD',
@@ -151,7 +151,7 @@
                             value: creditCardOwnerBirthDay,
                             valueUpdate: 'keyup'"
             />
-            <input type="text" name="payment[ps_cc_owner_birthday_month]" class="input-text ps_cc_birthdate" value="" maxlength="2" max="12"
+            <input type="tel" name="payment[ps_cc_owner_birthday_month]" class="input-text ps_cc_birthdate" value="" maxlength="2" max="12"
                    data-bind="attr: {
                                     autocomplete: off,
                                     placeholder: 'MM',
@@ -162,7 +162,7 @@
                             value: creditCardOwnerBirthMonth,
                             valueUpdate: 'keyup'"
             />
-            <input type="text" name="payment[ps_cc_owner_birthday_year]" class="input-text ps_cc_birthdate ps_cc_birthdate_year" value="" maxlength="4" max="2015"
+            <input type="tel" name="payment[ps_cc_owner_birthday_year]" class="input-text ps_cc_birthdate ps_cc_birthdate_year" value="" maxlength="4" max="2015"
                    data-bind="attr: {
                                     autocomplete: off,
                                     placeholder: $t('YYYY'),
@@ -182,7 +182,7 @@
             <span><!-- ko i18n: 'CPF '--><!-- /ko --></span>
         </label>
         <div class="control">
-            <input type="text" name="payment[ps_cc_cpf]" class="input-text" value=""
+            <input type="tel" name="payment[ps_cc_cpf]" class="input-text" value=""
                    data-bind="attr: {
                                     autocomplete: off,
                                     id: getCode() + '_cpf',
@@ -192,8 +192,8 @@
                             value: creditCardOwnerCpf,
                             event: {
                                 keypress: function(data, e){ return e.currentTarget.value.length < 11;}
-                            }
-                            valueUpdate: 'keyup'",
+                            },
+                            valueUpdate: 'keyup'"
             />
         </div>
         <span id="card-cpf-msg"></span>
@@ -209,7 +209,11 @@
                     <div class="control">
                         <select  name="payment[ps_cc_installments]"
                                  class="select select-installments"
-                                 data-bind="attr: {id: getCode() + '_cc_installments', 'data-container': getCode() + '-cc-installments',},
+                                 data-bind="attr: {
+                                                id: getCode() + '_cc_installments',
+                                                'data-container': getCode() + '-cc-installments',
+                                                'data-validate': JSON.stringify({ 'validate-select': true })
+                                            },
                                             enable: isActive($parents),
                                             optionsValue: 'value',
                                             optionsText: 'Installments',

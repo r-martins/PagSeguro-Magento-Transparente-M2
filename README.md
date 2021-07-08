@@ -6,7 +6,7 @@ Acesse https://pagseguro.ricardomartins.net.br/magento2/wizard.html e autorize s
 
 #### 2. Instale o módulo via composer
  
-    composer require ricardomartins/pagseguro:dev-master
+    composer require ricardomartins/pagseguro
     bin/magento cache:clean
     bin/magento setup:upgrade
     bin/magento setup:di:compile
