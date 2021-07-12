@@ -15,6 +15,7 @@
 
 ### Site Oficial do Módulo
 [https://pagseguro.ricardomartins.net.br/](https://pagseguro.ricardomartins.net.br/?utm_source=github&utm_medium=readme&utm_campaign=readme.md)
+
 Disponível também para [Magento 1.x](https://pagseguro.ricardomartins.net.br/magento1.html?utm_source=github&utm_medium=readme&utm_campaign=readme.md) e [WooCommerce](https://pagseguro.ricardomartins.net.br/woocommerce.html?utm_source=github&utm_medium=readme&utm_campaign=readme.md)
 
 ### Central de ajuda e suporte
