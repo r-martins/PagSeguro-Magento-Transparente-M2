@@ -35,6 +35,12 @@ define(
                        $("#pagseguro_cc_method div.messages").html(errorMessage);
                    }
 
+                   if(payload.paymentMethod.method == 'rm_pagseguro_twocc'){
+                    var responseMessage = JSON.parse(response.responseText);
+                    var errorMessage = '<div role="alert" class="message message-error error"><div data-ui-id="checkout-cart-validationmessages-message-error" data-bind="text: $data">'+responseMessage.message+'</div></div>';
+                    $("#pagseguro_twocc_method div.messages").html(errorMessage);
+                   }
+
                    $(document).scrollTop(0);
                    fullScreenLoader.stopLoader();
 

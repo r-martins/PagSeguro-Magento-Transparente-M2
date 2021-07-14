@@ -97,7 +97,6 @@ class Redirect extends Action implements HttpGetActionInterface
             $url = $order->getPayment()->getAdditionalInformation('redirectUrl');
         }
 
-
         if ($this->pagSeguroHelper->isRedirectToSuccessPageEnabled()) {
             $url = $this->pagSeguroHelper->getStoreConfigValue('payment/rm_pagseguro_pagar_no_pagseguro/redirectURL');
 

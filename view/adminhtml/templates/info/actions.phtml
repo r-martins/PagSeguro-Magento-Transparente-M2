@@ -4,10 +4,17 @@ $isPagSeguro = $block->isPagSeguro();
 if (!$isPagSeguro) {
     return;
 }
-?>
-<?php
 if ($block->isAllowed(\RicardoMartins\PagSeguro\Controller\Adminhtml\Update\Index::ADMIN_RESOURCE)):
     $updateUrl = $block->getUpdateOrderUrl();
-    ?>
+    if (is_array($updateUrl)) :
+        foreach($updateUrl as $card => $url) :
+?>
+    <p><a href="<?php echo $url; ?>" onclick="return confirm('Tem certeza?')">Atualizar situação manualmente <?php echo $card; ?> Cartão</a></p>
+<?php        
+        endforeach;
+    else:
+?>
     <a href="<?php echo $updateUrl; ?>" onclick="return confirm('Tem certeza?')">Atualizar situação manualmente</a>
-<?php endif; ?>
+<?php
+    endif;
+endif;

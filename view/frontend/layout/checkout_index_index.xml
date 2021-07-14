@@ -35,6 +35,14 @@
                                                                         </item>
                                                                     </item>
                                                                 </item>
+                                                                <item name="rm_pagseguro_twocc_payments" xsi:type="array">
+                                                                    <item name="component" xsi:type="string">RicardoMartins_PagSeguro/js/view/payment/rm_pagseguro_twocc</item>
+                                                                    <item name="methods" xsi:type="array">
+                                                                        <item name="rm_pagseguro_twocc" xsi:type="array">
+                                                                            <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                                        </item>
+                                                                    </item>
+                                                                </item>
 																<item name="rm_pagseguro_boleto_payments" xsi:type="array">
                                                                     <item name="component" xsi:type="string">RicardoMartins_PagSeguro/js/view/payment/rm_pagseguro_boleto</item>
                                                                     <item name="methods" xsi:type="array">
