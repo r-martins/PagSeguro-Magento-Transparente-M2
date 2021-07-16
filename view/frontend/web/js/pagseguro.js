@@ -1003,8 +1003,8 @@ class RMPagSeguro_RequestQueue {
     _proccessRequests(type) {
         if( typeof this.queues[type] === "undefined" ||
             this.queues[type].requests.length == 0 ||
-            this.queues[type].lock !== false )
-        {
+            this.queues[type].lock !== false
+        ) {
             return;
         }
 
@@ -1012,52 +1012,53 @@ class RMPagSeguro_RequestQueue {
         let originalParams = this.queues[type].requests.shift();
         
         var params = Object.assign({}, originalParams);
-        var localCallbacks = 
-        {
+        var localCallbacks = {
             success : function() {},
             error   : function() {},
             always  : function() {}
         };
 
         // overrides success, error and always callback functions
-        if(originalParams.success) { localCallbacks.success = originalParams.success; }
-        if(originalParams.error)   { localCallbacks.error = originalParams.error; }
-        if(originalParams.always)  { localCallbacks.always = originalParams.always; }
+        if(originalParams.success) {
+            localCallbacks.success = originalParams.success;
+        }
+        
+        if(originalParams.error) {
+            localCallbacks.error = originalParams.error;
+        }
+        
+        if(originalParams.always) {
+            localCallbacks.always = originalParams.always;
+        }
 
-        params.success = function(response)
-        {
+        params.success = function(response) {
             localCallbacks.success(response);
             
             // if you trust in PagSeguro lib, move this to always callback
             self._resumeRequests(type);
         };
 
-        params.error = function(response)
-        {
+        params.error = function(response) {
             localCallbacks.error(response);
 
             // if you trust in PagSeguro lib, move this to always callback
             self._resumeRequests(type);
         };
 
-        params.always = function(response)
-        {
+        params.always = function(response) {
             localCallbacks.always(response);
         };
 
         // set a time limit for the lock
-        var thisTimeoutId = setTimeout((function()
-        {
-            if(this.queues[type].lock == thisTimeoutId)
-            {
+        var thisTimeoutId = setTimeout((function() {
+            if(this.queues[type].lock == thisTimeoutId) {
                 // avoid late response to do wrong work
                 params.success = function(){};
                 params.error = function(){};
                 params.always = function(){};
 
                 // requeue the request
-                if(this.queues[type].requests.length == 0)
-                {
+                if(this.queues[type].requests.length == 0) {
                     this.queuePSCall(type, originalParams);
                 }
 
