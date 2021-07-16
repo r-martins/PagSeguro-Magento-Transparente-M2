@@ -649,7 +649,9 @@ RMPagSeguro.prototype.updateTwoBrand = function(cardLabel){
             this.cardSecondBin = currentBin;
         }
         localStorage.removeItem('rm_pagseguro_twocc_'+cardLabel);
-        PagSeguroDirectPayment.getBrand({
+        
+        //PagSeguroDirectPayment.getBrand({
+        self.requestOnWs('getBrand', {
             cardBin: currentBin,
             success: function(psresponse){
                 if (cardLabel === 'first') {
@@ -668,7 +670,7 @@ RMPagSeguro.prototype.updateTwoBrand = function(cardLabel){
                     console.debug('Check the call to / getBin on df.uol.com on your Network inspector for more details.');
                 }
             }
-        })
+        });
     }
 }
 
@@ -967,3 +969,129 @@ RMPagSeguro.prototype.setCardPlaceHolderImage = function(ccPlaceholderImage){
         }
     });
 }
+
+/**
+ * Class that implements a PagSeguro WS requests queue
+ */
+class RMPagSeguro_RequestQueue {
+    constructor() {
+        this.queues = [];
+    }
+
+    /**
+     * Adds a new request on queue and calls the queue processing
+     * for its type
+     * @param string type 
+     * @param object params
+     */
+    pushRequest(type, params) {
+        if (typeof this.queues[type] === "undefined") {
+            this.queues[type] = {
+                "requests" : [],
+                "lock"  : false
+            }
+        }
+
+        this.queues[type].requests.push(params);
+        this._proccessRequests(type);
+    }
+
+    /**
+     * Process the request queue of a given type
+     * @param string type
+     */
+    _proccessRequests(type) {
+        if( typeof this.queues[type] === "undefined" ||
+            this.queues[type].requests.length == 0 ||
+            this.queues[type].lock !== false )
+        {
+            return;
+        }
+
+        let self = this;
+        let originalParams = this.queues[type].requests.shift();
+        
+        var params = Object.assign({}, originalParams);
+        var localCallbacks = 
+        {
+            success : function() {},
+            error   : function() {},
+            always  : function() {}
+        };
+
+        // overrides success, error and always callback functions
+        if(originalParams.success) { localCallbacks.success = originalParams.success; }
+        if(originalParams.error)   { localCallbacks.error = originalParams.error; }
+        if(originalParams.always)  { localCallbacks.always = originalParams.always; }
+
+        params.success = function(response)
+        {
+            localCallbacks.success(response);
+            
+            // if you trust in PagSeguro lib, move this to always callback
+            self._resumeRequests(type);
+        };
+
+        params.error = function(response)
+        {
+            localCallbacks.error(response);
+
+            // if you trust in PagSeguro lib, move this to always callback
+            self._resumeRequests(type);
+        };
+
+        params.always = function(response)
+        {
+            localCallbacks.always(response);
+        };
+
+        // set a time limit for the lock
+        var thisTimeoutId = setTimeout((function()
+        {
+            if(this.queues[type].lock == thisTimeoutId)
+            {
+                // avoid late response to do wrong work
+                params.success = function(){};
+                params.error = function(){};
+                params.always = function(){};
+
+                // requeue the request
+                if(this.queues[type].requests.length == 0)
+                {
+                    this.queuePSCall(type, originalParams);
+                }
+
+                // resume the queue processing
+                this._resumeRequests(type);
+            }
+        }).bind(this), 10000);
+
+        this.queues[type].lock = thisTimeoutId;
+        PagSeguroDirectPayment[type](params);
+    }
+
+    /**
+     * Releases the queue lock and resumes the queue processing,
+     * of a given request type
+     * @param string type 
+     */
+    _resumeRequests(type) {
+        this.queues[type].lock = false;
+        this._proccessRequests(type);
+    }
+}
+
+/**
+ * Function that uses the request queue stored on window's object
+ * to made PagSeguro WS functions calling
+ * @param string type 
+ * @param object params
+ */
+RMPagSeguro.prototype.requestOnWs = function(type, params){
+    if (typeof window.rmPsRquestStack == 'undefined') {
+        window.rmPsRquestStack = new RMPagSeguro_RequestQueue();
+    }
+
+    window.rmPsRquestStack.pushRequest(type, params);
+}
+
