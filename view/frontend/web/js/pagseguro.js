@@ -835,7 +835,8 @@ RMPagSeguro.prototype.getTwoInstallments = function(grandTotal, selectedInstallm
        this.getGrandTotal();
     }
 
-    PagSeguroDirectPayment.getInstallments({
+    //PagSeguroDirectPayment.getInstallments({
+    self.requestOnWs('getInstallments', {
         amount: grandTotal,
         brand: brandName,
         success: function(response) {
@@ -884,7 +885,7 @@ RMPagSeguro.prototype.getTwoInstallments = function(grandTotal, selectedInstallm
             }
         },
         complete: function(response) {
-            console.log('inside getInstallments complete');            
+            console.log('inside getInstallments complete');
         }
     });
 }
@@ -1059,7 +1060,7 @@ class RMPagSeguro_RequestQueue {
 
                 // requeue the request
                 if(this.queues[type].requests.length == 0) {
-                    this.queuePSCall(type, originalParams);
+                    this.pushRequest(type, originalParams);
                 }
 
                 // resume the queue processing
