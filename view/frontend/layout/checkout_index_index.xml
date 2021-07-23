@@ -10,6 +10,7 @@
         </referenceContainer>
         <referenceContainer name="content">
             <block class="Magento\Framework\View\Element\Template" name="checkout_images_pagseg" template="RicardoMartins_PagSeguro::cc_images_checkout.phtml" after="-" />
+            <block class="Magento\Framework\View\Element\Template" name="checkout_images_pagseg_multicc" template="RicardoMartins_PagSeguro::multicc_images_checkout.phtml" after="-" />
         </referenceContainer>
         <referenceBlock name="checkout.root">
             <arguments>

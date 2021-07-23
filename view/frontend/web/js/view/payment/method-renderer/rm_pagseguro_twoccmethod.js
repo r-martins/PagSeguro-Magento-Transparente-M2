@@ -55,7 +55,7 @@ define(
             },
 
             getPagSeguroCcImagesHtml: function () {
-                return document.getElementById('pagSeguroCcImagesHtml').innerHTML;
+                return document.getElementById('pagSeguroMultiCcImagesHtml').innerHTML;
             },
 
             initObservable: function () {
