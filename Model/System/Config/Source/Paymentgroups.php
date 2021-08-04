@@ -23,6 +23,7 @@ class Paymentgroups implements ArrayInterface
         $options = array();
         $options[] = array('value' => 'CREDIT_CARD', 'label' => __('Cartões de Crédito'));
         $options[] = array('value' => 'BOLETO', 'label' => __('Boleto'));
+        $options[] = array('value' => 'PIX', 'label' => __('PIX'));
 
         return $options;
     }
