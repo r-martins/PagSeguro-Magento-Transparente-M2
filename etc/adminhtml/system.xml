@@ -150,7 +150,7 @@
                 </field>
                 <field id="order_status" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>New Order Status</label>
-                    <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
+                    <source_model>RicardoMartins\PagSeguro\Model\System\Config\Source\Order\Status\PendingPayment</source_model>
                 </field>
                 <field id="sort_order" translate="label comment" type="text" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Sort Order</label>
@@ -169,7 +169,7 @@
                 </field>
                 <field id="order_status" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>New Order Status</label>
-                    <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
+                    <source_model>RicardoMartins\PagSeguro\Model\System\Config\Source\Order\Status\PendingPayment</source_model>
                 </field>
                 <field id="allowspecific" translate="label" type="allowspecific" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="0" canRestore="1">
                     <label>Payment from Applicable Countries</label>
@@ -223,7 +223,7 @@
                 </field>
                 <field id="order_status" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>New Order Status</label>
-                    <source_model>Magento\Sales\Model\Config\Source\Order\Status\NewStatus</source_model>
+                    <source_model>RicardoMartins\PagSeguro\Model\System\Config\Source\Order\Status\PendingPayment</source_model>
                 </field>
                 <field id="accepted_groups" translate="label" type="multiselect" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Pagamentos aceitos</label>

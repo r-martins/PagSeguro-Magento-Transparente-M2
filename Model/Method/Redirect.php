@@ -155,7 +155,7 @@ class Redirect extends \RicardoMartins\PagSeguro\Model\Method\AbstractMethodExte
                 }
                 $this->cookieHelper->set('redirectURL', $redirectUrl, 3600);
                 $order->setStatus($this->getConfigData('order_status'));
-                $order->setState(Order::STATE_NEW);
+                $order->setState(Order::STATE_PENDING_PAYMENT);
             }
 
         } catch (\Exception $e) {
