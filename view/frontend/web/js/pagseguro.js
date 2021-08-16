@@ -307,10 +307,10 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
 
 RMPagSeguro.prototype.updateCreditCardToken = function(){
     if (jQuery("input[name='payment[method]']:checked").val() === 'rm_pagseguro_twocc' ) {
-        self.updateTwoCreditCardToken('first');
-        self.updateTwoCreditCardToken('second');
+        this.updateTwoCreditCardToken('first');
+        this.updateTwoCreditCardToken('second');
     } else {
-        self.updateOneCreditCardToken();
+        this.updateOneCreditCardToken();
     }
 }
 
@@ -464,7 +464,8 @@ RMPagSeguro.prototype.updateTwoCreditCardToken = function(cardLabel){
                 typeof self.lastExpMoFirst != "undefined" &&
                 ccExpMo == self.lastExpMoFirst &&
                 self.lastExpYrFirst == ccExpYr &&
-                self.lastFirstCcNum == ccNum
+                self.lastFirstCcNum == ccNum && 
+                self.lastFirstCvv == ccCvv
             ) {
                 return;
             }
@@ -474,7 +475,8 @@ RMPagSeguro.prototype.updateTwoCreditCardToken = function(cardLabel){
                 typeof self.lastExpMoSecond != "undefined" &&
                 ccExpMo == self.lastExpMoSecond &&
                 self.lastExpYrSecond == ccExpYr &&
-                self.lastSecondCcNum == ccNum
+                self.lastSecondCcNum == ccNum && 
+                self.lastSecondCvv == ccCvv
             ) {
                 return;
             }
@@ -492,10 +494,12 @@ RMPagSeguro.prototype.updateTwoCreditCardToken = function(cardLabel){
             self.lastExpMoFirst = ccExpMo;
             self.lastExpYrFirst = ccExpYr;
             self.lastFirstCcNum = ccNum;
+            self.lastFirstCvv = ccCvv;
         } else {
             self.lastExpMoSecond = ccExpMo;
             self.lastExpYrSecond = ccExpYr;
             self.lastSecondCcNum = ccNum;
+            self.lastSecondCvv = ccCvv;
         }
 
 
