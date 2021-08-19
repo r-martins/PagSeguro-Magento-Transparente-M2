@@ -482,14 +482,6 @@ RMPagSeguro.prototype.updateTwoCreditCardToken = function(cardLabel){
             }
         }
 
-        // checks if there is a validation for the card number and validates it
-        if (
-            validationAlgorithm == 'LUHN' &&
-            !self.validateLuhn(ccNum)
-        ) {
-            return;
-        }
-
         if (cardLabel === 'first') {
             self.lastExpMoFirst = ccExpMo;
             self.lastExpYrFirst = ccExpYr;
