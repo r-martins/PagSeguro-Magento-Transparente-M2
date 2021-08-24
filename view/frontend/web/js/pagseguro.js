@@ -509,6 +509,7 @@ RMPagSeguro.prototype.updateTwoCreditCardToken = function(cardLabel){
                     self.creditCardTokenSecond = psresponse.card.token;
                 }
                 jQuery('#'+cardLabel+'-card-msg').html('');
+                jQuery('#'+cardLabel+'-card-msg').removeAttr('generated');
                 self.updatePaymentHashes();                
             },
             error: function(psresponse){
@@ -528,6 +529,7 @@ RMPagSeguro.prototype.updateTwoCreditCardToken = function(cardLabel){
                 }else{
                     jQuery('#'+cardLabel+'-card-msg').html('Verifique os dados do cartão.');
                 }
+                jQuery('#'+cardLabel+'-card-msg').attr('generated', 'true');
                 console.error('Falha ao obter token do cartão.');
                 console.log(psresponse.errors);
                 errors = true;

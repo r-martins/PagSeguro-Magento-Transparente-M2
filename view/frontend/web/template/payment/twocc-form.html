@@ -72,7 +72,7 @@
                                 enable: isActive($parents),
                                 value: creditCardFirstNumber,
                                 valueUpdate: 'keyup' "/>
-                <span id="first-card-msg"></span>
+                <div id="first-card-msg" class="mage-error"></div>
             </div>
             </div>
         </div>
@@ -130,7 +130,7 @@
                     data-bind="attr: {id: getCode() + '_first_cc_cid',
                             title: $t('Card Verification Number'),
                             'data-container': getCode() + '-first-cc-cvv',
-                            'data-validate': JSON.stringify({'required-number':true, 'validate-card-cvv':'#' + getCode() + '_cc_type'})},
+                            'data-validate': JSON.stringify({'required-number':true})},
                             enable: isActive($parents),
                             event: {
                                 keypress: function(data, e){ return e.currentTarget.value.length < 4;}
@@ -311,7 +311,7 @@
                                     enable: isActive($parents),
                                     value: creditCardSecondNumber,
                                     valueUpdate: 'keyup' "/>
-                <span id="second-card-msg"></span>
+                <div id="second-card-msg" class="mage-error"></div>
               </div>
             </div>
         </div>
@@ -368,7 +368,7 @@
                         data-bind="attr: {id: getCode() + '_second_cc_cid',
                             title: $t('Card Verification Number'),
                             'data-container': getCode() + '-second-cc-cvv',
-                            'data-validate': JSON.stringify({'required-number':true, 'validate-card-cvv':'#' + getCode() + '_cc_type'})},
+                            'data-validate': JSON.stringify({'required-number':true})},
                             enable: isActive($parents),
                             event: {
                                 keypress: function(data, e){ return e.currentTarget.value.length < 4;}
