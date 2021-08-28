@@ -1,6 +1,6 @@
 # Módulo PagSeguro Transparente para Magento 2
 ## Com descontos nas taxas oficiais - A integração PagSeguro mais usada no Brasil
-![Screenshot do módulo](https://pagseguro.ricardomartins.net.br/assets/images/0589909f1b209ab5c65a10cac237548d_screenshotcheckoutcc.jpg)
+![Screenshot do módulo](https://i.imgur.com/ww2UhaP.jpg)
 
 ### Principais recursos
 * Aceite todos os Cartões de Crédito com cálculo automático de parcelamento
