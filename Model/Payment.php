@@ -324,7 +324,6 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     public function validate()
     {
         $creditCardToken = $this->pagSeguroHelper->getPaymentHash('credit_card_token');
-
         if (!$creditCardToken) {
             $missingInfo = sprintf('Token do cartão: %s', var_export($creditCardToken, true));
             $this->pagSeguroHelper->writeLog(

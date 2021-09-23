@@ -5,9 +5,9 @@
                class="radio"
                data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()"/>
         <label data-bind="attr: {'for': getCode()}" class="label"><span data-bind="text: getTitle()"></span></label>
-        <div data-bind="html: getPagSeguroCcImagesHtml()" id="rm_pagseguro_ccflags"></div>
+        <div data-bind="html: getPagSeguroCcImagesHtml()" id="rm_pagseguro_twoccflags"></div>
     </div>
-    <div class="payment-method-content" id="pagseguro_cc_method">
+    <div class="payment-method-content" id="pagseguro_twocc_method">
         <div id="checkout-messages" class="messages"></div>
         <div class="payment-method-billing-address">
             <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
@@ -16,7 +16,7 @@
         </div>
 
         <form class="form" data-bind="attr: {'id': getCode() + '-form'}">
-            <!-- ko template: 'RicardoMartins_PagSeguro/payment/cc-form' --><!-- /ko -->
+            <!-- ko template: 'RicardoMartins_PagSeguro/payment/twocc-form' --><!-- /ko -->
         </form>
 
         <div class="checkout-agreements-block">

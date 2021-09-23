@@ -10,6 +10,7 @@
         </referenceContainer>
         <referenceContainer name="content">
             <block class="Magento\Framework\View\Element\Template" name="checkout_images_pagseg" template="RicardoMartins_PagSeguro::cc_images_checkout.phtml" after="-" />
+            <block class="Magento\Framework\View\Element\Template" name="checkout_images_pagseg_multicc" template="RicardoMartins_PagSeguro::multicc_images_checkout.phtml" after="-" />
         </referenceContainer>
         <referenceBlock name="checkout.root">
             <arguments>
@@ -31,6 +32,14 @@
                                                                     <item name="component" xsi:type="string">RicardoMartins_PagSeguro/js/view/payment/rm_pagseguro_cc</item>
                                                                     <item name="methods" xsi:type="array">
                                                                         <item name="rm_pagseguro_cc" xsi:type="array">
+                                                                            <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                                        </item>
+                                                                    </item>
+                                                                </item>
+                                                                <item name="rm_pagseguro_twocc_payments" xsi:type="array">
+                                                                    <item name="component" xsi:type="string">RicardoMartins_PagSeguro/js/view/payment/rm_pagseguro_twocc</item>
+                                                                    <item name="methods" xsi:type="array">
+                                                                        <item name="rm_pagseguro_twocc" xsi:type="array">
                                                                             <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
                                                                         </item>
                                                                     </item>
