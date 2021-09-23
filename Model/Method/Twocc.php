@@ -391,7 +391,7 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
 
             if (count($errorMsg) > 0) {
                 $errorMsg = implode ( "\n", array_unique($errorMsg));
-                throw new \Magento\Framework\Validator\Exception($errorMsg);
+                throw new \Magento\Framework\Validator\Exception(__($errorMsg));
             }
 
         } else {
