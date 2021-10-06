@@ -30,6 +30,7 @@
             <rm_pagseguro>
                 <title>PagSeguro UOL</title>
                 <model>RicardoMartins\PagSeguro\Model\Payment</model>
+                <enable_updater>1</enable_updater>
                 <debug>1</debug>
                 <address_street_attribute>street_1</address_street_attribute>
                 <address_number_attribute>street_2</address_number_attribute>
