@@ -1521,7 +1521,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $responseXml = simplexml_load_string($response);
 
         if (!$responseXml) {
-            throw new LocalizedException(__('Invalid response: %1'), $response);
+            throw new LocalizedException(__('Invalid response: %1', $response));
         }
 
         return $responseXml;

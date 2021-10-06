@@ -12,16 +12,17 @@ use RicardoMartins\PagSeguro\Model\Notifications;
 
 class UpdatePendingOrderStatus
 {
-    const NEXT_UPDATE_TIME = 6; // in hours
+    const NEXT_UPDATE_TIME = 6; // expressed in hours
     const FILTER_DAYS_BEFORE = 7;
     const FILTER_ORDER_STATUS = [
         Order::STATE_PENDING_PAYMENT,
+        //Order::STATE_NEW,
     ];
     const FILTER_PAYMENT_METHODS = [
         \RicardoMartins\PagSeguro\Model\Method\Cc::CODE,
         \RicardoMartins\PagSeguro\Model\Method\Twocc::CODE,
         \RicardoMartins\PagSeguro\Model\Method\Boleto::CODE,
-        \RicardoMartins\PagSeguro\Model\Method\Redirect::CODE,
+        //\RicardoMartins\PagSeguro\Model\Method\Redirect::CODE,
         \RicardoMartins\PagSeguro\Model\Method\Tef::CODE,
     ];
 
@@ -76,12 +77,10 @@ class UpdatePendingOrderStatus
 
         foreach ($this->_getOrderCollection() as $order) {
             // checks if its to update this order
-            /*
             if (!$this->_canUpdate($order)) {
                 continue;
             }
-            */
-
+            
             foreach ($this->_getTransactionsIds($order) as $transactionId) {
                 try {
                     $responseXml = $this->psHelper->consultTransactionOnApi($transactionId);
@@ -89,14 +88,6 @@ class UpdatePendingOrderStatus
                         (string) $responseXml->status,
                         $order->getPayment()->getMethod()
                     );
-
-                    print_r([
-                        $order->getIncrementId(),
-                        $transactionId,
-                        $newStateObject,
-                        $order->getState(),
-                        $newStateObject->getState() == $order->getState(),
-                    ]);
 
                     // checks if the order was already updated
                     if ($newStateObject->getState() == $order->getState()) {
