@@ -783,7 +783,7 @@ RMPagSeguro.prototype.getInstallments = function(grandTotal, selectedInstallment
                 optionText = b[x].quantity + "x de R$" + b[x].installmentAmount.toFixed(2).toString().replace('.',',');
                 optionText += (b[x].interestFree)?" sem juros":" com juros";
                 if(window.rmconfig.show_total == 1){
-                    optionText += " (total R$" + (b[x].installmentAmount*b[x].quantity).toFixed(2).toString().replace('.', ',') + ")";
+                    optionText += " (total R$" + b[x].totalAmount.toFixed(2).toString().replace('.', ',') + ")";
                 }
                 optionVal = b[x].quantity + "|" + b[x].installmentAmount;
                 // if(b[x].quantity == selectedInstallment){
@@ -855,7 +855,7 @@ RMPagSeguro.prototype.getTwoInstallments = function(grandTotal, selectedInstallm
                 optionText = b[x].quantity + "x de R$" + b[x].installmentAmount.toFixed(2).toString().replace('.',',');
                 optionText += (b[x].interestFree)?" sem juros":" com juros";
                 if(window.rmconfig.show_total == 1){
-                    optionText += " (total R$" + (b[x].installmentAmount*b[x].quantity).toFixed(2).toString().replace('.', ',') + ")";
+                    optionText += " (total R$" + b[x].totalAmount.toFixed(2).toString().replace('.', ',') + ")";
                 }
                 optionVal = b[x].quantity + "|" + b[x].installmentAmount;
                 isSelected = (Number(value) == x)?" selected=\"selected\"":""
