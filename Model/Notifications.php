@@ -176,7 +176,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
             }
 
             $message = $processedState->getMessage();
-
+            
             if ($isFirst) {
                 $message = '1º ' . __('Credit Card') .' '. $message;
             }
@@ -208,7 +208,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                     );                    
                 }
                 if ($this->_code == \RicardoMartins\PagSeguro\Model\Method\Twocc::CODE) {
-                    $this->pagSeguroHelper->TwoCardCancel($payment);
+                    $this->pagSeguroHelper->twoCardCancel($payment);
                 }
             }
 
@@ -229,7 +229,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                 $cancelOrder = $this->orderData->load($order->getId());
                 $cancelOrder->cancel()->save();
                 if ($this->_code == \RicardoMartins\PagSeguro\Model\Method\Twocc::CODE) {
-                    $this->pagSeguroHelper->TwoCardCancel($payment);
+                    $this->pagSeguroHelper->twoCardCancel($payment);
                 }
             }
 
@@ -437,7 +437,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
      * @param $statusCode
      * @return Object
      */
-    public function processStatus($statusCode)
+    public function processStatus($statusCode, $paymentCode = null)
     {
         $return = new \Magento\Framework\DataObject();
         $return->setStateChanged(true);
@@ -445,8 +445,11 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
 
         switch ($statusCode) {
             case '1':
+                if (!$paymentCode) {
+                    $paymentCode = $this->getCode();
+                }
                 $return->setState(\Magento\Sales\Model\Order::STATE_PENDING_PAYMENT);
-                $return->setIsCustomerNotified(($this->getCode()!='pagseguro_cc')&&($this->getCode()!='pagseguro_twocc'));
+                $return->setIsCustomerNotified($paymentCode != 'pagseguro_cc' && $paymentCode != 'pagseguro_twocc');
 
                 $return->setMessage(
                     __('Awaiting payment: the buyer initiated the transaction, but so far PagSeguro has not '
