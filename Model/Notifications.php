@@ -208,7 +208,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                     );                    
                 }
                 if ($this->_code == \RicardoMartins\PagSeguro\Model\Method\Twocc::CODE) {
-                    $this->pagSeguroHelper->TwoCardCancel($payment);
+                    $this->pagSeguroHelper->twoCardCancel($payment);
                 }
             }
 
@@ -229,7 +229,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                 $cancelOrder = $this->orderData->load($order->getId());
                 $cancelOrder->cancel()->save();
                 if ($this->_code == \RicardoMartins\PagSeguro\Model\Method\Twocc::CODE) {
-                    $this->pagSeguroHelper->TwoCardCancel($payment);
+                    $this->pagSeguroHelper->twoCardCancel($payment);
                 }
             }
 

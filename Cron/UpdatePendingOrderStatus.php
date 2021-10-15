@@ -74,7 +74,7 @@ class UpdatePendingOrderStatus
         if (!$this->psHelper->isUpdaterEnabled()) {
             return;
         }
-
+        
         foreach ($this->_getOrderCollection() as $order) {
             // checks if its to update this order
             if (!$this->_canUpdate($order)) {
@@ -97,12 +97,15 @@ class UpdatePendingOrderStatus
                     $this->notificationModel->proccessNotificatonResult($responseXml);
                     
                     if ($order->getPayment()->getMethod() == \RicardoMartins\PagSeguro\Model\Method\Twocc::CODE) {
-                        // if one transaction was cancelled, we doesnt want to process the other
+                        // if one transaction was cancelled, we doesnt want to process the other (2cc)
+                        // because if the first transaction is cancelled, the processNotificationResult above would
+                        // cancel and refund the second one
                         if (in_array((string) $responseXml->status, ['6', '7'])) {
                             break;
                         }
                         
-                        // reloads the order to get updated data
+                        // reloads the order to get updated to avoid error loading old order data from memory in the
+                        // next loop
                         $order->load($order->getId());
                     }
                     

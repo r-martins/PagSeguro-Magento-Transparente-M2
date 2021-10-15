@@ -533,6 +533,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 default:
                     $this->writeLog('Retorno inesperado do PagSeguro: ' . $response);
                     $errMsg = 'There was a problem with PagSeguro communication. Could you try again?';
+                    $errMsg .= $this->isSandbox() ? 'Note that you are using sandbox. It is very likely to be a temporary problem.' : '';
             }
             throw new \Magento\Framework\Validator\Exception(
                 new Phrase($errMsg)
@@ -1424,7 +1425,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $senderIp;
     }
 
-    public function TwoCardCancel($payment)
+    /**
+     * Calcel payments in orders with 2 credit cards (multi-cc orders)
+     * @param $payment
+     *
+     * @throws \Magento\Framework\Validator\Exception
+     */
+    public function twoCardCancel($payment)
     {
         $order = $payment->getOrder();
 
@@ -1439,7 +1446,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $payment->getAdditionalInformation('transaction_id_second'),
         ];
 
-        $errorMsgs = [];
+        $errorMsg = [];
 
         foreach ($transactionIds as $transactionId) {
             try {
@@ -1478,7 +1485,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 $this->registerTransaction($transactionId, $transactionType, $payment);
 
             } catch (\Exception $e) {
-                $errorMsgs[] = __(
+                $errorMsg[] = __(
                     'Error trying to cancel Transaction %1 (Order %2): %3',
                     $transactionId,
                     $order->getIncrementId(),
@@ -1487,17 +1494,20 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             }
         }
 
-        if (count($errorMsgs) > 0) {
-            throw new \Magento\Framework\Validator\Exception(__(implode("\n", $errorMsgs)));
+        if (count($errorMsg) > 0) {
+            throw new \Magento\Framework\Validator\Exception(__(implode("\n", $errorMsg)));
         }
     }
 
     /**
      * Consults the transaction on PagSeguro
+     *
      * @param String $transactionId
-     * @return SimpleXMLElement
+     *
+     * @return \SimpleXMLElement
+     * @throws LocalizedException
      */
-    public function consultTransactionOnApi($transactionId)
+    public function consultTransactionOnApi(String $transactionId): \SimpleXMLElement
     {
         $email = $this->getMerchantEmail();
         $token = $this->getToken();

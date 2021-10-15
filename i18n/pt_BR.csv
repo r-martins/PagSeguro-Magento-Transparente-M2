@@ -274,3 +274,4 @@
 "Second Credit Card","2º Cartão"
 "If this config is enabled, the Magento will check updates on order status automatically. This is specially useful in cases when the store has some instability problem and looses some status update notifications from PagSeguro.","A cada 6 horas o módulo tentará buscar mudanças no status dos pedidos. Útil caso sua loja esteja sofrendo instabilidades ou tenha problemas para processar estas atualizações."
 "Enable Updater","Habilitar Consulta Automática de Pedidos Aguardando Pagamento"
+"Note that you are using sandbox. It is very likely to be a temporary problem.","Note que você está usando sandbox. É bem provável que seja um problema temporário."
