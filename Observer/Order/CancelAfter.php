@@ -48,7 +48,7 @@ class CancelAfter implements \Magento\Framework\Event\ObserverInterface
         $payment = $order->getPayment();
 
         if ($payment->getMethod() == \RicardoMartins\PagSeguro\Model\Method\Twocc::CODE) {
-            $this->helper->TwoCardCancel($payment);
+            $this->helper->twoCardCancel($payment);
         }
     }
 }

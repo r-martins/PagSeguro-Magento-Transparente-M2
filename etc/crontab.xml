@@ -4,5 +4,8 @@
         <job instance="RicardoMartins\PagSeguro\Cron\UpdateProductInstallmentValues" method="execute" name="rm_pagseguro_updateinstallments">
             <schedule>*/5 * * * *</schedule>
         </job>
+        <job instance="RicardoMartins\PagSeguro\Cron\UpdatePendingOrderStatus" method="execute" name="rm_pagseguro_updatependingorderstatus">
+            <schedule>*/5 * * * *</schedule>
+        </job>
     </group>
 </config>

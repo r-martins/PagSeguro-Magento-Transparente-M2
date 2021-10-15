@@ -1,9 +1,11 @@
 <?php
 namespace RicardoMartins\PagSeguro\Helper;
 
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Phrase;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Sales\Model\Order\Email\Sender\OrderCommentSender;
+use Magento\Framework\HTTP\ClientInterface;
 
 /**
  * Class Data Helper
@@ -28,6 +30,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_PATH_PAYMENT_PAGSEGURO_JS_URL             = 'https://stc.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.directpayment.js';
     const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_WS_URL     = 'https://ws.ricardomartins.net.br/pspro/v7/wspagseguro/v2/';
     const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_WS_URL_APP = 'payment/rm_pagseguro/sandbox_ws_url_app';
+    const XML_PATH_PAYMENT_PAGSEGURO_ENABLE_UPDATER     = 'payment/rm_pagseguro/enable_updater';
     const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_JS_URL     = 'https://stc.sandbox.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.directpayment.js';
     const XML_PATH_PAYMENT_PAGSEGURO_CC_ACTIVE          = 'payment/rm_pagseguro_cc/active';
     const XML_PATH_PAYMENT_PAGSEGURO_TWOCC_ACTIVE       = 'payment/rm_pagseguro_twocc/active';
@@ -83,6 +86,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     protected $orderCommentSender;
 
     /**
+     * @var ClientInterface
+     */
+    protected $httpClient;
+
+    /**
      * @param \Magento\Store\Model\StoreManagerInterface        $storeManager
      * @param \Magento\Checkout\Model\Session                   $checkoutSession
      * @param \Magento\Customer\Model\Customer                  $customer
@@ -94,6 +102,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Magento\Framework\Serialize\SerializerInterface  $serializer
      * @param \Magento\Sales\Api\TransactionRepositoryInterface $transactionRepository
      * @param OrderCommentSender                                $orderCommentSender
+     * @param ClientInterface                                   $httpClient
      */
 
     public function __construct(
@@ -108,7 +117,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Framework\Serialize\SerializerInterface $serializer,
         \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress,
         \Magento\Sales\Api\TransactionRepositoryInterface $transactionRepository,
-        OrderCommentSender $orderCommentSender
+        OrderCommentSender $orderCommentSender,
+        ClientInterface $httpClient
     ) {
         $this->storeManager = $storeManager;
         $this->checkoutSession = $checkoutSession;
@@ -121,6 +131,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->remoteAddress = $remoteAddress;
         $this->orderCommentSender = $orderCommentSender;
         $this->transactionRepository = $transactionRepository;
+        $this->httpClient = $httpClient;
         parent::__construct($context);
     }
 
@@ -233,6 +244,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         //Production mode
         return $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_KEY, ScopeInterface::SCOPE_WEBSITE);
+    }
+
+     /**
+      * Checks if the updater is enabled
+      * @return bool
+      */
+    public function isUpdaterEnabled()
+    {
+        return (bool) $this->scopeConfig->getValue(
+            self::XML_PATH_PAYMENT_PAGSEGURO_ENABLE_UPDATER,
+            ScopeInterface::SCOPE_WEBSITE
+        );
     }
 
     /**
@@ -510,6 +533,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 default:
                     $this->writeLog('Retorno inesperado do PagSeguro: ' . $response);
                     $errMsg = 'There was a problem with PagSeguro communication. Could you try again?';
+                    $errMsg .= $this->isSandbox() ? 'Note that you are using sandbox. It is very likely to be a temporary problem.' : '';
             }
             throw new \Magento\Framework\Validator\Exception(
                 new Phrase($errMsg)
@@ -1401,143 +1425,116 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $senderIp;
     }
 
-    public function TwoCardCancel($payment) {
-        
-        $transactionId = $payment->getAdditionalInformation('transaction_id');
-        $transactionIdFirst = $payment->getAdditionalInformation('transaction_id_first');
-
-        $transactionIdSecond = $payment->getAdditionalInformation('transaction_id_second');
-
-        $transactionIdFirstObj = false;
-        $transactionIdSecondObj = false;
-
-        $token = $this->getToken();
-        $email = $this->getMerchantEmail();
-
+    /**
+     * Calcel payments in orders with 2 credit cards (multi-cc orders)
+     * @param $payment
+     *
+     * @throws \Magento\Framework\Validator\Exception
+     */
+    public function twoCardCancel($payment)
+    {
         $order = $payment->getOrder();
+
+        // sends the cancellation e-mail to the customer
         if ($order->getState() == 'canceled') {
             $this->orderCommentSender->send($order, true);
         }
 
-        if (isset($transactionIdFirst) && isset($transactionIdSecond)) {
-            $errorMsg = [];
+        // iterates through the two cards transactions and cancels them
+        $transactionIds = [
+            $payment->getAdditionalInformation('transaction_id_first'),
+            $payment->getAdditionalInformation('transaction_id_second'),
+        ];
 
-            $transactionIdFirstObj  = $this->getTransaction($transactionIdFirst, $payment);
-            $transactionIdSecondObj = $this->getTransaction($transactionIdSecond, $payment);
+        $errorMsg = [];
 
-            if (false !== $transactionIdFirstObj) {
+        foreach ($transactionIds as $transactionId) {
+            try {
+                // checks the state of the transaction on pagseguro server
+                $transactionXml = $this->consultTransactionOnApi($transactionId);
+                $transactionStatus = (int) $transactionXml->status;
 
-                $params = [
-                    'transactionCode'   => $transactionIdFirst
-                ];
-        
-                $params['token'] = $token;
-                $params['email'] = $email;
-        
-                try {
-                    // call API - refund
-                    $returnXml  = $this->callApi($params, $payment, 'transactions/refunds');
-        
-                    if ($returnXml === null) {
-                        $errorMsg[] = 'Impossível gerar reembolso do 1º cartão. Aldo deu errado.';
+                if (in_array($transactionStatus, [6, 7])) {
+                    $transactionType = \Magento\Sales\Model\Order\Payment\Transaction::TYPE_VOID;
+                    
+                    if ($transactionStatus == 6) {
+                        $transactionType = \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND;
                     }
-                } catch (\Exception $e) {
-                    $this->writeLog(__('Payment refunding error.'));
-                    $errorMsg[] = __('Payment refunding error.');
+                    
+                    $this->registerTransaction($transactionId, $transactionType, $payment);
+                    continue;
                 }
 
-                $payment->setTransactionId($transactionIdFirst . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND);
-                $transaction = $payment->addTransaction(
-                    \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND,
-                    null,
-                    true
-                );
-            } else {
-                $params = [
-                    'transactionCode'   => $transactionIdFirst
-                ];
-        
-                try {
-                    // call API - cancels
-                    $returnXml  = $this->callApi($params, $payment, 'transactions/cancels/');
-        
-                    if ($returnXml === null) {
-                        $errorMsg[] = 'Impossível cancelar compra do 1º cartão. Aldo deu errado.';
-                    }
-                } catch (\Exception $e) {                    
-                    if ($e->getMessage() !== "invalid transaction status to cancel.") {
-                        $this->writeLog(__('Payment cancels error.'));
-                        $errorMsg[] = __('Payment cancels error.');
-                    }
+                $apiEndpoint = 'transactions/cancels';
+                $params = ['transactionCode' => $transactionId];
+                $transactionType = \Magento\Sales\Model\Order\Payment\Transaction::TYPE_VOID;
+
+                // if the transaction is already paid,
+                // ajusts the endpoint and the parameters
+                if (in_array($transactionStatus, [3, 4, 5])) {
+                    $apiEndpoint = 'transactions/refunds';
+                    $params['token'] = $this->getToken();
+                    $params['email'] = $this->getMerchantEmail();
+                    $transactionType = \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND;
                 }
 
-                $payment->setTransactionId($transactionIdFirst . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_VOID);
-                $transaction = $payment->addTransaction(
-                    \Magento\Sales\Model\Order\Payment\Transaction::TYPE_VOID,
-                    null,
-                    true
-                );
-            }
-            $payment->save();
-            if (false !== $transactionIdSecondObj) {
-
-                $params = [
-                    'transactionCode'   => $transactionIdSecond
-                ];
-        
-                $params['token'] = $token;
-                $params['email'] = $email;
-        
-                try {
-                    // call API - refund
-                    $returnXml  = $this->callApi($params, $payment, 'transactions/refunds');
-        
-                    if ($returnXml === null) {
-                        $errorMsg[] = 'Impossível gerar reembolso do 2º cartão. Aldo deu errado.';
-                    }
-                } catch (\Exception $e) {
-                    $this->writeLog(__('Payment refunding error.'));
-                    $errorMsg[] = __('Payment refunding error.');
-                }
-    
-                $payment->setTransactionId($transactionIdSecond . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND);
-                $transaction = $payment->addTransaction(
-                    \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND,
-                    null,
-                    true
-                );
-            } else {
-                $params = [
-                    'transactionCode'   => $transactionIdSecond
-                ];
-        
-                try {
-                    // call API - cancels
-                    $returnXml  = $this->callApi($params, $payment, 'transactions/cancels/');
-        
-                    if ($returnXml === null) {
-                        $errorMsg[] = 'Impossível cancelar compra do 2º cartão. Aldo deu errado.';
-                    }
-                } catch (\Exception $e) {
-                    if ($e->getMessage() !== "invalid transaction status to cancel.") {
-                        $this->writeLog(__('Payment cancels error.'));
-                        $errorMsg[] = __('Payment cancels error.');
-                    }
+                if ($this->callApi($params, $payment, $apiEndpoint) === null) {
+                    throw new LocalizedException(__('Cancellation request went wrong.'));
                 }
 
-                $payment->setTransactionId($transactionIdSecond . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_VOID);
-                $transaction = $payment->addTransaction(
-                    \Magento\Sales\Model\Order\Payment\Transaction::TYPE_VOID,
-                    null,
-                    true
+                $this->registerTransaction($transactionId, $transactionType, $payment);
+
+            } catch (\Exception $e) {
+                $errorMsg[] = __(
+                    'Error trying to cancel Transaction %1 (Order %2): %3',
+                    $transactionId,
+                    $order->getIncrementId(),
+                    $e->getMessage()
                 );
-            }
-            $payment->save();
-            if (count($errorMsg) > 0) {
-                $errorMsg = implode ( "\n", array_unique($errorMsg));
-                throw new \Magento\Framework\Validator\Exception(__($errorMsg));
             }
         }
+
+        if (count($errorMsg) > 0) {
+            throw new \Magento\Framework\Validator\Exception(__(implode("\n", $errorMsg)));
+        }
+    }
+
+    /**
+     * Consults the transaction on PagSeguro
+     *
+     * @param String $transactionId
+     *
+     * @return \SimpleXMLElement
+     * @throws LocalizedException
+     */
+    public function consultTransactionOnApi(String $transactionId): \SimpleXMLElement
+    {
+        $email = $this->getMerchantEmail();
+        $token = $this->getToken();
+        $url = "https://ws.pagseguro.uol.com.br/v2/transactions/{$transactionId}?email={$email}&token={$token}";
+
+        if ($this->isSandbox()) {
+            $publicKey = $this->getPagSeguroPubKey();
+            $url =
+                "https://ws.ricardomartins.net.br/pspro/v7/wspagseguro/v3/transactions/" .
+                "{$transactionId}?public_key={$publicKey}&isSandbox=1";
+        }
+
+        $this->httpClient->get($url);
+        $response = $this->httpClient->getBody();
+
+        if (!$response) {
+            throw new LocalizedException(__('Response is empty'));
+        }
+
+        libxml_use_internal_errors(true);
+        $responseXml = simplexml_load_string($response);
+
+        if (!$responseXml) {
+            throw new LocalizedException(__('Invalid response: %1', $response));
+        }
+
+        return $responseXml;
     }
 
     /**
@@ -1554,5 +1551,26 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             throw new \Magento\Framework\Exception\LocalizedException($exception->getMessage());
         }
         return $transactionData;
+    }
+
+    /**
+     * Registers a transaction related to payment
+     * @param string $transactionId
+     * @param string $transactionType
+     * @param Payment $payment
+     */
+    public function registerTransaction($transactionId, $transactionType, $payment)
+    {
+        if ($this->getTransaction($transactionId . '-' . $transactionType, $payment)) {
+            return;
+        }
+
+        $payment->setTransactionId($transactionId . '-' . $transactionType);
+        $transaction = $payment->addTransaction(
+            $transactionType,
+            null,
+            true
+        );
+        $payment->save();
     }
 }
