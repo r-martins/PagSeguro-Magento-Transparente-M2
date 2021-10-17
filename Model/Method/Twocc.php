@@ -504,9 +504,15 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
 
         //DOB value
         if ($this->pagSeguroHelper->isDobVisible()) {
-            $dobDay = $data['additional_data']['first_cc_owner_birthday_day'] ?? '01';
-            $dobMonth = $data['additional_data']['first_cc_owner_birthday_month'] ?? '01';
-            $dobYear = $data['additional_data']['first_cc_owner_birthday_year'] ?? '1970';
+            $dobDay = $data['additional_data']['first_cc_owner_birthday_day'] ? trim(
+                $data['additional_data']['first_cc_owner_birthday_day']
+            ) : '01';
+            $dobMonth = $data['additional_data']['first_cc_owner_birthday_month'] ? trim(
+                $data['additional_data']['first_cc_owner_birthday_month']
+            ) : '01';
+            $dobYear = $data['additional_data']['first_cc_owner_birthday_year'] ? trim(
+                $data['additional_data']['first_cc_owner_birthday_year']
+            ) : '1970';
             $info->setAdditionalInformation(
                 'credit_card_owner_birthdate_first',
                 date(
@@ -516,9 +522,15 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
                     )
                 )
             );
-            $dobDay = $data['additional_data']['second_cc_owner_birthday_day'] ?? '01';
-            $dobMonth = $data['additional_data']['second_cc_owner_birthday_month'] ?? '01';
-            $dobYear = $data['additional_data']['second_cc_owner_birthday_year'] ?? '1970';
+            $dobDay = $data['additional_data']['second_cc_owner_birthday_day'] ? trim(
+                $data['additional_data']['second_cc_owner_birthday_day']
+            ) : '01';
+            $dobMonth = $data['additional_data']['second_cc_owner_birthday_month'] ? trim(
+                $data['additional_data']['second_cc_owner_birthday_month']
+            ) : '01';
+            $dobYear = $data['additional_data']['second_cc_owner_birthday_year'] ? trim(
+                $data['additional_data']['second_cc_owner_birthday_year']
+            ) : '1970';
             $info->setAdditionalInformation(
                 'credit_card_owner_birthdate_second',
                 date(
