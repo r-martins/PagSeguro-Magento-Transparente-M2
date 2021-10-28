@@ -3,13 +3,11 @@ define(
         'Magento_Payment/js/view/payment/cc-form',
         'jquery',
         'Magento_Checkout/js/model/full-screen-loader',
-        'Magento_Ui/js/model/messageList',
-        'Magento_Checkout/js/action/place-order',
         'Magento_Checkout/js/model/payment/additional-validators',
         'Magento_Payment/js/model/credit-card-validation/validator',
         'PagseguroDirectMethod'
     ],
-    function (Component, $, fullScreenLoader, globalMessageList) {
+    function (Component, $, fullScreenLoader) {
         'use strict';
 
         return Component.extend({
@@ -48,17 +46,23 @@ define(
             },
 
             getData: function () {
-            return {
+                let originalCcNumber = this.creditCardNumber();
+                let ccNumber =
+                    originalCcNumber.substring(0, 4).padEnd(originalCcNumber.length - 4, '*') +
+                    originalCcNumber.substring(originalCcNumber.length - 4);
+
+
+                return {
                     'method': this.item.method,
                     'additional_data': {
-                        'cc_cid': this.creditCardVerificationNumber(),
+                        'cc_cid': '',
                         'cc_ss_start_month': this.creditCardSsStartMonth(),
                         'cc_ss_start_year': this.creditCardSsStartYear(),
                         'cc_ss_issue': this.creditCardSsIssue(),
                         'cc_type': this.creditCardType(),
-                        'cc_exp_year': this.creditCardExpYear(),
-                        'cc_exp_month': this.creditCardExpMonth(),
-                        'cc_number': this.creditCardNumber(),
+                        'cc_exp_year': '',
+                        'cc_exp_month': '',
+                        'cc_number': ccNumber,
                         'cc_owner_name' : this.creditCardOwnerName(),
                         'cc_owner_birthday_day' : this.creditCardOwnerBirthDay(),
                         'cc_owner_birthday_month' : this.creditCardOwnerBirthMonth(),
@@ -98,6 +102,7 @@ define(
             },
 
             placeOrder: function(data, event) {
+
                 if (this.validate()) {
                     fullScreenLoader.startLoader();
                     this.disablePlaceOrderButton(true);
