@@ -13,7 +13,7 @@ $isSandbox = $helper->isSandbox() ? 1 : 0;
 <script src="<?php echo $viewJsPath;?>"></script>
 <script type="text/javascript">
      //<![CDATA[
-    function preparePagSeguro(){
+    function preparePagSeguro(externalReference = null){
 
         if(typeof RMPagSeguroObj != "undefined"){
             <?php if ($helper->isDebugActive()): ?>
@@ -34,6 +34,10 @@ $isSandbox = $helper->isSandbox() ? 1 : 0;
             RMPagSeguroObj.getGrandTotal();
             RMPagSeguroObj.removeUnavailableBanks();
             RMPagSeguroObj.setCardPlaceHolderImage("<?php echo $ccPlaceholderImage ?>");
+
+            if (externalReference) {
+                externalReference.RMPagSeguroObj = RMPagSeguroObj;
+            }
     }
     window.visibleCpf = <?php echo $visibleCpf ?>;
     window.visibleDob = <?php echo $visibleDob ?>;

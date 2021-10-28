@@ -116,9 +116,10 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
         var ccSecondExpYrVisibileElm = jQuery('#rm_pagseguro_twocc_second_cc_year_visible');
         var ccSecondNumVisibleElm = jQuery('.second_cc_number_visible');
 
-        jQuery(ccNumElm).keyup(function( event ) {
-            obj.updateOneCreditCardToken();
+        jQuery(ccNumElm).on('keyup change', function() {
+            obj.updateOneBrand();
         });
+
         jQuery(ccNumVisibleElm).change(function() {
             jQuery(ccNumVisibleElm).keyup();
         });
@@ -144,7 +145,7 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
                 cc_num = cc_num.trim();
                 return cc_num;
             });
-            obj.updateOneCreditCardToken();
+            //obj.updateOneCreditCardToken();
         });
 
         jQuery(ccExpMoElm).change(function() {
@@ -159,9 +160,12 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
                 obj.updateCreditCardToken();
         });
 
+        /*
         jQuery(ccCvvElm).keyup(function( event ) {
             obj.updateOneCreditCardToken();
         });
+        */
+
         jQuery(ccExpYrVisibileElm).keyup(function( event ) {
             var ccExpYr = '';
             if(jQuery(this).val().length == 1) {
@@ -309,25 +313,25 @@ RMPagSeguro.prototype.updateCreditCardToken = function(){
     if (jQuery("input[name='payment[method]']:checked").val() === 'rm_pagseguro_twocc' ) {
         this.updateTwoCreditCardToken('first');
         this.updateTwoCreditCardToken('second');
-    } else {
-        this.updateOneCreditCardToken();
     }
+    
+    /* else {
+        this.updateOneCreditCardToken();
+    } */
 }
 
-RMPagSeguro.prototype.updateOneCreditCardToken = function() {
+RMPagSeguro.prototype.updateOneCreditCardToken = function(successCallback = null, errorCallback = null, completeCallback = null) {
     var ccNum = jQuery('input[name="payment[ps_cc_number]"]').val().replace(/[^0-9\.]+/g, '');
     var ccExpMo = jQuery('input[name="payment[ps_cc_exp_month]"]').val().replace(/[^0-9\.]+/g, '');
     var ccExpYr = jQuery('input[name="payment[ps_cc_exp_year]"]').val().replace(/[^0-9\.]+/g, '');
     var ccCvv = jQuery('input[name="payment[ps_cc_cid]"]').val().replace(/[^0-9\.]+/g, '');
     var brandName = '';
     var self = this;
-    if(typeof this.lastCcNum != "undefined" || ccNum != this.lastCcNum){
-        this.updateBrand();
-        if(typeof this.brand != "undefined"){
-            brandName = this.brand.name;
-        }
+    
+    if(typeof this.brand != "undefined"){
+        brandName = this.brand.name;
     }
-
+    
     if(ccNum.length > 6 && ccExpMo != "" && ccExpYr != "" && ccCvv.length >= 3)
     {
         PagSeguroDirectPayment.createCardToken({
@@ -342,8 +346,13 @@ RMPagSeguro.prototype.updateOneCreditCardToken = function() {
                 self.updatePaymentHashes();
                 self.getInstallments(self.grandTotal, self.installmentsQty);
                 jQuery('#card-msg').html('');
+
+                if (successCallback) {
+                    successCallback();
+                }
             },
             error: function(psresponse){
+                /*
                 //TODO: get real message instead of trying to catch all errors in the universe
                 if(undefined!=psresponse.errors["30400"]) {
                     jQuery('#card-msg').html('Dados do cartão inválidos. Verifique número, data de validade e CVV.');
@@ -360,12 +369,21 @@ RMPagSeguro.prototype.updateOneCreditCardToken = function() {
                 }else{
                     jQuery('#card-msg').html('Verifique os dados do cartão.');
                 }
+                */
                 console.error('Falha ao obter token do cartão.');
                 console.log(psresponse.errors);
                 errors = true;
+
+                if (errorCallback) {
+                    errorCallback(psresponse.errors);
+                }
             },
             complete: function(psresponse){
-                 console.info('Token do cartão atualizado com sucesso.');
+                console.info('Token do cartão atualizado com sucesso.');
+
+                if (completeCallback) {
+                    completeCallback();
+                }
             }
         });
     }    
@@ -578,11 +596,17 @@ RMPagSeguro.prototype.updateBrand = function(){
    return sum % 10 === 0;
 }
 
-RMPagSeguro.prototype.updateOneBrand = function(){
+RMPagSeguro.prototype.updateOneBrand = function() {
+
     var ccNum ='';
     if(jQuery('input[name="payment[ps_cc_number]"]').val()){
         var ccNum = jQuery('input[name="payment[ps_cc_number]"]').val().replace(/[^0-9\.]+/g, '');
     }
+
+    if(typeof this.lastCcNum != "undefined" && ccNum == this.lastCcNum){
+        return;
+    }
+    
     var currentBin = ccNum.substring(0, 6);
     var flag = window.rmconfig.flag;
     var debug = window.rmconfig.debug;
