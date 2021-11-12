@@ -11,7 +11,8 @@ var config = {
         // but this is implemented in a way that does not trigger necessary events
         mixins: {
             'Magento_Checkout/js/model/payment-service': {
-                'Swissup_Firecheckout/js/mixin/model/payment-service-mixin': false
+                'Swissup_Firecheckout/js/mixin/model/payment-service-mixin': false,
+                'RicardoMartins_PagSeguro/js/mixin/model/payment-service-firecheckout-fix': true
             }
         }
     }
