@@ -700,6 +700,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 $return['itemDescription'.$x] = substr($items[$y]->getName(), 0, 100);
                 $return['itemAmount'.$x] = number_format($itemPrice, 2, '.', '');
                 $return['itemQuantity'.$x] = (int) $qtyOrdered;
+
+                if ($items[$y]->getIsQtyDecimal()) {
+                    $qtyDescription = ' (' . $items[$y]->getQtyOrdered() . ' un.)';
+                    
+                    $return['itemQuantity'.$x] = 1;
+                    $return['itemAmount'.$x] = number_format($items[$y]->getRowTotalInclTax() * $percent, 2, '.', '');
+                    $return['itemDescription'.$x] =
+                        substr($items[$y]->getName(), 0, 100 - strlen($qtyDescription)) .
+                        $qtyDescription;
+                }
             }
         }
         return $return;
