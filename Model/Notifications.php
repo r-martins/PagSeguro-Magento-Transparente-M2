@@ -1,6 +1,8 @@
 <?php
 namespace RicardoMartins\PagSeguro\Model;
 
+use Magento\Sales\Model\Order as Sales_Order;
+
 /**
  * Processes notifications from PagSeguro
  *
@@ -158,6 +160,13 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
             $this->_code = $payment->getMethod();
             $processedState = $this->processStatus((int)$resultXML->status);
 
+            // avoids holding complete orders
+            if (((int) $resultXML->status) == 9 &&
+                $order->getState() == Sales_Order::STATE_COMPLETE
+            ) {
+                $processedState->setStateChanged(false);
+            }
+
             $isFirst = false;
             $isSecond = false;
 
@@ -205,7 +214,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                     $payment->registerRefundNotification(floatval($resultXML->grossAmount));
                     $order->addStatusHistoryComment(
                         'Returned: Amount returned to buyer.'
-                    );                    
+                    );
                 }
                 if ($this->_code == \RicardoMartins\PagSeguro\Model\Method\Twocc::CODE) {
                     $this->pagSeguroHelper->twoCardCancel($payment);
@@ -237,7 +246,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
 
                 // somente para o status 6 que edita o status do pedido - Weber
                 if ((int)$resultXML->status != 6) {
-
+                    
                     $this->pagSeguroHelper->writeLog("State: ". $processedState->getState());
 
                     $order->setState($processedState->getState());
