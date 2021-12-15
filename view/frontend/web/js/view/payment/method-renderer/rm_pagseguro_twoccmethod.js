@@ -7,13 +7,23 @@ define(
         'Magento_Payment/js/model/credit-card-validation/credit-card-number-validator',
         'Magento_Checkout/js/model/quote',
         'Magento_Checkout/js/action/redirect-on-success',
+        'uiRegistry',
         'Magento_Checkout/js/action/place-order',
         'Magento_Checkout/js/model/full-screen-loader',
         'Magento_Checkout/js/model/payment/additional-validators',
         'Magento_Payment/js/model/credit-card-validation/validator',
         'PagseguroDirectMethod'
     ],
-    function (Component, $, creditCardSecondData, creditCardData, cardNumberValidator, quote, redirectOnSuccessAction) {
+    function (
+        Component,
+        $,
+        creditCardSecondData,
+        creditCardData,
+        cardNumberValidator,
+        quote,
+        redirectOnSuccessAction,
+        uiRegistry
+    ) {
         'use strict';
 
         return Component.extend({
@@ -102,6 +112,10 @@ define(
                 var self = this;
     
                 this._super();
+
+                uiRegistry.get(this.name + '.' + this.name + '.messages', (function(component) {
+                    component.hideTimeout = 12000;
+                }));
     
                 //Set credit card number to credit card data object
                 this.creditCardFirstNumber.subscribe(function (value) {
