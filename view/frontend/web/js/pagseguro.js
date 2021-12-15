@@ -344,7 +344,6 @@ RMPagSeguro.prototype.updateOneCreditCardToken = function(successCallback = null
                 console.log(psresponse);
                 self.creditCardToken = psresponse.card.token;
                 self.updatePaymentHashes();
-                //self.getInstallments(self.grandTotal, self.installmentsQty);
                 jQuery('#card-msg').html('');
 
                 if (successCallback) {
