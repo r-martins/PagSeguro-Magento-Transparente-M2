@@ -230,6 +230,8 @@ define(
                     this.creditCardSecondAmount( amountSecond.toString());
 
                     if (this.RMPagSeguroObj) {
+                        console.debug('Total changed: triggering the installments update...');
+                        
                         // triggers only the first card installments update, because the second will
                         // automatically occurs after the first one
                         this.RMPagSeguroObj.setTwoInstallments('first');

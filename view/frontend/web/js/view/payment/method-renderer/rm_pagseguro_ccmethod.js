@@ -5,8 +5,6 @@ define(
         'Magento_Checkout/js/model/full-screen-loader',
         'uiRegistry',
         'Magento_Ui/js/model/messageList',
-        'Magento_SalesRule/js/action/set-coupon-code',
-        'Magento_SalesRule/js/action/cancel-coupon',
         'Magento_Checkout/js/model/quote',
         'Magento_Checkout/js/model/payment/additional-validators',
         'Magento_Payment/js/model/credit-card-validation/validator',
@@ -18,8 +16,6 @@ define(
         fullScreenLoader,
         uiRegistry,
         globalMessageList,
-        setCouponCodeAction,
-        cancelCouponAction,
         quote
     ) {
         'use strict';
@@ -61,11 +57,6 @@ define(
                 uiRegistry.get(this.name + '.' + this.name + '.messages', (function(component) {
                     component.hideTimeout = 12000;
                 }));
-
-                /*
-                setCouponCodeAction.registerSuccessCallback(this._updateInstallments.bind(this));
-                cancelCouponAction.registerSuccessCallback(this._updateInstallments.bind(this));
-                */
 
                 quote.totals.subscribe(this._updateInstallments.bind(this));
             },
@@ -197,7 +188,7 @@ define(
             _updateInstallments: function() {
                 // checks if the component was fully initialized and the form its open
                 if (this.RMPagSeguroObj && this.getCode() == this.isChecked()) {
-                    console.log('Total changed: triggering the installments update...');
+                    console.debug('Total changed: triggering the installments update...');
                     this.RMPagSeguroObj.getInstallments(quote.getTotals()().grand_total);
                 }
             }
