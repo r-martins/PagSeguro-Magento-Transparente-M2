@@ -21,23 +21,29 @@ $isSandbox = $helper->isSandbox() ? 1 : 0;
             <?php endif; ?>
             return;
         }
+        
         <?php if ($helper->isDebugActive()): ?>
         console.info('PagSeguro is initiating. Wait for ready message.');
         <?php endif; ?>
-            var RMPagSeguroObj = new RMPagSeguro(<?php echo $helper->getConfigJs()?>);
-            console.info('PagSeguro ready');
-            RMPagSeguroObj.addCardFieldsObserver(RMPagSeguroObj);
-            RMPagSeguroObj.setupGrandTotalListener(RMPagSeguroObj);
-            RMPagSeguroObj.setStoreUrl("<?php echo $storeUrl ?>");
-            RMPagSeguroObj.updateBrand();
-            RMPagSeguroObj.setInstallmentsQty(<?php echo $installments;?>);
-            RMPagSeguroObj.getGrandTotal();
-            RMPagSeguroObj.removeUnavailableBanks();
-            RMPagSeguroObj.setCardPlaceHolderImage("<?php echo $ccPlaceholderImage ?>");
 
-            if (externalReference) {
-                externalReference.RMPagSeguroObj = RMPagSeguroObj;
-            }
+        // ensures that there will be only one instance of the RMPagSeguro class
+        var RMPagSeguroObj = window.RMPagSeguroObj;
+        if (!RMPagSeguroObj) {
+            RMPagSeguroObj = window.RMPagSeguroObj = new RMPagSeguro(<?php echo $helper->getConfigJs()?>);
+        }
+        console.info('PagSeguro ready');
+        RMPagSeguroObj.addCardFieldsObserver(RMPagSeguroObj);
+        RMPagSeguroObj.setupGrandTotalListener(RMPagSeguroObj);
+        RMPagSeguroObj.setStoreUrl("<?php echo $storeUrl ?>");
+        RMPagSeguroObj.updateBrand();
+        RMPagSeguroObj.setInstallmentsQty(<?php echo $installments;?>);
+        RMPagSeguroObj.getGrandTotal();
+        RMPagSeguroObj.removeUnavailableBanks();
+        RMPagSeguroObj.setCardPlaceHolderImage("<?php echo $ccPlaceholderImage ?>");
+
+        if (externalReference) {
+            externalReference.RMPagSeguroObj = RMPagSeguroObj;
+        }
     }
     window.visibleCpf = <?php echo $visibleCpf ?>;
     window.visibleDob = <?php echo $visibleDob ?>;

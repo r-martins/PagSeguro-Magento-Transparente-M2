@@ -221,13 +221,19 @@ define(
             },
 
             updAmount: function() {
-                if (this.amountTotal !== quote.getTotals()().grand_total) {
+                if (this.amountTotal !== quote.getTotals()().grand_total && this.getCode() == this.isChecked()) {
                     var percentFirst = $('input[name="payment[ps_first_cc_amount]"]').val() / this.amountTotal;
                     this.amountTotal = quote.getTotals()().grand_total;
                     var amountFirst = (this.amountTotal * percentFirst).toFixed(2);
                     var amountSecond = (this.amountTotal - amountFirst).toFixed(2);
                     this.creditCardFirstAmount( amountFirst.toString());
                     this.creditCardSecondAmount( amountSecond.toString());
+
+                    if (this.RMPagSeguroObj) {
+                        // triggers only the first card installments update, because the second will
+                        // automatically occurs after the first one
+                        this.RMPagSeguroObj.setTwoInstallments('first');
+                    }
                 }
             },
 
