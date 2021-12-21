@@ -516,6 +516,8 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                 $return->setMessage(__('Debited: The transaction amount was returned to the buyer.'));
                 break;
             case '9':
+                // If order status is completed, the state will not be changed, as verified at
+                // self::proccessNotificatonResult
                 $return->setState(\Magento\Sales\Model\Order::STATE_HOLDED);
                 $return->setIsCustomerNotified(true);
                 $return->setMessage(__('Temporary Retention: The buyer has opened a dispute with the credit card operator and the transaction is now being analysed.'));
