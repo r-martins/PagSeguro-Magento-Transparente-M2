@@ -8,7 +8,6 @@
         <div data-bind="html: getPagSeguroCcImagesHtml()" id="rm_pagseguro_ccflags"></div>
     </div>
     <div class="payment-method-content" id="pagseguro_cc_method">
-        <div id="checkout-messages" class="messages"></div>
         <div class="payment-method-billing-address">
             <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
             <!-- ko template: getTemplate() --><!-- /ko -->
@@ -24,6 +23,9 @@
             <!-- ko template: getTemplate() --><!-- /ko -->
             <!--/ko-->
         </div>
+        <!-- ko foreach: getRegion('messages') -->
+        <!-- ko template: getTemplate() --><!-- /ko -->
+        <!--/ko-->
         <div class="actions-toolbar">
             <!-- ko if: (window.isSandbox)-->
             <p style="text-align: right;">&#9888; <!-- ko i18n: 'Transação de Teste - Sandbox Ativo'--><!-- /ko --></p>

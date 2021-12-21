@@ -1,9 +1,4 @@
 var config = {
-    map: {
-        '*': {
-            'Magento_Checkout/js/model/place-order':'RicardoMartins_PagSeguro/js/model/place-order'
-        }
-    },
     config: {
         // Disables the firecheckout mixin on payment service model of Magento Checkout.
         // This avoids bugs when coupon is applied / cancelled on checkout page.

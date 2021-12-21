@@ -17,7 +17,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
      */
     protected $_formBlockType = \RicardoMartins\PagSeguro\Block\Form\Cc::class;
 
-    const CODE = 'rm_pagseguro_cc';
+    const CODE = 'rm_pagseguro';
 
     protected $_code = self::CODE;
     protected $_isGateway                   = true;

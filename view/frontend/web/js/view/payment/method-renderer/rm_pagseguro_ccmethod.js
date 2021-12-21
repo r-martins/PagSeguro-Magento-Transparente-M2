@@ -3,11 +3,13 @@ define(
         'Magento_Payment/js/view/payment/cc-form',
         'jquery',
         'Magento_Checkout/js/model/full-screen-loader',
+        'uiRegistry',
+        'Magento_Ui/js/model/messageList',
         'Magento_Checkout/js/model/payment/additional-validators',
         'Magento_Payment/js/model/credit-card-validation/validator',
         'PagseguroDirectMethod'
     ],
-    function (Component, $, fullScreenLoader) {
+    function (Component, $, fullScreenLoader, uiRegistry, globalMessageList) {
         'use strict';
 
         return Component.extend({
@@ -39,6 +41,14 @@ define(
                     ]);
 
                 return this;
+            },
+
+            initialize: function() {
+                this._super();
+                
+                uiRegistry.get(this.name + '.' + this.name + '.messages', (function(component) {
+                    component.hideTimeout = 12000;
+                }));
             },
 
             getCode: function() {
@@ -103,6 +113,12 @@ define(
 
             placeOrder: function(data, event) {
 
+                let messageContainer = this.messageContainer || globalMessageList;
+
+                if (event) {
+                    event.preventDefault();
+                }
+
                 if (this.validate()) {
                     fullScreenLoader.startLoader();
                     this.disablePlaceOrderButton(true);
@@ -139,20 +155,10 @@ define(
                                 formattedErrors.push('Verifique os dados do cartão.');
                             }
 
-                            let errorMessage = 'Dados do cartão inválidos. ' + formattedErrors.join(' ');
-                            let messageContainer = $('#pagseguro_cc_method div.messages');
-                            let errorTemplate = 
-                                `<div role="alert" class="message message-error error">
-                                    <div data-ui-id="checkout-cart-validationmessages-message-error">
-                                        ${errorMessage}
-                                    </div>
-                                </div>`;
+                            messageContainer.addErrorMessage({
+                                message: 'Dados do cartão inválidos. ' + formattedErrors.join(' ')
+                            });
                             
-                            // shows error and scroll to it
-                            messageContainer.html(errorTemplate);
-                            $('html, body').animate({
-                                scrollTop: messageContainer.offset().top - 20
-                            }, 1000);
                         }).bind(this),
 
                         // complete callback function
