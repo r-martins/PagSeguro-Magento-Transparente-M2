@@ -322,10 +322,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 self::XML_PATH_PAYMENT_PAGSEGURO_CC_SHOW_TOTAL,
                 ScopeInterface::SCOPE_WEBSITE
             ),
-            'force_installments_selection' => $this->scopeConfig->getValue(
-                self::XML_PATH_PAYMENT_PAGSEGURO_CC_FORCE_INSTALLMENTS,
-                ScopeInterface::SCOPE_WEBSITE
-            )];
+            'force_installments_selection' => $this->forceInstallmentSelection()];
 
         return json_encode($config);
     }
@@ -416,12 +413,38 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
+     * Checks if the force installments selection flag is on
+     * @return bool
+     */
+    public function forceInstallmentSelection()
+    {
+        return (bool) $this->scopeConfig->getValue(
+            self::XML_PATH_PAYMENT_PAGSEGURO_CC_FORCE_INSTALLMENTS,
+            ScopeInterface::SCOPE_WEBSITE
+        );
+    }
+
+    /**
      * Return Installment Qty
-     * return int
+     * @return int|null
      */
     public function getInstallmentQty()
     {
-        return  2;
+        $installmentsQty = null;
+
+        if (!$this->forceInstallmentSelection() && $this->checkoutSession->getData('installment')) {
+            $installmentsData = $this->serializer->unserialize($this->checkoutSession->getData('installment'));
+
+            if (isset($installmentsData['cc_installment']) && $installmentsData['cc_installment']) {
+                $installmentsData = explode('|', $installmentsData['cc_installment']);
+
+                if ($installmentsData && count($installmentsData) > 0) {
+                    $installmentsQty = (int) $installmentsData[0];
+                }
+            }
+        }
+
+        return $installmentsQty;
     }
 
     /**

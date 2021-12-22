@@ -189,7 +189,10 @@ define(
                 // checks if the component was fully initialized and the form its open
                 if (this.RMPagSeguroObj && this.getCode() == this.isChecked()) {
                     console.debug('Total changed: triggering the installments update...');
-                    this.RMPagSeguroObj.getInstallments(quote.getTotals()().grand_total);
+                    this.RMPagSeguroObj.getInstallments(
+                        quote.getTotals()().grand_total,
+                        this.RMPagSeguroObj.installmentsQty
+                    );
                 }
             }
         });

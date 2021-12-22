@@ -672,7 +672,7 @@ RMPagSeguro.prototype.updateTwoBrand = function(cardLabel){
         localStorage.removeItem('rm_pagseguro_twocc_'+cardLabel);
         
         //PagSeguroDirectPayment.getBrand({
-        self.requestOnWs('getBrand', {
+        self.requestToWs('getBrand', {
             cardBin: currentBin,
             success: function(psresponse){
                 if (cardLabel === 'first') {
@@ -809,22 +809,15 @@ RMPagSeguro.prototype.getInstallments = function(grandTotal, selectedInstallment
                     optionText += " (total R$" + b[x].totalAmount.toFixed(2).toString().replace('.', ',') + ")";
                 }
                 optionVal = b[x].quantity + "|" + b[x].installmentAmount;
-                // if(b[x].quantity == selectedInstallment){
-                //     parcelsDrop.append('<option value="'+optionVal+'" selected>'+optionText+'</option>');
-                // }else{
+                if (b[x].quantity == selectedInstallment) {
+                    parcelsDrop.append('<option value="'+optionVal+'" selected>'+optionText+'</option>');
+                } else {
                     parcelsDrop.append('<option value="'+optionVal+'">'+optionText+'</option>');
-                // }
+                }
             }
-            if(window.rmconfig.force_installments_selection != 1){
-                jQuery('#rm_pagseguro_cc_cc_installments option[selected="selected"]').each(
-                    function() {
-                        jQuery(this).removeAttr('selected');
-                    }
-                );
-                parcelsDrop.prop("selectedIndex",0);
-            }
-             // updating installment value in checkout session
-              self.updateInstallments();
+            
+            // updating installment value in checkout session
+            self.updateInstallments();
         },
         error: function(response) {
             console.error('Error getting parcels:');
@@ -857,7 +850,7 @@ RMPagSeguro.prototype.getTwoInstallments = function(grandTotal, selectedInstallm
     }
 
     //PagSeguroDirectPayment.getInstallments({
-    self.requestOnWs('getInstallments', {
+    self.requestToWs('getInstallments', {
         amount: grandTotal,
         brand: brandName,
         success: function(response) {
@@ -1110,7 +1103,7 @@ class RMPagSeguro_RequestQueue {
  * @param string type 
  * @param object params
  */
-RMPagSeguro.prototype.requestOnWs = function(type, params){
+RMPagSeguro.prototype.requestToWs = function(type, params){
     if (typeof window.rmPsRquestStack == 'undefined') {
         window.rmPsRquestStack = new RMPagSeguro_RequestQueue();
     }
