@@ -220,10 +220,10 @@ define(
                 return amountBalance;
             },
 
-            updAmount: function() {
-                if (this.amountTotal !== quote.getTotals()().grand_total && this.getCode() == this.isChecked()) {
+            updAmount: function(totals) {
+                if (this.amountTotal !== totals.grand_total && this.getCode() == this.isChecked()) {
                     var percentFirst = $('input[name="payment[ps_first_cc_amount]"]').val() / this.amountTotal;
-                    this.amountTotal = quote.getTotals()().grand_total;
+                    this.amountTotal = totals.grand_total;
                     var amountFirst = (this.amountTotal * percentFirst).toFixed(2);
                     var amountSecond = (this.amountTotal - amountFirst).toFixed(2);
                     this.creditCardFirstAmount( amountFirst.toString());
