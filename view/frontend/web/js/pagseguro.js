@@ -796,7 +796,7 @@ RMPagSeguro.prototype.getInstallments = function(grandTotal, selectedInstallment
             var b = response.installments[brandName];
             parcelsDrop.empty();
 
-            if(window.rmconfig.force_installments_selection == 1){
+            if(window.rmconfig.force_installments_selection){
                 parcelsDrop.append('<option value="" selected="selected">Selecione a quantidade de parcelas</option>');
             }
 
@@ -860,7 +860,7 @@ RMPagSeguro.prototype.getTwoInstallments = function(grandTotal, selectedInstallm
             var b = response.installments[brandName];
             parcelsDrop.empty();
 
-            if(window.rmconfig.force_installments_selection == 1){
+            if(window.rmconfig.force_installments_selection){
                 parcelsDrop.append('<option value="" selected="selected">Selecione a quantidade de parcelas</option>');
                 value--;
             }
@@ -880,7 +880,7 @@ RMPagSeguro.prototype.getTwoInstallments = function(grandTotal, selectedInstallm
                     document.querySelector('.'+ cardLabel +'_cc_installments').value = document.querySelector('#rm_pagseguro_twocc_'+ cardLabel +'_cc_installments').value;
                 }
             }
-            if(window.rmconfig.force_installments_selection == 1){
+            if(window.rmconfig.force_installments_selection){
                 value++;
             }
             parcelsDrop.prop('selectedIndex', value);

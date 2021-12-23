@@ -58,6 +58,7 @@ define(
                     component.hideTimeout = 12000;
                 }));
 
+                this.grandTotal = quote.totals().grand_total;
                 quote.totals.subscribe(this._updateInstallments.bind(this));
             },
 
@@ -185,12 +186,15 @@ define(
             /**
              * Triggers the update of the installments (consulted on PagSeguro)
              */
-            _updateInstallments: function() {
+            _updateInstallments: function(totals) {
+                
                 // checks if the component was fully initialized and the form its open
-                if (this.RMPagSeguroObj && this.getCode() == this.isChecked()) {
+                if (this.RMPagSeguroObj && this.getCode() == this.isChecked() && this.grandTotal != totals.grand_total) {
+                    this.grandTotal = totals.grand_total;
+                    
                     console.debug('Total changed: triggering the installments update...');
                     this.RMPagSeguroObj.getInstallments(
-                        quote.getTotals()().grand_total,
+                        totals.grand_total,
                         this.RMPagSeguroObj.installmentsQty
                     );
                 }
