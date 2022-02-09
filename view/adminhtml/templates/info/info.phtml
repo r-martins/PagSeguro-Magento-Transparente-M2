@@ -1,12 +1,23 @@
-<?php
-/** @var \RicardoMartins\PagSeguro\Block\Payment\Info $block */
-?>
+<?php /** @var \RicardoMartins\PagSeguro\Block\Payment\Info $block */ ?>
 <?php $paymentInfo = $block->getPaymentInfo(); ?>
-<p><strong><?= $block->escapeHtml($block->getMethod()->getTitle()) ?><?php if(isset($paymentInfo['is_sandbox']) && $paymentInfo['is_sandbox'] == '1') { echo __(' - Ambiente de Testes'); } ?></strong></p>
-<?php if($paymentInfo): ?>
 <p>
-    <a href="<?php echo $paymentInfo['url'];?>" target="_blank"><?php echo $paymentInfo['texto'];?></a>
+    <strong>
+        <?= $block->escapeHtml($block->getMethod()->getTitle()) ?>
+        <?php if (isset($paymentInfo['is_sandbox']) && $paymentInfo['is_sandbox'] == '1'): ?>
+            <?= $block->escapeHtml(__(' - Ambiente de Testes')); ?>
+        <?php endif; ?>
+    </strong>
 </p>
+<?php if ($paymentInfo): ?>
+    <p>
+        <a href="<?= $block->escapeUrl($paymentInfo['url']); ?>" target="_blank">
+            <?= $block->escapeHtml($paymentInfo['texto']);?>
+        </a>
+        <br />
+        <br />
+        <a href="<?= $block->escapeUrl($block->getTransactionLink()) ?>" target="_blank">
+            <?= $block->escapeHtml(__('View on PagSeguro')) ?>
+        </a>
+    </p>
 <?php endif;?>
-<?php
-echo $block->getBlockHtml('pagseguro.actions');
+<?= $block->getBlockHtml('pagseguro.actions');
