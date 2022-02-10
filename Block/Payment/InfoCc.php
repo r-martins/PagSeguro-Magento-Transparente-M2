@@ -82,4 +82,35 @@ class InfoCc extends \Magento\Payment\Block\Info
         if (false !== $isPaid) return 'Pago';
         return 'Pendente';
     }
+
+    /**
+     * Retrieves the link of the transaction on PagSeguro Panel
+     * @return string
+     */
+    public function getTransactionLink($cardIndex = '')
+    {
+        $transactionId = '';
+        $info = $this->getPaymentInfo();
+
+        switch ($cardIndex) {
+            case 'first':
+                $transactionId = $info['transaction_id_first'] ?? '';
+                break;
+            case 'second':
+                $transactionId = $info['transaction_id_second'] ?? '';
+                break;
+            default:
+                $transactionId = $info['transaction_id'] ?? '';
+        }
+
+        if (!$transactionId) {
+            return '';
+        }
+
+        if (isset($info['is_sandbox']) && $info['is_sandbox']) {
+            return 'https://sandbox.pagseguro.uol.com.br/aplicacao/transacoes.html';
+        }
+
+        return 'https://pagseguro.uol.com.br/transaction/details.jhtml?code=' . $transactionId;
+    }
 }

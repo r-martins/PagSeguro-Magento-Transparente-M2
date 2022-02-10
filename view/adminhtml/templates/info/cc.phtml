@@ -3,38 +3,71 @@
 $info = $block->getPaymentInfo();
 ?>
 
-<p><strong><?= $block->escapeHtml($block->getMethod()->getTitle()) ?><?php if(isset($info['is_sandbox']) && $info['is_sandbox'] == '1') { echo __(' - Ambiente de Testes'); } ?></strong></p>
-<?php if (isset($info['transaction_id_first']) && isset($info['transaction_id_second'])) : ?>
+<p>
+    <strong>
+        <?= $block->escapeHtml($block->getMethod()->getTitle()) ?>
+        <?php if (isset($info['is_sandbox']) && $info['is_sandbox'] == '1') {
+            echo $block->escapeHtml(__(' - Ambiente de Testes'));
+        } ?>
+    </strong>
+</p>
+<?php if (isset($info['transaction_id_first']) && isset($info['transaction_id_second'])): ?>
     <p><b>Cartão 1:</b></p>
     <?php if (isset($info['credit_card_type_first'])): ?>
-    <p>Bandeira: <?php echo ucwords($info['credit_card_type_first']); ?></p>
+    <p>Bandeira: <?= $block->escapeHtml(ucwords($info['credit_card_type_first'])); ?></p>
     <?php endif?>
-    <?php if (isset($info['installment_quantity_first']) && isset($info['installment_value_first'])) : ?>
-    <p>Parcelas: <?php echo $info['installment_quantity_first']?> (R$ <?php echo number_format(str_replace(',','.',$info['installment_value_first']), 2, ',', '.')?>)</p>
+    <?php if (isset($info['installment_quantity_first']) && isset($info['installment_value_first'])): ?>
+    <p>Parcelas: <?= $block->escapeHtml($info['installment_quantity_first']) ?>
+    (R$
+        <?= $block->escapeHtml(number_format(str_replace(',', '.', $info['installment_value_first']), 2, ',', '.')) ?>
+    )</p>
     <?php endif?>
-    <?php if (isset($info['transaction_id_first'])) : ?>
-        <p>Código da transação do 1º cartão: <?php echo $info['transaction_id_first']?></p>
-        <p>Status da transação do 1º cartão: <b><?= $block->getStatus($info['transaction_id_first'])?></b></p>
+    <?php if (isset($info['transaction_id_first'])): ?>
+        <p>Código da transação do 1º cartão: <?= $block->escapeHtml($info['transaction_id_first']) ?></p>
+        <p>
+            Status da transação do 1º cartão:
+            <b><?= $block->escapeHtml($block->getStatus($info['transaction_id_first'])) ?></b>
+        </p>
+        <a href="<?= $block->escapeUrl($block->getTransactionLink('first')) ?>" target="_blank">
+            <?= $block->escapeHtml(__('View on PagSeguro')) ?>
+        </a>
+        <br /><br />
     <?php endif?>
     <p><b>Cartão 2:</b></p>
     <?php if (isset($info['credit_card_type_second'])): ?>
-    <p>Bandeira: <?php echo ucwords($info['credit_card_type_second']); ?></p>
+    <p>Bandeira: <?= $block->escapeHtml(ucwords($info['credit_card_type_second'])); ?></p>
     <?php endif?>
-    <?php if (isset($info['installment_quantity_second']) && isset($info['installment_value_second'])) : ?>
-    <p>Parcelas: <?php echo $info['installment_quantity_second']?> (R$ <?php echo number_format(str_replace(',','.',$info['installment_value_second']), 2, ',', '.')?>)</p>
+    <?php if (isset($info['installment_quantity_second']) && isset($info['installment_value_second'])): ?>
+    <p>Parcelas: <?= $block->escapeHtml($info['installment_quantity_second']) ?>
+    (R$
+        <?= $block->escapeHtml(number_format(str_replace(',', '.', $info['installment_value_second']), 2, ',', '.'))?>
+    )</p>
     <?php endif?>
-    <?php if (isset($info['transaction_id_second'])) : ?>
-        <p>Código da transação do 2º cartão: <?php echo $info['transaction_id_second']?></p>
-        <p>Status da transação do 2º cartão: <b><?= $block->getStatus($info['transaction_id_second'])?></b></p>
+    <?php if (isset($info['transaction_id_second'])): ?>
+        <p>Código da transação do 2º cartão: <?= $block->escapeHtml($info['transaction_id_second']) ?></p>
+        <p>
+            Status da transação do 2º cartão:
+            <b><?= $block->escapeHtml($block->getStatus($info['transaction_id_second'])) ?></b>
+        </p>
+        <a href="<?= $block->escapeUrl($block->getTransactionLink('second')) ?>" target="_blank">
+            <?= $block->escapeHtml(__('View on PagSeguro')) ?>
+        </a>
+        <br /><br />
     <?php endif?>
 <?php else:?>
-    <?php if (isset($info['installment_quantity']) && isset($info['installment_value'])) : ?>
-    <p>Parcelas: <?php echo $info['installment_quantity']?> (R$ <?php echo number_format($info['installment_value'], 2, ',', '.')?>)</p>
+    <?php if (isset($info['installment_quantity']) && isset($info['installment_value'])): ?>
+    <p>Parcelas: <?= $block->escapeHtml($info['installment_quantity']) ?>
+    (R$
+        <?= $block->escapeHtml(number_format($info['installment_value'], 2, ',', '.')) ?>
+    )</p>
     <?php endif?>
-    <?php if (isset($info['transaction_id'])) : ?>
-        <p>Código da transação: <?php echo $info['transaction_id']?></p>
+    <?php if (isset($info['transaction_id'])): ?>
+        <p>Código da transação: <?= $block->escapeHtml($info['transaction_id']) ?></p>
+        <a href="<?= $block->escapeUrl($block->getTransactionLink()) ?>" target="_blank">
+            <?= $block->escapeHtml(__('View on PagSeguro')) ?>
+        </a>
+        <br /><br />
     <?php endif?>
 <?php endif;?>
 
-<?php
-echo $block->getBlockHtml('pagseguro.actions');
+<?= $block->getBlockHtml('pagseguro.actions');
