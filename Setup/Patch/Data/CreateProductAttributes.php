@@ -85,7 +85,7 @@ class CreateProductAttributes implements DataPatchInterface, PatchRevertableInte
                 'required'      => false,
                 'sort_order'    => 50,
                 'user_defined'  => false,
-                'default'       => '',
+                'default'       => 0,
                 'searchable'    => false,
                 'filterable'    => false,
                 'comparable'    => false,
