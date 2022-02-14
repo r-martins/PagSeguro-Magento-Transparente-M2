@@ -129,7 +129,7 @@ class CreateProductAttributes implements DataPatchInterface, PatchRevertableInte
     }
 
     /**
-     * Adds a product attribute to the group of each attribute set
+     * Adds a product attribute to the General group of each attribute set
      * @param string $attrCode
      * @param array $attrData
      */
