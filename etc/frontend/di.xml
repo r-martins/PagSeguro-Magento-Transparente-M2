@@ -1,17 +1,16 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
-    <virtualType name="RicardoMartins\PagSeguro\Model\ConfigProvider" type="Magento\Payment\Model\CcGenericConfigProvider">
+    <type name="Magento\Payment\Model\CcGenericConfigProvider">
         <arguments>
             <argument name="methodCodes" xsi:type="array">
                 <item name="rm_pagseguro_cc" xsi:type="const">RicardoMartins\PagSeguro\Model\Method\Cc::CODE</item>
                 <item name="rm_pagseguro_twocc" xsi:type="const">RicardoMartins\PagSeguro\Model\Method\Twocc::CODE</item>
             </argument>
         </arguments>
-    </virtualType>    
+    </type>
     <type name="Magento\Checkout\Model\CompositeConfigProvider">
         <arguments>
             <argument name="configProviders" xsi:type="array">
-                <item name="rm_pagseguro_cc_config_provider" xsi:type="object">RicardoMartins\PagSeguro\Model\ConfigProvider</item>
                 <item name="rm_pagseguro_redirect_config_provider" xsi:type="object">RicardoMartins\PagSeguro\Model\AdditionalConfigProvider</item>
             </argument>
         </arguments>
