@@ -517,7 +517,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             // checks all transaction errors, except the refund transactions
             // that could not succeed because of the transaction status
             // error code 14007: invalid transaction status to refund
-            if ($type !== "transactions/refunds" && $xml->error->code != '14007' && $xml->error->code != '53041') {
+            if ($type !== "transactions/refunds" && $xml->error->code != '14007') {
                 $errArray = [];
                 $xmlError = json_decode(json_encode($xml), true);
                 $xmlError = $xmlError['error'];
