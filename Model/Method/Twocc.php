@@ -1,6 +1,8 @@
 <?php
 namespace RicardoMartins\PagSeguro\Model\Method;
 
+use RicardoMartins\PagSeguro\Model\Exception\WrongInstallmentsException;
+
 /**
  * Credit Card Payment Method for PagSeguro Payment
  *
@@ -118,17 +120,11 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
     {
         /*@var \Magento\Sales\Model\Order $order */
         $order = $payment->getOrder();
-
         $transactions = [];
 
         try {
-
-            // will grab data to be sent via POST to API inside $params
-
             //First Credit Card
-            $params = $this->pagSeguroHelper->getCreditCardApiCallParams($order, $payment, '_first');
-            //call API
-            $returnXmlFirst = $this->pagSeguroHelper->callApi($params, $payment);
+            $returnXmlFirst = $this->_createTransaction($payment, '_first');
 
             if (isset($returnXmlFirst->errors)) {
                 $errMsg = [];
@@ -145,9 +141,9 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
                 $error = $returnXmlFirst->error;
                 $message = $this->pagSeguroHelper->translateError((string)$error->message);
                 $errMsg[] = $message . ' (' . $error->code . ')';
-                throw new \Magento\Framework\Validator\Exception(
+                throw new \Magento\Framework\Validator\Exception(__(
                     'Um erro ocorreu em seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg)
-                );
+                ));
             }
 
             /* process return result code status*/
@@ -159,9 +155,7 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
             $transactions[] = $transactionId;
             
             //Second Credit Card
-            $params = $this->pagSeguroHelper->getCreditCardApiCallParams($order, $payment, '_second');
-            //call API
-            $returnXmlSecond = $this->pagSeguroHelper->callApi($params, $payment);
+            $returnXmlSecond = $this->_createTransaction($payment, '_second');
 
             if (isset($returnXmlSecond->errors)) {
                 $errMsg = [];
@@ -253,6 +247,33 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
             throw new \Magento\Framework\Exception\LocalizedException(__($e->getMessage()));
         }
         return $this;
+    }
+
+    /**
+     * Sends the request to create the transaction in PagSeguro
+     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param string $cardIndex
+     * @return \SimpleXMLElement
+     */
+    protected function _createTransaction($payment, $cardIndex)
+    {
+        $order = $payment->getOrder();
+        $params = $this->pagSeguroHelper->getCreditCardApiCallParams($order, $payment, $cardIndex);
+
+        try {
+            $returnXml = $this->pagSeguroHelper->callApi($params, $payment);
+        } catch (WrongInstallmentsException $e) {
+            $returnXml = $this->pagSeguroHelper->recalcInstallmentsAndResendOrder(
+                $params,
+                $payment,
+                floatval($payment->getAdditionalInformation('credit_card_amount' . $cardIndex)),
+                $payment->getAdditionalInformation('credit_card_type' . $cardIndex)
+            );
+
+            $payment->setAdditionalInformation('recalculated_installments' . $cardIndex, true);
+        }
+
+        return $returnXml;
     }
 
     /**

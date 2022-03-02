@@ -6,6 +6,7 @@ use Magento\Framework\Phrase;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Sales\Model\Order\Email\Sender\OrderCommentSender;
 use Magento\Framework\HTTP\ClientInterface;
+use RicardoMartins\PagSeguro\Model\Exception\WrongInstallmentsException;
 
 /**
  * Class Data Helper
@@ -32,6 +33,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_WS_URL_APP = 'payment/rm_pagseguro/sandbox_ws_url_app';
     const XML_PATH_PAYMENT_PAGSEGURO_ENABLE_UPDATER     = 'payment/rm_pagseguro/enable_updater';
     const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_JS_URL     = 'https://stc.sandbox.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.directpayment.js';
+    const XML_PATH_PAYMENT_PAGSEGURO_CHECKOUT_URL       = 'https://pagseguro.uol.com.br/checkout/v2/installments.json';
+    const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_CHECKOUT_URL = 'https://sandbox.pagseguro.uol.com.br/checkout/v2/installments.json';
     const XML_PATH_PAYMENT_PAGSEGURO_CC_ACTIVE          = 'payment/rm_pagseguro_cc/active';
     const XML_PATH_PAYMENT_PAGSEGURO_TWOCC_ACTIVE       = 'payment/rm_pagseguro_twocc/active';
     const XML_PATH_PAYMENT_PAGSEGURO_CC_FLAG            = 'payment/rm_pagseguro_cc/flag';
@@ -192,7 +195,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             return false;
         }
 
-        return (string)$xml->id;
+        return (string) $xml->id;
     }
 
     public function getAuthResponse()
@@ -501,8 +504,20 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         libxml_use_internal_errors(true);
         $xml = \simplexml_load_string(trim($response));
 
+        // checks if its a create transaction call that had an incorrect
+        // installments exception
+        if ('transactions' == $type && $this->hasInstallmentsException($xml)) {
+            throw new WrongInstallmentsException(__(
+                'installment value invalid value: %1',
+                $params['installmentValue']
+            ));
+        }
+
         if (false !== $xml && $xml->error->code) {
-            if ($type !== "transactions/refunds" && $xml->error->code != '14007') {
+            // checks all transaction errors, except the refund transactions
+            // that could not succeed because of the transaction status
+            // error code 14007: invalid transaction status to refund
+            if ($type !== "transactions/refunds" && $xml->error->code != '14007' && $xml->error->code != '53041') {
                 $errArray = [];
                 $xmlError = json_decode(json_encode($xml), true);
                 $xmlError = $xmlError['error'];
@@ -562,6 +577,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 new Phrase($errMsg)
             );
         }
+
+        $this->writeLog('retorna o XML');
 
         return $xml;
     }
@@ -1312,6 +1329,70 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $args = $matches;
         }
         return call_user_func_array('__', $args);
+    }
+
+    /**
+     * Checks if the response XML object indicates an installments exception
+     * @param \SimpleXMLElement $responseXml
+     * @return bool
+     */
+    public function hasInstallmentsException($responseXml)
+    {
+        // for scenarios with multiple errors
+        if (isset($responseXml->errors)) {
+            foreach ($responseXml->errors as $error) {
+                if ("53041" == (string) $error->code) {
+                    return true;
+                }
+            }
+        }
+
+        // for scenarios with a single error
+        if (isset($responseXml->error)) {
+            if ("53041" == (string) $responseXml->error->code) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Calculates and update the installments on request params and
+     * submits again the transaction to PagSeguro web service
+     * @param array $params
+     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param float $amount
+     * @param string $creditCardBrand
+     * @return \SimpleXMLElement|null
+     */
+    public function recalcInstallmentsAndResendOrder($params, $payment, $amount, $creditCardBrand)
+    {
+        $installmentsQty = $params['installmentQuantity'];
+        
+        $url = $this->isSandbox()
+            ? self::XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_CHECKOUT_URL
+            : self::XML_PATH_PAYMENT_PAGSEGURO_CHECKOUT_URL;
+            
+        $url .= '?' . http_build_query([
+            'sessionId'       => $this->getSessionId(),
+            'amount'          => number_format($amount, 2, '.', ''),
+            'creditCardBrand' => $creditCardBrand,
+        ]);
+
+        /* TO DO: consider maxInstallmentNoInterest parameter */
+
+        $this->httpClient->get($url);
+        $response = json_decode($this->httpClient->getBody());
+
+        if (!isset($response->installments->{$creditCardBrand}[$installmentsQty-1]->installmentAmount)) {
+            return null;
+        }
+        
+        $installmentsValue = (float) $response->installments->{$creditCardBrand}[$installmentsQty-1]->installmentAmount;
+        $params['installmentValue'] = number_format($installmentsValue, 2, '.', '');
+
+        return $this->callApi($params, $payment);
     }
 
     /**

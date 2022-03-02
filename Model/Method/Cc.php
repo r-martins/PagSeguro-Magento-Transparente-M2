@@ -1,6 +1,8 @@
 <?php
 namespace RicardoMartins\PagSeguro\Model\Method;
 
+use RicardoMartins\PagSeguro\Model\Exception\WrongInstallmentsException;
+
 /**
  * Credit Card Payment Method for PagSeguro Payment
  *
@@ -119,11 +121,7 @@ class Cc extends \Magento\Payment\Model\Method\Cc
         $order = $payment->getOrder();
 
         try {
-
-            //will grab data to be send via POST to API inside $params
-            $params = $this->pagSeguroHelper->getCreditCardApiCallParams($order, $payment);
-            //call API
-            $returnXml = $this->pagSeguroHelper->callApi($params, $payment);
+            $returnXml = $this->_createTransaction($payment);
 
             if (isset($returnXml->errors)) {
                 $errMsg = [];
@@ -139,9 +137,9 @@ class Cc extends \Magento\Payment\Model\Method\Cc
                 $error = $returnXml->error;
                 $message = $this->pagSeguroHelper->translateError((string)$error->message);
                 $errMsg[] = $message . ' (' . $error->code . ')';
-                throw new \Magento\Framework\Validator\Exception(
+                throw new \Magento\Framework\Validator\Exception(__(
                     'Um erro ocorreu em seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg)
-                );
+                ));
             }
             /* process return result code status*/
             if ((int)$returnXml->status == 6 || (int)$returnXml->status == 7) {
@@ -177,6 +175,32 @@ class Cc extends \Magento\Payment\Model\Method\Cc
             throw new \Magento\Framework\Exception\LocalizedException(__($e->getMessage()));
         }
         return $this;
+    }
+
+    /**
+     * Sends the request to create the transaction in PagSeguro
+     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @return \SimpleXMLElement
+     */
+    protected function _createTransaction($payment)
+    {
+        $order = $payment->getOrder();
+        $params = $this->pagSeguroHelper->getCreditCardApiCallParams($order, $payment);
+
+        try {
+            $returnXml = $this->pagSeguroHelper->callApi($params, $payment);
+        } catch (WrongInstallmentsException $e) {
+            $returnXml = $this->pagSeguroHelper->recalcInstallmentsAndResendOrder(
+                $params,
+                $payment,
+                $payment->getOrder()->getGrandTotal(),
+                $payment->getCcType()
+            );
+
+            $payment->setAdditionalInformation('recalculated_installments', true);
+        }
+
+        return $returnXml;
     }
 
     /**
