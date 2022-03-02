@@ -1384,7 +1384,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $response = json_decode($this->httpClient->getBody());
 
         if (!isset($response->installments->{$creditCardBrand}[$installmentsQty-1]->installmentAmount)) {
-            return null;
+            throw new LocalizedException(__('installment value invalid value: %1', $params['installmentValue']));
         }
         
         $installmentsValue = (float) $response->installments->{$creditCardBrand}[$installmentsQty-1]->installmentAmount;
