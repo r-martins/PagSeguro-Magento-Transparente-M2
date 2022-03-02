@@ -578,8 +578,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             );
         }
 
-        $this->writeLog('retorna o XML');
-
         return $xml;
     }
 
