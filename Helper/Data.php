@@ -1364,8 +1364,17 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param string $creditCardBrand
      * @return \SimpleXMLElement|null
      */
-    public function recalcInstallmentsAndResendOrder($params, $payment, $amount, $creditCardBrand)
+    public function recalcInstallmentsAndResendOrder($params, $payment, $cardIndex = '')
     {
+        $amount = (float) ($cardIndex
+            ? $payment->getAdditionalInformation('credit_card_amount' . $cardIndex)
+            : $payment->getOrder()->getGrandTotal()
+        );
+
+        $creditCardBrand = $cardIndex
+                ? $payment->getAdditionalInformation('credit_card_type' . $cardIndex)
+                : $payment->getCcType();
+
         $installmentsQty = $params['installmentQuantity'];
         
         $url = $this->isSandbox() ? self::PAGSEGURO_SANDBOX_CHECKOUT_URL : self::PAGSEGURO_CHECKOUT_URL;
@@ -1386,6 +1395,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         
         $installmentsValue = (float) $response->installments->{$creditCardBrand}[$installmentsQty-1]->installmentAmount;
         $params['installmentValue'] = number_format($installmentsValue, 2, '.', '');
+
+        // update additional information with the updated value
+        $payment->setAdditionalInformation('installment_value' . $cardIndex, $installmentsValue);
+        $payment->setAdditionalInformation('recalculated_installments' . $cardIndex, true);
 
         return $this->callApi($params, $payment);
     }

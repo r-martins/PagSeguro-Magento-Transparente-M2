@@ -263,14 +263,7 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
         try {
             $returnXml = $this->pagSeguroHelper->callApi($params, $payment);
         } catch (WrongInstallmentsException $e) {
-            $returnXml = $this->pagSeguroHelper->recalcInstallmentsAndResendOrder(
-                $params,
-                $payment,
-                floatval($payment->getAdditionalInformation('credit_card_amount' . $cardIndex)),
-                $payment->getAdditionalInformation('credit_card_type' . $cardIndex)
-            );
-
-            $payment->setAdditionalInformation('recalculated_installments' . $cardIndex, true);
+            $returnXml = $this->pagSeguroHelper->recalcInstallmentsAndResendOrder($params, $payment, $cardIndex);
         }
 
         return $returnXml;
