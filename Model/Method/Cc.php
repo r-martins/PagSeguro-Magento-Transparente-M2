@@ -190,14 +190,7 @@ class Cc extends \Magento\Payment\Model\Method\Cc
         try {
             $returnXml = $this->pagSeguroHelper->callApi($params, $payment);
         } catch (WrongInstallmentsException $e) {
-            $returnXml = $this->pagSeguroHelper->recalcInstallmentsAndResendOrder(
-                $params,
-                $payment,
-                $payment->getOrder()->getGrandTotal(),
-                $payment->getCcType()
-            );
-
-            $payment->setAdditionalInformation('recalculated_installments', true);
+            $returnXml = $this->pagSeguroHelper->recalcInstallmentsAndResendOrder($params, $payment);
         }
 
         return $returnXml;
