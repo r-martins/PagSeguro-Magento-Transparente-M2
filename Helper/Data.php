@@ -33,8 +33,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_WS_URL_APP = 'payment/rm_pagseguro/sandbox_ws_url_app';
     const XML_PATH_PAYMENT_PAGSEGURO_ENABLE_UPDATER     = 'payment/rm_pagseguro/enable_updater';
     const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_JS_URL     = 'https://stc.sandbox.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.directpayment.js';
-    const PAGSEGURO_CHECKOUT_URL                        = 'https://pagseguro.uol.com.br/checkout/v2/installments.json';
-    const PAGSEGURO_SANDBOX_CHECKOUT_URL                = 'https://sandbox.pagseguro.uol.com.br/checkout/v2/installments.json';
+    const PAGSEGURO_INSTALLMENTS_URL                    = 'https://pagseguro.uol.com.br/checkout/v2/installments.json';
+    const PAGSEGURO_SANDBOX_INSTALLMENTS_URL            = 'https://sandbox.pagseguro.uol.com.br/checkout/v2/installments.json';
     const XML_PATH_PAYMENT_PAGSEGURO_CC_ACTIVE          = 'payment/rm_pagseguro_cc/active';
     const XML_PATH_PAYMENT_PAGSEGURO_TWOCC_ACTIVE       = 'payment/rm_pagseguro_twocc/active';
     const XML_PATH_PAYMENT_PAGSEGURO_CC_FLAG            = 'payment/rm_pagseguro_cc/flag';
@@ -1368,7 +1368,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $installmentsQty = $params['installmentQuantity'];
         
-        $url = $this->isSandbox() ? self::PAGSEGURO_SANDBOX_CHECKOUT_URL : self::PAGSEGURO_CHECKOUT_URL;
+        $url = $this->isSandbox() ? self::PAGSEGURO_SANDBOX_INSTALLMENTS_URL : self::PAGSEGURO_INSTALLMENTS_URL;
         $url .= '?' . http_build_query([
             'sessionId'       => $this->getSessionId(),
             'amount'          => number_format($amount, 2, '.', ''),
