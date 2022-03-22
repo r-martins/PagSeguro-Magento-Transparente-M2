@@ -191,6 +191,7 @@ define(
                 // checks if the component was fully initialized and the form its open
                 if (this.RMPagSeguroObj && this.getCode() == this.isChecked() && this.grandTotal != totals.grand_total) {
                     this.grandTotal = totals.grand_total;
+                    this.RMPagSeguroObj.grandTotal = totals.grand_total;
                     
                     console.debug('Total changed: triggering the installments update...');
                     this.RMPagSeguroObj.getInstallments(
