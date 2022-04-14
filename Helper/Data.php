@@ -1,6 +1,7 @@
 <?php
 namespace RicardoMartins\PagSeguro\Helper;
 
+use Laminas\Stdlib\StringUtils;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Phrase;
 use Magento\Store\Model\ScopeInterface;
@@ -763,7 +764,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getSenderParams(\Magento\Sales\Model\Order $order, $payment, $cc = '')
     {
-        $digits = new \Zend\Filter\Digits();
         $cpf = $this->getCustomerCpfValue($order, $payment, $cc);
 
         $phone = $this->extractPhone($order->getBillingAddress()->getTelephone());
@@ -772,7 +772,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'senderName'    => $this->getSenderName($order),
             'senderEmail'   => trim($order->getCustomerEmail()),
             'senderHash'    => $this->getPaymentHash($payment, 'sender_hash'),
-            'senderCPF'     => $digits->filter($cpf),
+            'senderCPF'     => $this->filterDigits($cpf),
             'senderAreaCode'=> $phone['area'],
             'senderPhone'   => $phone['number'],
             ];
@@ -802,7 +802,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getCreditCardHolderParams(\Magento\Sales\Model\Order $order, $payment, $cc = '')
     {
-        $digits = new \Zend\Filter\Digits();
         $cpf = $this->getCustomerCpfValue($order, $payment, $cc);
 
         //data
@@ -814,7 +813,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $return = [
             'creditCardHolderName'      => $holderName,
             'creditCardHolderBirthDate' => $creditCardHolderBirthDate,
-            'creditCardHolderCPF'       => $digits->filter($cpf),
+            'creditCardHolderCPF'       => $this->filterDigits($cpf),
             'creditCardHolderAreaCode'  => $phone['area'],
             'creditCardHolderPhone'     => $phone['number'],
             ];
@@ -863,8 +862,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getAddressParams(\Magento\Sales\Model\Order $order, $type, $percent = 1.0)
     {
-        $digits = new \Zend\Filter\Digits();
-
         //address attributes
         /** @var Mage_Sales_Model_Order_Address $address */
         $address = ($type=='shipping' && !$order->getIsVirtual()) ?
@@ -891,7 +888,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $addressNumber = $this->getAddressAttributeValue($address, $addressNumberAttribute);
         $addressComplement = $this->getAddressAttributeValue($address, $addressComplementAttribute);
         $addressDistrict = $this->getAddressAttributeValue($address, $addressNeighborhoodAttribute);
-        $addressPostalCode = $digits->filter($address->getPostcode());
+        $addressPostalCode = $this->filterDigits($address->getPostcode());
         $addressCity = $address->getCity();
         $addressState = $this->getStateCode($address->getRegion());
 
@@ -976,8 +973,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
       */
     private function extractPhone($phone)
     {
-        $digits = new \Zend\Filter\Digits();
-        $phone = $digits->filter($phone);
+        $phone = $this->filterDigits($phone);
         //se começar com zero, pula o primeiro digito
         if (substr($phone, 0, 1) == '0') {
             $phone = substr($phone, 1, strlen($phone));
@@ -1694,5 +1690,39 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             true
         );
         $payment->save();
+    }
+
+    /**
+    * Extracted from laminas/laminas-filter project
+    *
+    * Returns the string $value, removing all but digit characters
+    *
+    * If the value provided is not integer, float or string, the value will remain unfiltered
+    *
+    * @param  string $value
+    * @return string|mixed
+    */
+    public function filterDigits($value)
+    {
+        if (is_int($value)) {
+            return (string) $value;
+        }
+        if (! is_float($value) && ! is_string($value)) {
+            return $value;
+        }
+        $value = (string) $value;
+
+        if (! StringUtils::hasPcreUnicodeSupport()) {
+            // POSIX named classes are not supported, use alternative 0-9 match
+            $pattern = '/[^0-9]/';
+        } elseif (extension_loaded('mbstring')) {
+            // Filter for the value with mbstring
+            $pattern = '/[^[:digit:]]/';
+        } else {
+            // Filter for the value without mbstring
+            $pattern = '/[\p{^N}]/';
+        }
+
+        return preg_replace($pattern, '', $value);
     }
 }
