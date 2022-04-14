@@ -18,9 +18,9 @@ class Actions extends \Magento\Backend\Block\Template
     private $authSession;
 
     public function __construct(
-        \Magento\Backend\Block\Template\Context $context, array $data = [],
         \Magento\Framework\Authorization\PolicyInterface $policy,
-        \Magento\Backend\Model\Auth\Session $authSession
+        \Magento\Backend\Model\Auth\Session $authSession,
+        \Magento\Backend\Block\Template\Context $context, array $data = []
     ) {
         parent::__construct($context, $data);
         $this->policy = $policy;
