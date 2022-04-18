@@ -591,6 +591,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     protected function convertEncoding(array $params)
     {
         foreach ($params as $k => $v) {
+            if (is_null($v)) {
+                $v = '';
+            }
+            
             $params[$k] = utf8_decode($v);
         }
         return $params;
@@ -606,6 +610,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $fieldsString = '';
         foreach ($params as $k => $v) {
+            if (is_null($v)) {
+                $v = '';
+            }
             $fieldsString .= $k.'='.urlencode($v).'&';
         }
         return rtrim($fieldsString, '&');
@@ -1205,7 +1212,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function stripAccents($string)
     {
-        return preg_replace('/[`^~\'"]/', null, iconv('UTF-8', 'ASCII//TRANSLIT', $string));
+        return preg_replace('/[`^~\'"]/', '', iconv('UTF-8', 'ASCII//TRANSLIT', $string));
     }
 
     /**

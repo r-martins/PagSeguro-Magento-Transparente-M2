@@ -33,12 +33,12 @@ $this->logger = $pagSegurologger;
         \Magento\Payment\Helper\Data $paymentData,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Payment\Model\Method\Logger $logger,
+        \RicardoMartins\PagSeguro\Helper\Data $pagSeguroHelper,
+        \RicardoMartins\PagSeguro\Helper\Logger $pagSegurologger,
         \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = [],
-        DirectoryHelper $directory = null,
-        \RicardoMartins\PagSeguro\Helper\Data $pagSeguroHelper,
-        \RicardoMartins\PagSeguro\Helper\Logger $pagSegurologger
+        DirectoryHelper $directory = null
     ) {
         parent::__construct($context, $registry, $extensionFactory, $customAttributeFactory, $paymentData, $scopeConfig,
             $logger, $resource, $resourceCollection, $data, $directory);

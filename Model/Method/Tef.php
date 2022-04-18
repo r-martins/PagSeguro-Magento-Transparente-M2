@@ -65,20 +65,18 @@ class Tef extends \RicardoMartins\PagSeguro\Model\Method\AbstractMethodExtension
         \Magento\Payment\Helper\Data $paymentData,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Payment\Model\Method\Logger $logger,
-        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
-        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
-        array $data = [],
-        DirectoryHelper $directory = null,
         \RicardoMartins\PagSeguro\Helper\Data $pagSeguroHelper,
         \RicardoMartins\PagSeguro\Helper\Logger $pagSegurologger,
         \Magento\Backend\Model\Auth\Session $adminSession,
-        \RicardoMartins\PagSeguro\Model\Notifications $pagSeguroAbModel
+        \RicardoMartins\PagSeguro\Model\Notifications $pagSeguroAbModel,
+        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
+        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+        array $data = [],
+        DirectoryHelper $directory = null
     ) {
         parent::__construct($context, $registry, $extensionFactory, $customAttributeFactory, $paymentData, $scopeConfig,
-            $logger, $resource, $resourceCollection, $data, $directory, $pagSeguroHelper, $pagSegurologger);
-        //@TODO Remove
-        // $this->_minAmount = 1;
-        // $this->_maxAmount = 999999999;
+            $logger, $pagSeguroHelper, $pagSegurologger, $resource, $resourceCollection, $data, $directory);
+        
         $this->pagSeguroHelper = $pagSeguroHelper;
         $this->pagSeguroAbModel = $pagSeguroAbModel;
         $this->adminSession = $adminSession;
