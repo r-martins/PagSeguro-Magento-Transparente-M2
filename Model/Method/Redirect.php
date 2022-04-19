@@ -89,7 +89,7 @@ class Redirect extends \RicardoMartins\PagSeguro\Model\Method\AbstractMethodExte
         \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = [],
-        DirectoryHelper $directory = null,
+        DirectoryHelper $directory = null
     ) {
         parent::__construct($context, $registry, $extensionFactory, $customAttributeFactory, $paymentData, $scopeConfig,
             $logger, $pagSeguroHelper, $pagSegurologger, $resource, $resourceCollection, $data, $directory);
