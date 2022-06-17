@@ -6,10 +6,8 @@ use Magento\Sales\Model\Order as Sales_Order;
 /**
  * Processes notifications from PagSeguro
  *
- * @see       http://bit.ly/pagseguromagento Official Website
  * @author    Ricardo Martins (and others) <pagseguro-transparente@ricardomartins.net.br>
- * @copyright 2018-2019 Ricardo Martins
- * @license   https://www.gnu.org/licenses/gpl-3.0.pt-br.html GNU GPL, version 3
+ * @copyright 2018-2022 Ricardo Martins
  */
 class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
 {
@@ -384,19 +382,12 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
      */
     public function getNotificationStatus($notificationCode)
     {
-        //@TODO Remove hard coded URL
-        $url = "https://ws.pagseguro.uol.com.br/v3/transactions/notifications/" . $notificationCode;
-        if($this->pagSeguroHelper->isSandbox()) {
-            $url = "https://ws.ricardomartins.net.br/pspro/v7/wspagseguro/v3/transactions/notifications/" . $notificationCode;
-        }
+        $url = $this->pagSeguroHelper->getWsUrlV3('transactions/notifications/' . $notificationCode);
 
-        $params = ['token' => $this->pagSeguroHelper->getToken(),
-                   'email' => $this->pagSeguroHelper->getMerchantEmail()];
-
-        if($this->pagSeguroHelper->isSandbox()) { //Sandbox mode
-            $params = ['public_key' => $this->pagSeguroHelper->getPagSeguroPubKey(),
-                        'isSandbox' => 1];
-        }
+        $params = [
+            'public_key' => $this->pagSeguroHelper->getPagSeguroPubKey(),
+            'isSandbox' => $this->pagSeguroHelper->isSandbox() ? 1 : 0
+        ];
 
         $url .= '?' . http_build_query($params);
 

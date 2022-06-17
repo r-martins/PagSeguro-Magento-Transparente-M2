@@ -27,7 +27,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_EMAIL      = 'payment/rm_pagseguro/sandbox_merchant_email';
     const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_KEY      = 'payment/rm_pagseguro/sandbox_key';
     //@TODO Remove hardcoded value in constant and move to config.xml defaults
-    const XML_PATH_PAYMENT_PAGSEGURO_WS_URL             = 'https://ws.ricardomartins.net.br/pspro/v6/wspagseguro/v2/';
+    const XML_PATH_PAYMENT_PAGSEGURO_WS_URL             = 'https://ws.ricardomartins.net.br/pspro/v7/wspagseguro/v2/';
     const XML_PATH_PAYMENT_PAGSEGURO_WS_URL_APP         = 'payment/rm_pagseguro/ws_url_app';
     const XML_PATH_PAYMENT_PAGSEGURO_JS_URL             = 'https://stc.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.directpayment.js';
     const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_WS_URL     = 'https://ws.ricardomartins.net.br/pspro/v7/wspagseguro/v2/';
@@ -1219,11 +1219,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * Returns Webservice URL based on selected environment (prod or sandbox)
      *
      * @param string $amend suffix
-     * @param bool $useApp uses app?
      *
      * @return string
      */
-    public function getWsUrl($amend = '', $useApp = false)
+    public function getWsUrl($amend = '')
     {
         if ($this->isSandbox()) {
             return self::XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_WS_URL . $amend;
@@ -1231,6 +1230,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         //Production mode
         return self::XML_PATH_PAYMENT_PAGSEGURO_WS_URL.$amend;
+    }
+
+    public function getWsUrlV3($amend = '') {
+        return str_replace('/v2/', '/v3/', $this->getWsUrl($amend));
     }
 
     /**
