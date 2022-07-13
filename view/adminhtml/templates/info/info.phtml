@@ -1,5 +1,8 @@
 <?php /** @var \RicardoMartins\PagSeguro\Block\Payment\Info $block */ ?>
-<?php $paymentInfo = $block->getPaymentInfo(); ?>
+<?php 
+$paymentInfo = $block->getPaymentInfo();
+$info = $block->getInfo()->getAdditionalInformation();
+?>
 <p>
     <strong>
         <?= $block->escapeHtml($block->getMethod()->getTitle()) ?>
@@ -8,7 +11,7 @@
         <?php endif; ?>
     </strong>
 </p>
-<?php if ($paymentInfo): ?>
+<?php if ($paymentInfo && !isset($info['escrow_end_date'])): ?>
     <p>
         <a href="<?= $block->escapeUrl($paymentInfo['url']); ?>" target="_blank">
             <?= $block->escapeHtml($paymentInfo['texto']);?>
@@ -20,4 +23,16 @@
         </a>
     </p>
 <?php endif;?>
+    <?php if (isset($info['escrow_end_date'])) :?>
+        <p><a href="javascript: void(0);" onclick="$('ps-extrainfo').toggle()">Exibir/ocultar informações adicionais</a></p>
+        <div id="ps-extrainfo" style="font-size: 0.9em; display: none;">
+            <p>Taxas: R$ <?=$info['fee_amount']??''?></p>
+            <p>Valor líquido: R$ <?=$info['net_amount']??''?></p>
+            <?php if (isset($info['escrow_end_date'])):
+                $escData = new DateTime($info['escrow_end_date']);?>
+                <p>Disponível em: <?=$escData->format('d/m/Y à\s H:i');?> <span title="Data que o valor estará disponível para saque em sua conta PagSeguro" style="font-size: 1.1em; cursor:pointer;">&#x2754</span></p>
+            <?php endif;?>
+            <br/>
+        </div>
+    <?php endif; ?>
 <?= $block->getBlockHtml('pagseguro.actions');

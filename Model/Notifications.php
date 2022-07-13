@@ -2,6 +2,7 @@
 namespace RicardoMartins\PagSeguro\Model;
 
 use Magento\Sales\Model\Order as Sales_Order;
+use SimpleXMLElement;
 
 /**
  * Processes notifications from PagSeguro
@@ -356,6 +357,19 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
     
                     }
                 }
+                if (isset($resultXML->paymentMethod->type) && $resultXML->paymentMethod->type == 1) {
+                    $payment->setAdditionalInformation('gateway_type', (string)$resultXML->gatewaySystem->type);
+                    $payment->setAdditionalInformation('gateway_raw_code', (string)$resultXML->gatewaySystem->rawCode);
+                    $payment->setAdditionalInformation('gateway_authorization_code', (string)$resultXML->gatewaySystem->authorizationCode);
+                    $payment->setAdditionalInformation('gateway_nsu', (string)$resultXML->gatewaySystem->nsu);
+                    $payment->setAdditionalInformation('gateway_tid', (string)$resultXML->gatewaySystem->tid);
+                    $payment->setAdditionalInformation('gateway_establishment_code', (string)$resultXML->gatewaySystem->establishmentCode);
+                    $payment->setAdditionalInformation('gateway_acquirer_name', (string)$resultXML->gatewaySystem->acquirerName);
+                }
+                
+                $payment->setAdditionalInformation('fee_amount', $this->getAttributeFromXml($resultXML, 'feeAmount'));
+                $payment->setAdditionalInformation('net_amount', $this->getAttributeFromXml($resultXML, 'netAmount'));
+                $payment->setAdditionalInformation('escrow_end_date', $this->getAttributeFromXml($resultXML, 'escrowEndDate'));
             }
 
             if (!is_object($_payment)) {
@@ -382,7 +396,7 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
      */
     public function getNotificationStatus($notificationCode)
     {
-        $url = $this->pagSeguroHelper->getWsUrlV3('transactions/notifications/' . $notificationCode);
+        $url = $this->pagSeguroHelper->getWsUrl('transactions/notifications/' . $notificationCode);
 
         $params = [
             'public_key' => $this->pagSeguroHelper->getPagSeguroPubKey(),
@@ -521,4 +535,17 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
         return $return;
     }
 
+    /**
+     * Get attribute from XML or return "" if node doesn't exist
+     * @param string $xml
+     * @param string $node
+     *
+     * @return string
+     */
+    public function getAttributeFromXml(SimpleXMLElement $xml, string $node): string
+    {
+        $nodes = $xml->xpath("$node");
+
+        return count($nodes) == 1 ? (string) $nodes[0] : "";
+    }
 }

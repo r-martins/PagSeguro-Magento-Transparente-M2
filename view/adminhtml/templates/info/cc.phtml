@@ -68,6 +68,24 @@ $info = $block->getPaymentInfo();
         </a>
         <br /><br />
     <?php endif?>
+    <?php if (isset($info['escrow_end_date'])) :?>
+        <p><a href="javascript: void(0);" onclick="$('ps-extrainfo').toggle()">Exibir/ocultar informações adicionais</a></p>
+        <div id="ps-extrainfo" style="font-size: 0.9em; display: none;">
+            <p>Taxas: R$ <?=$info['fee_amount']??''?></p>
+            <p>Valor líquido: R$ <?=$info['net_amount']??''?></p>
+            <?php if (isset($info['escrow_end_date'])):
+                $escData = new DateTime($info['escrow_end_date']);?>
+                <p>Disponível em: <?=$escData->format('d/m/Y à\s H:i');?> <span title="Data que o valor estará disponível para saque em sua conta PagSeguro" style="font-size: 1.1em; cursor:pointer;">&#x2754</span></p>
+            <?php endif;?>
+            <p>Tipo do Gateway/Adquirente em: <?=$info['gateway_type']??''?>/<?=$info['gateway_acquirer_name']??''?></p>
+            <p>NSU: <?=$info['gateway_nsu']??''?></p>
+            <p>TID: <?=$info['gateway_tid']??''?></p>
+            <p>Estabilishment Code: <?=$info['gateway_establishment_code']??''?></p>
+            <p>Authorization: <?=$info['gateway_authorization_code']??''?></p>
+            <p>Raw Code: <?=$info['gateway_raw_code']??''?></p>
+            <br/>
+        </div>
+    <?php endif; ?>
 <?php endif;?>
 
 <?= $block->getBlockHtml('pagseguro.actions');
