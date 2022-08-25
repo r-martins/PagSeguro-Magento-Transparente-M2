@@ -365,6 +365,11 @@ class Notifications extends \Magento\Payment\Model\Method\AbstractMethod
                     $payment->setAdditionalInformation('gateway_tid', (string)$resultXML->gatewaySystem->tid);
                     $payment->setAdditionalInformation('gateway_establishment_code', (string)$resultXML->gatewaySystem->establishmentCode);
                     $payment->setAdditionalInformation('gateway_acquirer_name', (string)$resultXML->gatewaySystem->acquirerName);
+                    if (isset($resultXML->creditorFees)) {
+                        $payment->setAdditionalInformation('installment_fee_amount', (string)$resultXML->creditorFees->installmentFeeAmount);
+                        $payment->setAdditionalInformation('intermediation_rate_amount', (string)$resultXML->creditorFees->intermediationRateAmount);
+                        $payment->setAdditionalInformation('intermediation_fee_amount', (string)$resultXML->creditorFees->intermediationFeeAmount);
+                    }
                 }
                 
                 $payment->setAdditionalInformation('fee_amount', $this->getAttributeFromXml($resultXML, 'feeAmount'));
