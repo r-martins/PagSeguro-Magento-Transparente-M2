@@ -15,4 +15,34 @@
             </argument>
         </arguments>
     </type>
+    <!--<type name="Magento\Checkout\Block\Cart\Sidebar">
+        <arguments>
+            <argument name="data" xsi:type="array">
+                <item name="children" xsi:type="array">
+                    <item name="jsLayout" xsi:type="array">
+                        <item name="children" xsi:type="array">
+                            <item name="components" xsi:type="array">
+                                <item name="children" xsi:type="array">
+                                    <item name="minicart_content" xsi:type="array">
+                                        <item name="children" xsi:type="array">
+                                            <item name="extra_info" xsi:type="array">
+                                                <item name="children" xsi:type="array">
+                                                    <item name="pagseguroInstallments" xsi:type="array">
+                                                        <item name="component" xsi:type="string">uiComponent</item>
+                                                        <item name="config" xsi:type="array">
+                                                            <item name="template" xsi:type="string">RicardoMartins_PagSeguro/minicart/installments</item>
+                                                        </item>
+                                                    </item>
+                                                </item>
+                                            </item>
+                                        </item>
+                                    </item>
+                                </item>
+                            </item>
+                        </item>
+                    </item>
+                </item>
+            </argument>
+        </arguments>
+    </type>-->
 </config>

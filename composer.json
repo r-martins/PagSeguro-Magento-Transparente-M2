@@ -19,7 +19,8 @@
         "ext-libxml": "*",
         "ext-mbstring": "*",
         "ext-simplexml": "*",
-        "laminas/laminas-stdlib": "*"
+        "laminas/laminas-stdlib": "*",
+        "magento/module-ui": "*"
     },
     "authors": [
         {
