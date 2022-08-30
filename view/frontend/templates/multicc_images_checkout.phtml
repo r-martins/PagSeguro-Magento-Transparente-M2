@@ -6,14 +6,14 @@ $images_url = $assetRepo->getUrl("RicardoMartins_PagSeguro::images");
 $enable_cc_images = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface')->getValue('payment/rm_pagseguro_cc/enable_cc_images');
 $html = "";
 if($enable_cc_images) {
-    $html .= "<img style=\"margin-left:27px; height: 35px;\" src=\"" . $images_url . "/multi-cc.png\">\r\n";
-    $html .= " <img style='height: 35px;' src=\"" . $images_url . "/visa.png\">\r\n";
-    $html .= " <img style='height: 35px;' src=\"" . $images_url . "/mastercard.png\">\r\n";
-    $html .= " <img style='height: 35px;' src=\"" . $images_url . "/elo.png\">\r\n";
-    $html .= " <img style='height: 35px;' src=\"" . $images_url . "/amex.png\">\r\n";
-    $html .= " <img style='height: 35px;' src=\"" . $images_url . "/diners.png\">\r\n";
-    $html .= "<img style=\"height: 35px;\" src=\"" . $images_url . "/outros.png\">\r\n";
-    $html .= " <img style='height: 35px;' src=\"" . $images_url . "/pslogo.png\">\r\n";
+    $html .= "<img style=\"margin-left:27px; height: 35px;\" src=\"" . $this->getViewFileUrl('RicardoMartins_PagSeguro::images/visa.png') . "\">\r\n";
+    $html .= " <img style='height: 35px;' src=\"" . $this->getViewFileUrl('RicardoMartins_PagSeguro::images/mastercard.png') . "\">\r\n";
+    $html .= " <img style='height: 35px;' src=\"" . $this->getViewFileUrl('RicardoMartins_PagSeguro::images/elo.png') . "\">\r\n";
+    $html .= " <img style='height: 35px;' src=\"" . $this->getViewFileUrl('RicardoMartins_PagSeguro::images/amex.png') . "\">\r\n";
+    $html .= " <img style='height: 35px;' src=\"" . $this->getViewFileUrl('RicardoMartins_PagSeguro::images/diners.png') . "\">\r\n";
+    $html .= " <img style='height: 35px;' src=\"" . $this->getViewFileUrl('RicardoMartins_PagSeguro::images/hipercard.png') . "\">\r\n";
+    $html .= "<img style=\"height: 35px;\" src=\"" . $this->getViewFileUrl('RicardoMartins_PagSeguro::images/outros.png') . "\">\r\n";
+    $html .= " <img style='height: 35px;' src=\"" . $this->getViewFileUrl('RicardoMartins_PagSeguro::images/pslogo.png') . "\">\r\n";
 //    $html .= "</div>\r\n";
 }
 
