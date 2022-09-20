@@ -135,6 +135,12 @@ class CreateProductAttributes implements DataPatchInterface, PatchRevertableInte
      */
     protected function _addProductAttribute($attrCode, $attrData)
     {
+        $attrExist = $this->eavSetup->getAttribute(Product::ENTITY, $attrCode);
+        
+        if (!empty($attrExist)) {
+            return;
+        }
+        
         $this->eavSetup->addAttribute(
             Product::ENTITY,
             $attrCode,
