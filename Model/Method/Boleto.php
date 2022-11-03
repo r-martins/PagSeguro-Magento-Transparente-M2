@@ -196,9 +196,10 @@ class Boleto extends \RicardoMartins\PagSeguro\Model\Method\AbstractMethodExtens
      */
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
     {
-        if ($this->adminSession->getUser()) {
+        if ($this->getConfigData("disable_frontend") && !$this->adminSession->getUser()) {
             return false;
         }
+
         $isAvailable = $this->getConfigData('active', $quote ? $quote->getStoreId() : null);
         if (empty($quote)) {
             return $isAvailable;
