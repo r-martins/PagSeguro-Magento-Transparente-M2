@@ -1,0 +1,66 @@
+<?php $helper = $this->helper('RicardoMartins\PagSeguro\Helper\Data'); ?>
+
+<?php if ($helper->isBoletoActive() || $helper->isTefActive()): ?>
+    <?php
+    $viewJsPath = $block->getViewFileUrl('RicardoMartins_PagSeguro::js/pagseguro.js');
+    $visibleCpf = $helper->isCpfVisible() ? '1':'0';
+    $visibleDob = $helper->isDobVisible() ? '1':'0';
+    $isSandbox = $helper->isSandbox() ? 1 : 0;
+    ?>
+    <script src="<?php echo $viewJsPath;?>"></script>
+    <script>
+       require.config({
+           map: {
+               '*': {
+                   'PagseguroDirectMethod':  '<?php echo $helper->getJsUrl(); ?>'
+               }
+           }
+       });
+    </script>
+    <script>
+        require([
+            'jquery',
+            'PagseguroDirectMethod'
+        ], function (
+            $,
+            PagseguroDirectMethod
+        ) {
+            'use strict';
+
+            $(document).ready(function(){
+                //<![CDATA[
+                function preparePagSeguro(externalReference = null){
+
+                    if(typeof RMPagSeguroObj != "undefined"){
+                        <?php if ($helper->isDebugActive()): ?>
+                        console.info('PagSeguro was already started.');
+                        <?php endif; ?>
+                        return;
+                    }
+
+                    <?php if ($helper->isDebugActive()): ?>
+                    console.info('PagSeguro is initiating. Wait for ready message.');
+                    <?php endif; ?>
+
+                    // ensures that there will be only one instance of the RMPagSeguro class
+                    var RMPagSeguroObj = window.RMPagSeguroObj;
+                    if (!RMPagSeguroObj) {
+                        RMPagSeguroObj = window.RMPagSeguroObj = new RMPagSeguro(<?php echo $helper->getConfigJs()?>);
+                    }
+                    console.info('PagSeguro ready');
+
+                    if (externalReference) {
+                        externalReference.RMPagSeguroObj = RMPagSeguroObj;
+                    }
+                }
+                preparePagSeguro();
+                //]]>
+                //<![CDATA[
+                window.visibleCpf = <?php echo $visibleCpf ?>;
+                window.visibleDob = <?php echo $visibleDob ?>;
+                window.isSandbox = <?php echo $isSandbox ?>;
+                //]]>
+            });
+        });
+    </script>
+<?php endif; ?>

@@ -1,0 +1,50 @@
+<?php
+// @codingStandardsIgnoreFile
+/**
+ * @var \RicardoMartins\PagSeguro\Block\Form $block
+ */
+$code = $block->escapeHtml($block->getMethodCode());
+$helper = $this->helper('RicardoMartins\PagSeguro\Helper\Data');
+?>
+<fieldset class="standard-form admin__fieldset items payment-method <?php echo $code; ?>"
+          id="payment_form_<?php /* @noEscape */ echo $code; ?>" style="display: none;">
+
+    <?php if ($block->isCpfWithPaymentData()): ?>
+        <div class="admin__field _required">
+            <label class="label admin__field-label" for="tef_cpf"><span><?php echo __('CPF'); ?></span></label>
+            <div class="admin__field-control control">
+                <input class="required-entry input-text admin__control-text" type="text" name="payment[tef_cpf]" id="tef_cpf">
+            </div>
+        </div>
+    <?php endif; ?>
+
+    <div class="admin__field _required">
+        <label class="label admin__field-label" for="tef_cpf"><span><?php echo __('Select'); ?></span></label>
+        <div class="admin__field-control control">
+            <select id="pagseguropro_tef_bank" class="admin__control-select" name="payment[tef_bank]" >
+                <option value=""><?= $block->escapeHtml(__('Please Select')) ?></option>
+                <option value="BANCO_BRASIL"><?= $block->escapeHtml(__('Banco do Brasil')) ?></option>
+            </select>
+        </div>
+    </div>
+</fieldset>
+<script>
+    require([
+        'jquery',
+        'PagseguroDirectMethod'
+    ], function (
+        $,
+        PagseguroDirectMethod
+    ) {
+        'use strict';
+
+        $(document).ready(function(){
+            //<![CDATA[
+            function preparePagSeguroTef(){
+                RMPagSeguroObj.removeUnavailableBanks();
+            }
+            preparePagSeguroTef();
+            //]]>
+        });
+    });
+</script>

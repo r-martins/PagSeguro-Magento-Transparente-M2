@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="after.body.start">
+            <block class="Magento\Framework\View\Element\Template" name="beforebody" template="RicardoMartins_PagSeguro::preparePagSeguro.phtml"/>
+        </referenceContainer>
+        <referenceBlock name="order_create_billing_form">
+            <action method="setMethodFormTemplate">
+                <argument name="method" xsi:type="string">rm_pagseguro_boleto</argument>
+                <argument name="template" xsi:type="string">RicardoMartins_PagSeguro::form/boleto.phtml</argument>
+            </action>
+        </referenceBlock>
+        <referenceBlock name="order_create_billing_form">
+            <action method="setMethodFormTemplate">
+                <argument name="method" xsi:type="string">rm_pagseguro_tef</argument>
+                <argument name="template" xsi:type="string">RicardoMartins_PagSeguro::form/tef.phtml</argument>
+            </action>
+        </referenceBlock>
+    </body>
+</page>

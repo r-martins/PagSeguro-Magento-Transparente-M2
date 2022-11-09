@@ -1,18 +1,18 @@
 <?php
 // @codingStandardsIgnoreFile
 /**
- * @var \RicardoMartins\PagSeguro\Block\Form\Boleto $block
+ * @var \RicardoMartins\PagSeguro\Block\Form $block
  */
 $code = $block->escapeHtml($block->getMethodCode());
 ?>
-<?php if ($block->isCpfWithPaymentData()): ?>
-    <fieldset class="standard-form admin__fieldset items payment-method <?php echo $code; ?>"
-              id="payment_form_<?php /* @noEscape */ echo $code; ?>" style="display: none;">
+<fieldset class="standard-form admin__fieldset items payment-method <?php echo $code; ?>"
+          id="payment_form_<?php /* @noEscape */ echo $code; ?>" style="display: none;">
+    <?php if ($block->isCpfWithPaymentData()): ?>
         <div class="admin__field _required">
             <label class="label admin__field-label" for="boleto_cpf"><span><?php echo __('CPF'); ?></span></label>
             <div class="admin__field-control control">
                 <input class="required-entry input-text admin__control-text required-entry _required" type="text" name="payment[boleto_cpf]" id="boleto_cpf">
             </div>
         </div>
-    </fieldset>
-<?php endif; ?>
+    <?php endif; ?>
+</fieldset>
