@@ -76,7 +76,7 @@ class Tef extends \RicardoMartins\PagSeguro\Model\Method\AbstractMethodExtension
     ) {
         parent::__construct($context, $registry, $extensionFactory, $customAttributeFactory, $paymentData, $scopeConfig,
             $logger, $pagSeguroHelper, $pagSegurologger, $resource, $resourceCollection, $data, $directory);
-        
+
         $this->pagSeguroHelper = $pagSeguroHelper;
         $this->pagSeguroAbModel = $pagSeguroAbModel;
         $this->adminSession = $adminSession;
@@ -205,13 +205,15 @@ class Tef extends \RicardoMartins\PagSeguro\Model\Method\AbstractMethodExtension
      */
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
     {
-        if ($this->adminSession->getUser()) {
+        if ($this->getConfigData("disable_frontend") && !$this->adminSession->getUser()) {
             return false;
         }
+
         $isAvailable = $this->getConfigData('active', $quote ? $quote->getStoreId() : null);
         if (empty($quote)) {
             return $isAvailable;
         }
+
         if ($this->getConfigData("group_restriction") == false) {
             return $isAvailable;
         }

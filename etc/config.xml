@@ -39,6 +39,7 @@
             </rm_pagseguro>
             <rm_pagseguro_boleto>
                 <active>1</active>
+                <disable_frontend>0</disable_frontend>
                 <payment_action>order</payment_action>
                 <title>Boleto - via PagSeguro UOL</title>
                 <order_status>holded</order_status>
@@ -48,6 +49,7 @@
             </rm_pagseguro_boleto>
             <rm_pagseguro_tef>
                 <active>1</active>
+                <disable_frontend>0</disable_frontend>
                 <payment_action>order</payment_action>
                 <title>PagSeguro - TEF - Ricardo Martins</title>
                 <order_status>holded</order_status>
