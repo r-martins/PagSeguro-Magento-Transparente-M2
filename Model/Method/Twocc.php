@@ -316,7 +316,7 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
                     }
                 } catch (\Exception $e) {
                     $this->debugData(['transaction_id' => $transactionId, 'exception' => $e->getMessage()]);
-                    $this->pagSeguroHelper->writeLog(__('Payment refunding error.'));
+                    $this->pagSeguroHelper->writeLog(__('Payment refunding error.') . $e->getMessage());
                     $errorMsg[] = __('Payment refunding error.');
                 }
 
@@ -339,7 +339,7 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
                         $errorMsg[] = 'Impossível cancelar compra do 1º cartão. Aldo deu errado.';
                     }
                 } catch (\Exception $e) {                    
-                    $this->writeLog(__('Payment cancels error.'));
+                    $this->pagSeguroHelper->writeLog(__('Payment cancels error.') . $e->getMessage());
                     $errorMsg[] = __('Payment cancels error.');
                 }
 
@@ -391,7 +391,7 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
                         $errorMsg[] = 'Impossível cancelar compra do 2º cartão. Aldo deu errado.';
                     }
                 } catch (\Exception $e) {
-                    $this->writeLog(__('Payment cancels error.'));
+                    $this->pagSeguroHelper->writeLog(__('Payment cancels error.') . $e->getMessage());
                     $errorMsg[] = __('Payment cancels error.');
                 }
 
@@ -427,7 +427,7 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
                 }
             } catch (\Exception $e) {
                 $this->debugData(['transaction_id' => $transactionId, 'exception' => $e->getMessage()]);
-                $this->pagSeguroHelper->writeLog(__('Payment refunding error.'));
+                $this->pagSeguroHelper->writeLog(__('Payment refunding error.') . $e->getMessage());
                 throw new \Magento\Framework\Validator\Exception(__('Payment refunding error.'));
             }
 
@@ -461,7 +461,7 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
                 $errorMsg[] = 'Impossível cancelar compra . Aldo deu errado.';
             }
         } catch (\Exception $e) {                    
-            $this->writeLog(__('Payment cancels error.'));
+            $this->pagSeguroHelper->writeLog(__('Payment cancels error.') . $e->getMessage());
             $errorMsg[] = __('Payment cancels error.');
         }
 
