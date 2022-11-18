@@ -496,11 +496,11 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
             )
             ->setAdditionalInformation('credit_card_owner_first', $data['additional_data']['first_cc_owner_name'] ?? null)
             ->setAdditionalInformation('credit_card_type_first', $data['additional_data']['first_cc_type'] ?? null)
-            ->setAdditionalInformation('credit_card_last_four_first',substr($data['additional_data']['first_cc_number'] ?? null, -4))
+            ->setAdditionalInformation('credit_card_last_four_first',substr($data['additional_data']['first_cc_number'] ?? '', -4))
             ->setAdditionalInformation('credit_card_amount_first',$data['additional_data']['first_cc_amount'] ?? null)
             ->setAdditionalInformation('credit_card_owner_second', $data['additional_data']['second_cc_owner_name'] ?? null)
             ->setAdditionalInformation('credit_card_type_second', $data['additional_data']['second_cc_type'] ?? null)
-            ->setAdditionalInformation('credit_card_last_four_second',substr($data['additional_data']['second_cc_number'] ?? null, -4))
+            ->setAdditionalInformation('credit_card_last_four_second',substr($data['additional_data']['second_cc_number'] ?? '', -4))
             ->setAdditionalInformation('credit_card_amount_second',$data['additional_data']['second_cc_amount'] ?? null)
             
             ->setCcType($data['additional_data']['cc_type'] ?? null)
