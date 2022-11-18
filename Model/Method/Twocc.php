@@ -504,7 +504,7 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
             ->setAdditionalInformation('credit_card_amount_second',$data['additional_data']['second_cc_amount'] ?? null)
             
             ->setCcType($data['additional_data']['cc_type'] ?? null)
-            ->setCcLast4(substr($data['additional_data']['cc_number'] ?? null, -4))
+            ->setCcLast4(substr($data['additional_data']['cc_number'] ?? '', -4))
             ->setCcExpYear($data['additional_data']['cc_exp_year'] ?? null)
             ->setCcExpMonth($data['additional_data']['cc_exp_month'] ?? null);
 
