@@ -1079,11 +1079,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     private function getShippingType(\Magento\Sales\Model\Order $order)
     {
         $method =  strtolower($order->getShippingMethod() ?? '');
-        if (strstr($method, 'pac') !== false) {
+        if ($method && strstr($method, 'pac') !== false) {
             return '1';
-        } elseif (strstr($method, 'sedex') !== false) {
+        } elseif ($method &&  strstr($method, 'sedex') !== false) {
             return '2';
         }
+        
         return '3';
     }
 
