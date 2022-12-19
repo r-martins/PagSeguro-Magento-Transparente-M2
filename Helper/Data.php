@@ -521,7 +521,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 $errArray = [];
                 $xmlError = json_decode(json_encode($xml), true);
                 $xmlError = $xmlError['error'];
-    
+
                 if (isset($xmlError['code'])) {
                     $errArray[] = $this->translateError($xmlError['message']);
                 } else {
@@ -529,12 +529,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                         $errArray[] = $this->translateError($xmlErr['message']);
                     }
                 }
-    
+
                 $errArray = implode(" / ", $errArray);
                 if ($errArray) {
                     throw new \Magento\Framework\Validator\Exception(new Phrase($errArray));
                 }
-    
+
                 $this->setSessionVl($errArray);
             }
         }
@@ -593,7 +593,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             if (is_null($v)) {
                 $v = '';
             }
-            
+
             $params[$k] = utf8_decode($v);
         }
         return $params;
@@ -626,11 +626,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $reference = $order->getIncrementId();
         $cardAmount = $order->getGrandTotal();
         $percent = 1.0;
-        
+
         if (!empty($cc)) {
             $cardAmount = floatval($payment->getAdditionalInformation('credit_card_amount' . $cc));
             $percent = $cardAmount / $order->getGrandTotal();
-        
+
             if ($cc == '_first') {
                 $reference .= '-cc1';
             } else {
@@ -716,7 +716,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 $extra -= 0.01 * $item->getQtyOrdered();
             }
         }
-        
+
         return number_format($extra, 2, '.', '');
     }
 
@@ -748,7 +748,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
                 if ($items[$y]->getIsQtyDecimal()) {
                     $qtyDescription = ' (' . $items[$y]->getQtyOrdered() . ' un.)';
-                    
+
                     $return['itemQuantity'.$x] = 1;
                     $return['itemAmount'.$x] = number_format($items[$y]->getRowTotalInclTax() * $percent, 2, '.', '');
                     $return['itemDescription'.$x] =
@@ -914,7 +914,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $shippingType = $this->getShippingType($order);
             $shippingCost = $order->getShippingAmount() * $percent;
             $return['shippingType'] = $shippingType;
-            
+
             if ($shippingCost > 0) {
                 if ($this->shouldSplit($order)) {
                     $shippingCost -= 0.01;
@@ -1381,7 +1381,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 : $payment->getCcType();
 
         $installmentsQty = $params['installmentQuantity'];
-        
+
         $url = $this->isSandbox() ? self::PAGSEGURO_SANDBOX_INSTALLMENTS_URL : self::PAGSEGURO_INSTALLMENTS_URL;
         $url .= '?' . http_build_query([
             'sessionId'       => $this->getSessionId(),
@@ -1397,7 +1397,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if (!isset($response->installments->{$creditCardBrand}[$installmentsQty-1]->installmentAmount)) {
             throw new LocalizedException(__('installment value invalid value: %1', $params['installmentValue']));
         }
-        
+
         $installmentsValue = (float) $response->installments->{$creditCardBrand}[$installmentsQty-1]->installmentAmount;
         $params['installmentValue'] = number_format($installmentsValue, 2, '.', '');
 
@@ -1583,11 +1583,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
                 if (in_array($transactionStatus, [6, 7])) {
                     $transactionType = \Magento\Sales\Model\Order\Payment\Transaction::TYPE_VOID;
-                    
+
                     if ($transactionStatus == 6) {
                         $transactionType = \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND;
                     }
-                    
+
                     $this->registerTransaction($transactionId, $transactionType, $payment);
                     continue;
                 }
@@ -1733,5 +1733,27 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         return preg_replace($pattern, '', $value);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function isBoletoActive()
+    {
+        return $this->scopeConfig->getValue(
+            self::XML_PATH_PAYMENT_PAGSEGURO_BOLETO_ACTIVE,
+            ScopeInterface::SCOPE_STORE
+        );
+    }
+
+    /**
+     * @return mixed
+     */
+    public function isTefActive()
+    {
+        return $this->scopeConfig->getValue(
+            self::XML_PATH_PAYMENT_PAGSEGURO_TEF_ACTIVE,
+            ScopeInterface::SCOPE_STORE
+        );
     }
 }

@@ -31,26 +31,27 @@ class Tef extends \RicardoMartins\PagSeguro\Model\Method\AbstractMethodExtension
     protected $_maxAmount = null;
     protected $_supportedCurrencyCodes = ['BRL'];
     protected $_infoBlockType = \RicardoMartins\PagSeguro\Block\Payment\Info::class;
+    protected $_formBlockType = \RicardoMartins\PagSeguro\Block\Form::class;
     protected $_debugReplacePrivateDataKeys = ['number', 'exp_month', 'exp_year', 'cvc'];
 
     /**
      * PagSeguro Helper
      *
-     * @var RicardoMartins\PagSeguro\Helper\Data;
+     * @var \RicardoMartins\PagSeguro\Helper\Data;
      */
     protected $pagSeguroHelper;
 
     /**
      * PagSeguro Abstract Model
      *
-     * @var RicardoMartins\PagSeguro\Model\Notifications
+     * @var \RicardoMartins\PagSeguro\Model\Notifications
      */
     protected $pagSeguroAbModel;
 
     /**
      * Backend Auth Session
      *
-     * @var Magento\Backend\Model\Auth\Session $adminSession
+     * @var \Magento\Backend\Model\Auth\Session $adminSession
      */
     protected $adminSession;
 
