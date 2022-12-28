@@ -311,7 +311,7 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
                     }
                 } catch (\Exception $e) {
                     $this->debugData(['transaction_id' => $transactionId, 'exception' => $e->getMessage()]);
-                    $this->pagSeguroHelper->writeLog(__('Payment refunding error.'));
+                    $this->pagSeguroHelper->writeLog(__('Payment refunding error.') . $e->getMessage());
                     $errorMsg[] = __('Payment refunding error.');
                 }
 
@@ -334,7 +334,7 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
                         $errorMsg[] = 'Impossível cancelar compra do 1º cartão. Aldo deu errado.';
                     }
                 } catch (\Exception $e) {
-                    $this->writeLog(__('Payment cancels error.'));
+                    $this->pagSeguroHelper->writeLog(__('Payment cancels error.') . $e->getMessage());
                     $errorMsg[] = __('Payment cancels error.');
                 }
 
@@ -385,7 +385,7 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
                         $errorMsg[] = 'Impossível cancelar compra do 2º cartão. Aldo deu errado.';
                     }
                 } catch (\Exception $e) {
-                    $this->writeLog(__('Payment cancels error.'));
+                    $this->pagSeguroHelper->writeLog(__('Payment cancels error.') . $e->getMessage());
                     $errorMsg[] = __('Payment cancels error.');
                 }
 
@@ -420,7 +420,7 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
                 }
             } catch (\Exception $e) {
                 $this->debugData(['transaction_id' => $transactionId, 'exception' => $e->getMessage()]);
-                $this->pagSeguroHelper->writeLog(__('Payment refunding error.'));
+                $this->pagSeguroHelper->writeLog(__('Payment refunding error.') . $e->getMessage());
                 throw new \Magento\Framework\Validator\Exception(__('Payment refunding error.'));
             }
 
@@ -450,7 +450,7 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
                 $errorMsg[] = 'Impossível cancelar compra . Aldo deu errado.';
             }
         } catch (\Exception $e) {
-            $this->writeLog(__('Payment cancels error.'));
+            $this->pagSeguroHelper->writeLog(__('Payment cancels error.') . $e->getMessage());
             $errorMsg[] = __('Payment cancels error.');
         }
 
@@ -485,15 +485,15 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
             )
             ->setAdditionalInformation('credit_card_owner_first', $data['additional_data']['first_cc_owner_name'] ?? null)
             ->setAdditionalInformation('credit_card_type_first', $data['additional_data']['first_cc_type'] ?? null)
-            ->setAdditionalInformation('credit_card_last_four_first',substr($data['additional_data']['first_cc_number'] ?? null, -4))
+            ->setAdditionalInformation('credit_card_last_four_first',substr($data['additional_data']['first_cc_number'] ?? '', -4))
             ->setAdditionalInformation('credit_card_amount_first',$data['additional_data']['first_cc_amount'] ?? null)
             ->setAdditionalInformation('credit_card_owner_second', $data['additional_data']['second_cc_owner_name'] ?? null)
             ->setAdditionalInformation('credit_card_type_second', $data['additional_data']['second_cc_type'] ?? null)
-            ->setAdditionalInformation('credit_card_last_four_second',substr($data['additional_data']['second_cc_number'] ?? null, -4))
+            ->setAdditionalInformation('credit_card_last_four_second',substr($data['additional_data']['second_cc_number'] ?? '', -4))
             ->setAdditionalInformation('credit_card_amount_second',$data['additional_data']['second_cc_amount'] ?? null)
 
             ->setCcType($data['additional_data']['cc_type'] ?? null)
-            ->setCcLast4(substr($data['additional_data']['cc_number'] ?? null, -4))
+            ->setCcLast4(substr($data['additional_data']['cc_number'] ?? '', -4))
             ->setCcExpYear($data['additional_data']['cc_exp_year'] ?? null)
             ->setCcExpMonth($data['additional_data']['cc_exp_month'] ?? null);
 

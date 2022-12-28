@@ -1,7 +1,6 @@
 <?php
 namespace RicardoMartins\PagSeguro\Helper;
 
-use Laminas\Stdlib\StringUtils;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Phrase;
 use Magento\Store\Model\ScopeInterface;
@@ -1058,12 +1057,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
       */
     private function getShippingType(\Magento\Sales\Model\Order $order)
     {
-        $method =  strtolower($order->getShippingMethod());
-        if (strstr($method, 'pac') !== false) {
+        $method =  strtolower($order->getShippingMethod() ?? '');
+        if ($method && strstr($method, 'pac') !== false) {
             return '1';
-        } elseif (strstr($method, 'sedex') !== false) {
+        } elseif ($method &&  strstr($method, 'sedex') !== false) {
             return '2';
         }
+        
         return '3';
     }
 
@@ -1698,7 +1698,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         $value = (string) $value;
 
-        if (! StringUtils::hasPcreUnicodeSupport()) {
+        if (class_exists('\Laminas\Stdlib\StringUtils') && !\Laminas\Stdlib\StringUtils::hasPcreUnicodeSupport()) {
             // POSIX named classes are not supported, use alternative 0-9 match
             $pattern = '/[^0-9]/';
         } elseif (extension_loaded('mbstring')) {
@@ -1710,5 +1710,27 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         return preg_replace($pattern, '', $value);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function isBoletoActive()
+    {
+        return $this->scopeConfig->getValue(
+            self::XML_PATH_PAYMENT_PAGSEGURO_BOLETO_ACTIVE,
+            ScopeInterface::SCOPE_STORE
+        );
+    }
+
+    /**
+     * @return mixed
+     */
+    public function isTefActive()
+    {
+        return $this->scopeConfig->getValue(
+            self::XML_PATH_PAYMENT_PAGSEGURO_TEF_ACTIVE,
+            ScopeInterface::SCOPE_STORE
+        );
     }
 }

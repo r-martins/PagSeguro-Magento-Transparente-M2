@@ -31,26 +31,27 @@ class Tef extends \RicardoMartins\PagSeguro\Model\Method\AbstractMethodExtension
     protected $_maxAmount = null;
     protected $_supportedCurrencyCodes = ['BRL'];
     protected $_infoBlockType = \RicardoMartins\PagSeguro\Block\Payment\Info::class;
+    protected $_formBlockType = \RicardoMartins\PagSeguro\Block\Form::class;
     protected $_debugReplacePrivateDataKeys = ['number', 'exp_month', 'exp_year', 'cvc'];
 
     /**
      * PagSeguro Helper
      *
-     * @var RicardoMartins\PagSeguro\Helper\Data;
+     * @var \RicardoMartins\PagSeguro\Helper\Data;
      */
     protected $pagSeguroHelper;
 
     /**
      * PagSeguro Abstract Model
      *
-     * @var RicardoMartins\PagSeguro\Model\Notifications
+     * @var \RicardoMartins\PagSeguro\Model\Notifications
      */
     protected $pagSeguroAbModel;
 
     /**
      * Backend Auth Session
      *
-     * @var Magento\Backend\Model\Auth\Session $adminSession
+     * @var \Magento\Backend\Model\Auth\Session $adminSession
      */
     protected $adminSession;
 
@@ -76,7 +77,7 @@ class Tef extends \RicardoMartins\PagSeguro\Model\Method\AbstractMethodExtension
     ) {
         parent::__construct($context, $registry, $extensionFactory, $customAttributeFactory, $paymentData, $scopeConfig,
             $logger, $pagSeguroHelper, $pagSegurologger, $resource, $resourceCollection, $data, $directory);
-        
+
         $this->pagSeguroHelper = $pagSeguroHelper;
         $this->pagSeguroAbModel = $pagSeguroAbModel;
         $this->adminSession = $adminSession;
@@ -205,13 +206,15 @@ class Tef extends \RicardoMartins\PagSeguro\Model\Method\AbstractMethodExtension
      */
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
     {
-        if ($this->adminSession->getUser()) {
+        if ($this->getConfigData("disable_frontend") && !$this->adminSession->getUser()) {
             return false;
         }
+
         $isAvailable = $this->getConfigData('active', $quote ? $quote->getStoreId() : null);
         if (empty($quote)) {
             return $isAvailable;
         }
+
         if ($this->getConfigData("group_restriction") == false) {
             return $isAvailable;
         }
