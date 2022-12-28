@@ -153,7 +153,7 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
 
             $transactionId  = (string)$returnXmlFirst->code;
             $transactions[] = $transactionId;
-            
+
             //Second Credit Card
             $returnXmlSecond = $this->_createTransaction($payment, '_second');
 
@@ -223,7 +223,7 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
                 ->setAdditionalInformation(
                     [\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS => (array) $additional]
                 )
-                ->setFailSafe(true)                
+                ->setFailSafe(true)
                 ->build(\Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH);
 
                 $trans = $this->transactionBuilder;
@@ -233,7 +233,7 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
                 ->setAdditionalInformation(
                     [\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS => (array) $additional]
                 )
-                ->setFailSafe(true)                
+                ->setFailSafe(true)
                 ->build(\Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH);
             }
 
@@ -303,14 +303,14 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
                     'transactionCode'   => $transactionIdFirst,
                     'refundValue'       => number_format($payment->getAdditionalInformation('credit_card_amount_first'), 2, '.', '')
                 ];
-        
+
                 $params['token'] = $token;
                 $params['email'] = $email;
-        
+
                 try {
                     // call API - refund
                     $returnXml  = $this->pagSeguroHelper->callApi($params, $payment, 'transactions/refunds');
-        
+
                     if ($returnXml === null) {
                         $errorMsg[] = 'Impossível gerar reembolso do 1º cartão. Aldo deu errado.';
                     }
@@ -330,15 +330,15 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
                 $params = [
                     'transactionCode'   => $transactionIdFirst
                 ];
-        
+
                 try {
                     // call API - cancels
                     $returnXml  = $this->callApi($params, $payment, 'transactions/cancels/');
-        
+
                     if ($returnXml === null) {
                         $errorMsg[] = 'Impossível cancelar compra do 1º cartão. Aldo deu errado.';
                     }
-                } catch (\Exception $e) {                    
+                } catch (\Exception $e) {
                     $this->pagSeguroHelper->writeLog(__('Payment cancels error.') . $e->getMessage());
                     $errorMsg[] = __('Payment cancels error.');
                 }
@@ -355,14 +355,14 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
                     'transactionCode'   => $transactionIdSecond,
                     'refundValue'       => number_format($payment->getAdditionalInformation('credit_card_amount_second'), 2, '.', '')
                 ];
-        
+
                 $params['token'] = $token;
                 $params['email'] = $email;
-        
+
                 try {
                     // call API - refund
                     $returnXml  = $this->pagSeguroHelper->callApi($params, $payment, 'transactions/refunds');
-        
+
                     if ($returnXml === null) {
                         $errorMsg[] = 'Impossível gerar reembolso do 2º cartão. Aldo deu errado.';
                     }
@@ -382,11 +382,11 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
                 $params = [
                     'transactionCode'   => $transactionIdSecond
                 ];
-        
+
                 try {
                     // call API - cancels
                     $returnXml  = $this->callApi($params, $payment, 'transactions/cancels/');
-        
+
                     if ($returnXml === null) {
                         $errorMsg[] = 'Impossível cancelar compra do 2º cartão. Aldo deu errado.';
                     }
@@ -413,14 +413,14 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
                 'transactionCode'   => $transactionId,
                 'refundValue'       => number_format($amount, 2, '.', '')
             ];
-    
+
             $params['token'] = $token;
             $params['email'] = $email;
-    
+
             try {
                 // call API - refund
                 $returnXml  = $this->pagSeguroHelper->callApi($params, $payment, 'transactions/refunds');
-    
+
                 if ($returnXml === null) {
                     $errorMsg = 'Impossível gerar reembolso. Aldo deu errado.';
                     throw new \Magento\Framework\Validator\Exception($errorMsg);
@@ -443,7 +443,7 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
     }
 
     private function TransactionCancel($payment, $transactionId) {
-        
+
         $token = $this->getToken();
         $email = $this->getMerchantEmail();
 
@@ -452,7 +452,7 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
         $params = [
             'transactionCode'   => $transactionId
         ];
-        
+
         try {
             // call API - cancels
             $returnXml  = $this->pagSeguroHelper->callApi($params, $payment, 'transactions/cancels/');
@@ -460,7 +460,7 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
             if ($returnXml === null) {
                 $errorMsg[] = 'Impossível cancelar compra . Aldo deu errado.';
             }
-        } catch (\Exception $e) {                    
+        } catch (\Exception $e) {
             $this->pagSeguroHelper->writeLog(__('Payment cancels error.') . $e->getMessage());
             $errorMsg[] = __('Payment cancels error.');
         }
@@ -485,34 +485,34 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
         }
 
         $info = $this->getInfoInstance();
-        $info->setAdditionalInformation('sender_hash', $data['additional_data']['sender_hash'] ?? null)
+        $info->setAdditionalInformation('sender_hash', $data['additional_data']['sender_hash'] ?? '')
             ->setAdditionalInformation(
                 'credit_card_token_first',
-                $data['additional_data']['credit_card_token_first'] ?? null
+                $data['additional_data']['credit_card_token_first'] ?? ''
             )
             ->setAdditionalInformation(
                 'credit_card_token_second',
-                $data['additional_data']['credit_card_token_second'] ?? null
+                $data['additional_data']['credit_card_token_second'] ?? ''
             )
-            ->setAdditionalInformation('credit_card_owner_first', $data['additional_data']['first_cc_owner_name'] ?? null)
-            ->setAdditionalInformation('credit_card_type_first', $data['additional_data']['first_cc_type'] ?? null)
+            ->setAdditionalInformation('credit_card_owner_first', $data['additional_data']['first_cc_owner_name'] ?? '')
+            ->setAdditionalInformation('credit_card_type_first', $data['additional_data']['first_cc_type'] ?? '')
             ->setAdditionalInformation('credit_card_last_four_first',substr($data['additional_data']['first_cc_number'] ?? '', -4))
-            ->setAdditionalInformation('credit_card_amount_first',$data['additional_data']['first_cc_amount'] ?? null)
-            ->setAdditionalInformation('credit_card_owner_second', $data['additional_data']['second_cc_owner_name'] ?? null)
-            ->setAdditionalInformation('credit_card_type_second', $data['additional_data']['second_cc_type'] ?? null)
+            ->setAdditionalInformation('credit_card_amount_first',$data['additional_data']['first_cc_amount'] ?? '')
+            ->setAdditionalInformation('credit_card_owner_second', $data['additional_data']['second_cc_owner_name'] ?? '')
+            ->setAdditionalInformation('credit_card_type_second', $data['additional_data']['second_cc_type'] ?? '')
             ->setAdditionalInformation('credit_card_last_four_second',substr($data['additional_data']['second_cc_number'] ?? '', -4))
-            ->setAdditionalInformation('credit_card_amount_second',$data['additional_data']['second_cc_amount'] ?? null)
-            
-            ->setCcType($data['additional_data']['cc_type'] ?? null)
+            ->setAdditionalInformation('credit_card_amount_second',$data['additional_data']['second_cc_amount'] ?? '')
+
+            ->setCcType($data['additional_data']['cc_type'] ?? '')
             ->setCcLast4(substr($data['additional_data']['cc_number'] ?? '', -4))
-            ->setCcExpYear($data['additional_data']['cc_exp_year'] ?? null)
-            ->setCcExpMonth($data['additional_data']['cc_exp_month'] ?? null);
+            ->setCcExpYear($data['additional_data']['cc_exp_year'] ?? '')
+            ->setCcExpMonth($data['additional_data']['cc_exp_month'] ?? '');
 
         // set cpf
         if ($this->pagSeguroHelper->isCpfVisible()) {
-            $ccOwnerCpf = $data['additional_data']['first_cc_owner_cpf'] ?? null;
+            $ccOwnerCpf = $data['additional_data']['first_cc_owner_cpf'] ?? '';
             $info->setAdditionalInformation($this->getCode() . '_cpf_first', $ccOwnerCpf);
-            $ccOwnerCpf = $data['additional_data']['second_cc_owner_cpf'] ?? null;
+            $ccOwnerCpf = $data['additional_data']['second_cc_owner_cpf'] ?? '';
             $info->setAdditionalInformation($this->getCode() . '_cpf_second', $ccOwnerCpf);
         }
 

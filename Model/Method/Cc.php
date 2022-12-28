@@ -257,20 +257,20 @@ class Cc extends \Magento\Payment\Model\Method\Cc
         }
 
         $info = $this->getInfoInstance();
-        $info->setAdditionalInformation('sender_hash', $data['additional_data']['sender_hash'] ?? null)
+        $info->setAdditionalInformation('sender_hash', $data['additional_data']['sender_hash'] ?? '')
             ->setAdditionalInformation(
                 'credit_card_token',
-                $data['additional_data']['credit_card_token'] ?? null
+                $data['additional_data']['credit_card_token'] ?? ''
             )
-            ->setAdditionalInformation('credit_card_owner', $data['additional_data']['cc_owner_name'] ?? null)
-            ->setCcType($data['additional_data']['cc_type'] ?? null)
+            ->setAdditionalInformation('credit_card_owner', $data['additional_data']['cc_owner_name'] ?? '')
+            ->setCcType($data['additional_data']['cc_type'] ?? '')
             ->setCcLast4(substr($data['additional_data']['cc_number'] ?? '', -4))
-            ->setCcExpYear($data['additional_data']['cc_exp_year'] ?? null)
-            ->setCcExpMonth($data['additional_data']['cc_exp_month'] ?? null);
+            ->setCcExpYear($data['additional_data']['cc_exp_year'] ?? '')
+            ->setCcExpMonth($data['additional_data']['cc_exp_month'] ?? '');
 
         // set cpf
         if ($this->pagSeguroHelper->isCpfVisible()) {
-            $ccOwnerCpf = $data['additional_data']['cc_owner_cpf'] ?? null;
+            $ccOwnerCpf = $data['additional_data']['cc_owner_cpf'] ?? '';
             $info->setAdditionalInformation($this->getCode() . '_cpf', $ccOwnerCpf);
         }
 
