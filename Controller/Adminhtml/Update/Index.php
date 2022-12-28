@@ -97,7 +97,7 @@ class Index extends Action implements HttpGetActionInterface
             return $url;
         }
 
-        $url = "https://ws.ricardomartins.net.br/pspro/v7/wspagseguro/v2/transactions/{$transactionId}?publicKey={$publicKey}";
+        $url = "https://ws.ricardomartins.net.br/pspro/v7/wspagseguro/v2/transactions/{$transactionId}?public_key={$publicKey}";
         return $url;
     }
 }

@@ -1615,7 +1615,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function consultTransactionOnApi(String $transactionId): \SimpleXMLElement
     {
         $publicKey = $this->getPagSeguroPubKey();
-        $url = "https://ws.ricardomartins.net.br/pspro/v7/wspagseguro/v2/transactions/{$transactionId}?publicKey={$publicKey}";
+        $url = "https://ws.ricardomartins.net.br/pspro/v7/wspagseguro/v2/transactions/{$transactionId}?public_key={$publicKey}";
 
         if ($this->isSandbox()) {
             $publicKey = $this->getPagSeguroPubKey();
