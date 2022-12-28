@@ -15,6 +15,7 @@
                 </field>
                 <field id="key" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Public Key</label>
+                    <validate>required-entry no-whitespace validate-pagseguro-public-key</validate>
                     <comment><![CDATA[Get your public key for free when <a href="//r-martins.github.io/PagSeguro-Magento-Transparente/pro/app.html" target="_blank">enabling your account</a>.]]></comment>
                 </field>
                 <field id="sandbox" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
