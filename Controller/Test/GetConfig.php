@@ -53,7 +53,6 @@ class GetConfig extends \Magento\Framework\App\Action\Action
     {
         $resultJson = $this->resultJsonFactory->create();
 
-        $tokenLen = strlen($this->_helper->getToken());
         $redirectMethod = $this->scopeConfig->getValue(
             \RicardoMartins\PagSeguro\Helper\Data::XML_PATH_PAYMENT_PAGSEGURO_TEF_ACTIVE, ScopeInterface::SCOPE_STORE
         );
@@ -68,12 +67,7 @@ class GetConfig extends \Magento\Framework\App\Action\Action
             'redirect'         => $redirectMethod,
             'sandbox_active' => $this->_helper->isSandbox(),
             'key_validate'  => $this->_helper->validateKey(),
-            'token_consistency' => ($tokenLen == 32 || $tokenLen == 100) ? "Good" : "Token does not consist 32 or 100 characters"
         );
-
-        if ($this->_helper->isSandbox()) {
-            unset($info['token_consistency']);
-        }
 
         $resultJson->setData($info);
         return $resultJson;

@@ -18,9 +18,7 @@ use RicardoMartins\PagSeguro\Model\Exception\WrongInstallmentsException;
  */
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
-
     const XML_PATH_PAYMENT_PAGSEGURO_EMAIL              = 'payment/rm_pagseguro/merchant_email';
-    const XML_PATH_PAYMENT_PAGSEGURO_TOKEN              = 'payment/rm_pagseguro/token';
     const XML_PATH_PAYMENT_PAGSEGURO_DEBUG              = 'payment/rm_pagseguro/debug';
     const XML_PATH_PAUMENT_PAGSEGURO_SANDBOX            = 'payment/rm_pagseguro/sandbox';
     const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_EMAIL      = 'payment/rm_pagseguro/sandbox_merchant_email';
@@ -149,7 +147,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         //@TODO Replace forbidden curl_*
         $ch = curl_init($url);
         $params['email'] = $this->getMerchantEmail();
-        $params['token'] = $this->getToken();
         $params['public_key'] = $this->getPagSeguroPubKey();
 
         if($this->isSandbox()) {
@@ -270,23 +267,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($this->isDebugActive()) {
             $this->_logHelper->writeLog($obj);
         }
-    }
-
-    /**
-     * Get current. Return FALSE if empty.
-     * @return string | false
-     */
-    public function getToken()
-    {
-        if(!$this->isSandbox()) {
-            $token = $this->scopeConfig->getValue(self::XML_PATH_PAYMENT_PAGSEGURO_TOKEN, ScopeInterface::SCOPE_WEBSITE);
-        }
-
-        if (empty($token)) {
-            return false;
-        }
-
-        return $token;
     }
 
     /**
@@ -640,7 +620,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         $params = [
             'email'             => $this->getMerchantEmail(),
-            'token'             => $this->getToken(),
             'paymentMode'       => 'default',
             'paymentMethod'     => 'creditCard',
             'receiverEmail'     =>  $this->getMerchantEmail(),
@@ -1291,7 +1270,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $params = [
             'email' => $this->getMerchantEmail(),
-            'token' => $this->getToken(),
             'paymentMode'   => 'default',
             'paymentMethod' =>  'boleto',
             'receiverEmail' =>  $this->getMerchantEmail(),
@@ -1601,7 +1579,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 // ajusts the endpoint and the parameters
                 if (in_array($transactionStatus, [3, 4, 5])) {
                     $apiEndpoint = 'transactions/refunds';
-                    $params['token'] = $this->getToken();
                     $params['email'] = $this->getMerchantEmail();
                     $transactionType = \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND;
                 }
@@ -1637,9 +1614,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function consultTransactionOnApi(String $transactionId): \SimpleXMLElement
     {
-        $email = $this->getMerchantEmail();
-        $token = $this->getToken();
-        $url = "https://ws.pagseguro.uol.com.br/v2/transactions/{$transactionId}?email={$email}&token={$token}";
+        $publicKey = $this->getPagSeguroPubKey();
+        $url = "https://ws.ricardomartins.net.br/pspro/v7/wspagseguro/v2/transactions/{$transactionId}?public_key={$publicKey}";
 
         if ($this->isSandbox()) {
             $publicKey = $this->getPagSeguroPubKey();

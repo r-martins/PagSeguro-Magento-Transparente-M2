@@ -287,8 +287,6 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
         $transactionId = $payment->getAdditionalInformation('transaction_id');
         $transactionIdFirst = $payment->getAdditionalInformation('transaction_id_first');
         $transactionIdSecond = $payment->getAdditionalInformation('transaction_id_second');
-
-        $token = $this->pagSeguroHelper->getToken();
         $email = $this->pagSeguroHelper->getMerchantEmail();
 
         if (isset($transactionIdFirst) && isset($transactionIdSecond)) {
@@ -303,9 +301,6 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
                     'transactionCode'   => $transactionIdFirst,
                     'refundValue'       => number_format($payment->getAdditionalInformation('credit_card_amount_first'), 2, '.', '')
                 ];
-
-                $params['token'] = $token;
-                $params['email'] = $email;
 
                 try {
                     // call API - refund
@@ -356,7 +351,6 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
                     'refundValue'       => number_format($payment->getAdditionalInformation('credit_card_amount_second'), 2, '.', '')
                 ];
 
-                $params['token'] = $token;
                 $params['email'] = $email;
 
                 try {
@@ -414,7 +408,6 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
                 'refundValue'       => number_format($amount, 2, '.', '')
             ];
 
-            $params['token'] = $token;
             $params['email'] = $email;
 
             try {
@@ -442,13 +435,9 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
         return $this;
     }
 
-    private function TransactionCancel($payment, $transactionId) {
-
-        $token = $this->getToken();
-        $email = $this->getMerchantEmail();
-
+    private function TransactionCancel($payment, $transactionId)
+    {
         $errorMsg = [];
-
         $params = [
             'transactionCode'   => $transactionId
         ];
