@@ -60,9 +60,6 @@ $this->logger = $pagSegurologger;
             'refundValue'       => number_format($amount, 2, '.', '')
         ];
 
-        $params['token'] = $this->pagSeguroHelper->getToken();
-        $params['email'] = $this->pagSeguroHelper->getMerchantEmail();
-
         try {
             // call API - refund
             $returnXml  = $this->pagSeguroHelper->callApi($params, $payment, 'transactions/refunds');

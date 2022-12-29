@@ -91,17 +91,13 @@ class Index extends Action implements HttpGetActionInterface
     {
         $transactionId = $this->getRequest()->getParam('transactionId');
         $sandbox = ($this->psHelper->isSandbox()) ? 'sandbox.' : '';
+        $publicKey = $this->psHelper->getPagSeguroPubKey();
         if ($sandbox) {
-            $publicKey = $this->psHelper->getPagSeguroPubKey();
-            $url = "https://ws.ricardomartins.net.br/pspro/v7/wspagseguro/v3/transactions/$transactionId?public_key=$publicKey&isSandbox=1";
+            $url = "https://ws.ricardomartins.net.br/pspro/v7/wspagseguro/v3/transactions/{$transactionId}?public_key={$publicKey}&isSandbox=1";
             return $url;
         }
 
-        $email = $this->psHelper->getMerchantEmail();
-        $token = $this->psHelper->getToken();
-        $url = "https://ws.pagseguro.uol.com.br/v2/transactions/$transactionId?email=$email&token=$token";
+        $url = "https://ws.ricardomartins.net.br/pspro/v7/wspagseguro/v2/transactions/{$transactionId}?public_key={$publicKey}";
         return $url;
-
     }
-
 }

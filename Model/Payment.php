@@ -194,9 +194,6 @@ class Payment extends \Magento\Payment\Model\Method\Cc
             'refundValue'       => number_format($amount, 2, '.', ''),
         );
 
-        $params['token'] = $this->pagSeguroHelper->getToken();
-        $params['email'] = $this->pagSeguroHelper->getMerchantEmail();
-
         try {
            // call API - refund
             $returnXml  = $this->pagSeguroHelper->callApi($params, $payment, 'transactions/refunds');
@@ -206,7 +203,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                 throw new \Magento\Framework\Validator\Exception($errorMsg);
             }
         } catch (\Exception $e) {
-            $this->logger->error(__('Payment refunding error.'));
+            $this->logger->debug([__('Payment refunding error.')]);
             throw new \Magento\Framework\Validator\Exception(__('Payment refunding error.'));
         }
 
