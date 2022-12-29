@@ -8,7 +8,7 @@ define(['jquery'], function($) {
                 return value.length === 35;
             },
             $.mage.__('Check your public key. It has 35 characters.')
-        )
+        );
         return targetWidget;
-    }
+    };
 });

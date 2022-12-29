@@ -27,6 +27,7 @@
                 </field>
                 <field id="sandbox_key" translate="label comment" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Sandbox Public Key</label>
+                    <validate>required-entry no-whitespace validate-pagseguro-public-key</validate>
                     <comment><![CDATA[Remember to <a href="//pagseguro.ricardomartins.net.br/sandbox.html" target="_blank">authorize your sandbox</a> account before using this feature.]]></comment>
                     <depends><field id="sandbox">1</field></depends>
                 </field>
