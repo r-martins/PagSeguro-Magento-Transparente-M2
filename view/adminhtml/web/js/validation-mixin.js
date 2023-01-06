@@ -5,7 +5,7 @@ define(['jquery'], function($) {
         $.validator.addMethod(
             'validate-pagseguro-public-key',
             function(value, element) {
-                return value.length === 35;
+                return value.length === 35 || value.length === 0;
             },
             $.mage.__('Check your public key. It has 35 characters.')
         );
