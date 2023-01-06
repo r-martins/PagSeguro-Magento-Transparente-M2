@@ -474,34 +474,34 @@ class Twocc extends \Magento\Payment\Model\Method\Cc
         }
 
         $info = $this->getInfoInstance();
-        $info->setAdditionalInformation('sender_hash', $data['additional_data']['sender_hash'] ?? null)
+        $info->setAdditionalInformation('sender_hash', $data['additional_data']['sender_hash'] ?? '')
             ->setAdditionalInformation(
                 'credit_card_token_first',
-                $data['additional_data']['credit_card_token_first'] ?? null
+                $data['additional_data']['credit_card_token_first'] ?? ''
             )
             ->setAdditionalInformation(
                 'credit_card_token_second',
-                $data['additional_data']['credit_card_token_second'] ?? null
+                $data['additional_data']['credit_card_token_second'] ?? ''
             )
-            ->setAdditionalInformation('credit_card_owner_first', $data['additional_data']['first_cc_owner_name'] ?? null)
-            ->setAdditionalInformation('credit_card_type_first', $data['additional_data']['first_cc_type'] ?? null)
+            ->setAdditionalInformation('credit_card_owner_first', $data['additional_data']['first_cc_owner_name'] ?? '')
+            ->setAdditionalInformation('credit_card_type_first', $data['additional_data']['first_cc_type'] ?? '')
             ->setAdditionalInformation('credit_card_last_four_first',substr($data['additional_data']['first_cc_number'] ?? '', -4))
-            ->setAdditionalInformation('credit_card_amount_first',$data['additional_data']['first_cc_amount'] ?? null)
-            ->setAdditionalInformation('credit_card_owner_second', $data['additional_data']['second_cc_owner_name'] ?? null)
-            ->setAdditionalInformation('credit_card_type_second', $data['additional_data']['second_cc_type'] ?? null)
+            ->setAdditionalInformation('credit_card_amount_first',$data['additional_data']['first_cc_amount'] ?? '')
+            ->setAdditionalInformation('credit_card_owner_second', $data['additional_data']['second_cc_owner_name'] ?? '')
+            ->setAdditionalInformation('credit_card_type_second', $data['additional_data']['second_cc_type'] ?? '')
             ->setAdditionalInformation('credit_card_last_four_second',substr($data['additional_data']['second_cc_number'] ?? '', -4))
-            ->setAdditionalInformation('credit_card_amount_second',$data['additional_data']['second_cc_amount'] ?? null)
+            ->setAdditionalInformation('credit_card_amount_second',$data['additional_data']['second_cc_amount'] ?? '')
 
-            ->setCcType($data['additional_data']['cc_type'] ?? null)
+            ->setCcType($data['additional_data']['cc_type'] ?? '')
             ->setCcLast4(substr($data['additional_data']['cc_number'] ?? '', -4))
-            ->setCcExpYear($data['additional_data']['cc_exp_year'] ?? null)
-            ->setCcExpMonth($data['additional_data']['cc_exp_month'] ?? null);
+            ->setCcExpYear($data['additional_data']['cc_exp_year'] ?? '')
+            ->setCcExpMonth($data['additional_data']['cc_exp_month'] ?? '');
 
         // set cpf
         if ($this->pagSeguroHelper->isCpfVisible()) {
-            $ccOwnerCpf = $data['additional_data']['first_cc_owner_cpf'] ?? null;
+            $ccOwnerCpf = $data['additional_data']['first_cc_owner_cpf'] ?? '';
             $info->setAdditionalInformation($this->getCode() . '_cpf_first', $ccOwnerCpf);
-            $ccOwnerCpf = $data['additional_data']['second_cc_owner_cpf'] ?? null;
+            $ccOwnerCpf = $data['additional_data']['second_cc_owner_cpf'] ?? '';
             $info->setAdditionalInformation($this->getCode() . '_cpf_second', $ccOwnerCpf);
         }
 
