@@ -766,7 +766,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $return['senderIp'] = $senderIp;
         }
 
-        if (strlen($return['senderCPF']) > 11) {
+        if (isset($return['senderCPF']) && strlen($return['senderCPF']) > 11) {
             $return['senderCNPJ'] = $return['senderCPF'];
             unset($return['senderCPF']);
         }
