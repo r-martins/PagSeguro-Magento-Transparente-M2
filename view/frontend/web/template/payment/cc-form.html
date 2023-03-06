@@ -58,7 +58,7 @@
                               enable: isActive($parents),
                               value: creditCardExpMonth,
                               valueUpdate: 'keyup',
-                              event: {keypress: limitvalue} "/>
+                              event: {keypress: numbervalidationwithmaxlength} "/>
 
             <input type="tel" placeholder="AA" class="input-text cc-exp-date" maxlength="2" value=""
                     data-bind="attr: {
@@ -69,7 +69,7 @@
                               enable: isActive($parents),
                               value: creditCardExpYear,
                               valueUpdate: 'keyup',
-                              event: {keypress: limitvalue} "/>
+                              event: {keypress: numbervalidationwithmaxlength} "/>
 
 
             <input type="hidden" placeholder="AA" name="payment[ps_cc_exp_year]" class="input-text cc-exp-date" maxlength="4" value=""
@@ -81,7 +81,7 @@
                               enable: isActive($parents),
                               value: creditCardExpYear,
                               valueUpdate: 'keyup',
-                              event: {keypress: limitvalue} "/>
+                              event: {keypress: numbervalidationwithmaxlength} "/>
         </div>
     </div>
     <!-- ko if: (hasVerification())-->
@@ -94,13 +94,14 @@
                    autocomplete="off"
                    class="input-text cvv"
                    name="payment[ps_cc_cid]"
+                   maxlength="3"
                    data-bind="attr: {id: getCode() + '_cc_cid',
                         title: $t('Card Verification Number'),
                         'data-container': getCode() + '-cc-cvv',
                         'data-validate': JSON.stringify({'required-number':true, 'validate-card-cvv':'#' + getCode() + '_cc_type'})},
                         enable: isActive($parents),
                         event: {
-                            keypress: function(data, e){ return e.currentTarget.value.length < 4;}
+                            keypress: numbervalidationwithmaxlength,
                         },
                         value: creditCardVerificationNumber" />
             <div class="field-tooltip toggle">
@@ -149,7 +150,8 @@
                                     'data-container': getCode() + '-cc-owner-birthday-day',
                                     'data-validate': JSON.stringify({'required':true})},
                             value: creditCardOwnerBirthDay,
-                            valueUpdate: 'keyup'"
+                            valueUpdate: 'keyup',
+                            event: {keypress: numbervalidationwithmaxlength}"
             />
             <input type="tel" name="payment[ps_cc_owner_birthday_month]" class="input-text ps_cc_birthdate" value="" maxlength="2" max="12"
                    data-bind="attr: {
@@ -160,7 +162,8 @@
                                     'data-container': getCode() + '-cc-owner-birthday-month',
                                     'data-validate': JSON.stringify({'required':true})},
                             value: creditCardOwnerBirthMonth,
-                            valueUpdate: 'keyup'"
+                            valueUpdate: 'keyup',
+                            event: {keypress: numbervalidationwithmaxlength}"
             />
             <input type="tel" name="payment[ps_cc_owner_birthday_year]" class="input-text ps_cc_birthdate ps_cc_birthdate_year" value="" maxlength="4" max="2015"
                    data-bind="attr: {
@@ -171,7 +174,8 @@
                                     'data-container': getCode() + '-cc-owner-birthday-year',
                                     'data-validate': JSON.stringify({'required':true})},
                             value: creditCardOwnerBirthYear,
-                            valueUpdate: 'keyup'"
+                            valueUpdate: 'keyup',
+                            event: {keypress: numbervalidationwithmaxlength}"
             />
         </div>
     </div>
@@ -182,7 +186,7 @@
             <span><!-- ko i18n: 'CPF '--><!-- /ko --></span>
         </label>
         <div class="control">
-            <input type="tel" name="payment[ps_cc_cpf]" class="input-text" value=""
+            <input type="tel" name="payment[ps_cc_cpf]" class="input-text" value="" maxlength="11"
                    data-bind="attr: {
                                     autocomplete: off,
                                     id: getCode() + '_cpf',
@@ -191,12 +195,12 @@
                                     'data-validate': JSON.stringify({'required':true})},
                             value: creditCardOwnerCpf,
                             event: {
-                                keypress: function(data, e){ return e.currentTarget.value.length < 11;}
+                                keypress: cpfvalidation
                             },
                             valueUpdate: 'keyup'"
             />
         </div>
-        <span id="card-cpf-msg"></span>
+        <div id="card-cpf-msg" class="mage-error"></div>
     </div>
     <!-- /ko -->
     <div class="field date required" data-bind="attr: {id: getCode() + '_cc_installments_div'}">

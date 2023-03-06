@@ -110,49 +110,49 @@ define(
 
             initialize: function () {
                 var self = this;
-    
+
                 this._super();
 
                 uiRegistry.get(this.name + '.' + this.name + '.messages', (function(component) {
                     component.hideTimeout = 12000;
                 }));
-    
+
                 //Set credit card number to credit card data object
                 this.creditCardFirstNumber.subscribe(function (value) {
                     var result;
-    
+
                     self.selectedCardFirstType(null);
-    
+
                     if (value === '' || value === null) {
                         return false;
                     }
                     result = cardNumberValidator(value);
-    
+
                     if (!result.isPotentiallyValid && !result.isValid) {
                         return false;
                     }
-    
+
                     if (result.card !== null) {
                         self.selectedCardFirstType(result.card.type);
                         creditCardData.creditCard = result.card;
                     }
-    
+
                     if (result.isValid) {
                         creditCardData.creditCardNumber = value;
                         self.creditCardFirstType(result.card.type);
                     }
                 });
-    
+
                 //Set expiration year to credit card data object
                 this.creditCardFirstExpYear.subscribe(function (value) {
                     creditCardData.expirationYear = value;
                 });
-    
+
                 //Set expiration month to credit card data object
                 this.creditCardFirstExpMonth.subscribe(function (value) {
                     creditCardData.expirationMonth = value;
                 });
-    
+
                 //Set cvv code to credit card data object
                 this.creditCardFirstVerificationNumber.subscribe(function (value) {
                     creditCardData.cvvCode = value;
@@ -161,39 +161,39 @@ define(
                 //Set credit card number to credit card data object
                 this.creditCardSecondNumber.subscribe(function (value) {
                     var result;
-    
+
                     self.selectedCardSecondType(null);
-    
+
                     if (value === '' || value === null) {
                         return false;
                     }
                     result = cardNumberValidator(value);
-    
+
                     if (!result.isPotentiallyValid && !result.isValid) {
                         return false;
                     }
-    
+
                     if (result.card !== null) {
                         self.selectedCardSecondType(result.card.type);
                         creditCardSecondData.creditCardSecond = result.card;
                     }
-    
+
                     if (result.isValid) {
                         creditCardSecondData.creditCardSecondNumber = value;
                         self.creditCardSecondType(result.card.type);
                     }
                 });
-    
+
                 //Set expiration year to credit card data object
                 this.creditCardSecondExpYear.subscribe(function (value) {
                     creditCardSecondData.expirationSecondYear = value;
                 });
-    
+
                 //Set expiration month to credit card data object
                 this.creditCardSecondExpMonth.subscribe(function (value) {
                     creditCardSecondData.expirationSecondMonth = value;
                 });
-    
+
                 //Set cvv code to credit card data object
                 this.creditCardSecondVerificationNumber.subscribe(function (value) {
                     creditCardSecondData.cvvSecondCode = value;
@@ -231,7 +231,7 @@ define(
 
                     if (this.RMPagSeguroObj) {
                         console.debug('Total changed: triggering the installments update...');
-                        
+
                         // triggers only the first card installments update, because the second will
                         // automatically occurs after the first one
                         this.RMPagSeguroObj.setTwoInstallments('first');
@@ -248,9 +248,9 @@ define(
                 if (event) {
                     event.preventDefault();
                 }
-                var isInstallments = localStorage.getItem('rm_pagseguro_twocc_installments', false);                
+                var isInstallments = localStorage.getItem('rm_pagseguro_twocc_installments', false);
 
-                if (this.validate() &&                    
+                if (this.validate() &&
                     isInstallments == "true"
                 ) {
                     this.getPlaceOrderDeferredObject()
@@ -338,6 +338,29 @@ define(
                 if (charCode > 31 && (charCode < 48 || charCode > 57)) {
                     return false;
                 }
+                return true;
+            },
+
+            numbervalidationwithmaxlength: function(data, e) {
+                var charCode = (e.which) ? e.which : e.keyCode;
+                var limit = $(e.currentTarget).attr('maxlength') ? $(e.currentTarget).attr('maxlength') : 4;
+                if(($(e.currentTarget).val().length == limit && e.key!=8) || (charCode < 48 || charCode > 57)) {
+                    return false;
+                }
+                return true;
+            },
+
+            cpfvalidation: function(data, e) {
+                var datalen = $(e.currentTarget).val().length;
+                var charCode = (e.which) ? e.which : e.keyCode
+                var limit = $(e.currentTarget).attr('maxlength') ? $(e.currentTarget).attr('maxlength') : 11;
+
+                if (charCode < 48 || charCode > 57 || datalen > limit) {
+                    $('#card-cpf-msg').html("Digite apenas números.");
+                    return false;
+                }
+
+                $('#card-cpf-msg').empty();
                 return true;
             },
 

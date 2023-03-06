@@ -53,7 +53,7 @@ define(
 
             initialize: function() {
                 this._super();
-                
+
                 uiRegistry.get(this.name + '.' + this.name + '.messages', (function(component) {
                     component.hideTimeout = 12000;
                 }));
@@ -122,6 +122,29 @@ define(
                 return true;
             },
 
+            numbervalidationwithmaxlength: function(data, e) {
+                var charCode = (e.which) ? e.which : e.keyCode;
+                var limit = $(e.currentTarget).attr('maxlength') ? $(e.currentTarget).attr('maxlength') : 4;
+                if(($(e.currentTarget).val().length == limit && e.key!=8) || (charCode < 48 || charCode > 57)) {
+                    return false;
+                }
+                return true;
+            },
+
+            cpfvalidation: function(data, e) {
+                var datalen = $(e.currentTarget).val().length;
+                var charCode = (e.which) ? e.which : e.keyCode
+                var limit = $(e.currentTarget).attr('maxlength') ? $(e.currentTarget).attr('maxlength') : 11;
+
+                if (charCode < 48 || charCode > 57 || datalen > limit) {
+                    $('#card-cpf-msg').html("Digite apenas números.");
+                    return false;
+                }
+
+                $('#card-cpf-msg').empty();
+                return true;
+            },
+
             placeOrder: function(data, event) {
 
                 let messageContainer = this.messageContainer || globalMessageList;
@@ -169,7 +192,7 @@ define(
                             messageContainer.addErrorMessage({
                                 message: 'Dados do cartão inválidos. ' + formattedErrors.join(' ')
                             });
-                            
+
                         }).bind(this),
 
                         // complete callback function
@@ -187,12 +210,12 @@ define(
              * Triggers the update of the installments (consulted on PagSeguro)
              */
             _updateInstallments: function(totals) {
-                
+
                 // checks if the component was fully initialized and the form its open
                 if (this.RMPagSeguroObj && this.getCode() == this.isChecked() && this.grandTotal != totals.grand_total) {
                     this.grandTotal = totals.grand_total;
                     this.RMPagSeguroObj.grandTotal = totals.grand_total;
-                    
+
                     console.debug('Total changed: triggering the installments update...');
                     this.RMPagSeguroObj.getInstallments(
                         totals.grand_total,
