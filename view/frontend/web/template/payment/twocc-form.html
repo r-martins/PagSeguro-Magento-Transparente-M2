@@ -213,12 +213,12 @@
         </div>
         <!-- /ko -->
         <!-- ko if: (window.visibleCpf)-->
-        <div class="field number required">
+        <span class="field number required">
             <label data-bind="attr: {for: getCode() + '_first_cpf'}" class="label">
                 <span><!-- ko i18n: 'CPF '--><!-- /ko --></span>
             </label>
             <div class="control">
-                <input type="text" name="payment[ps_first_cc_cpf]" class="input-text" value=""
+                <input type="text" name="payment[ps_first_cc_cpf]" class="input-text" value="" maxlength="14"
                     data-bind="attr: {
                                 autocomplete: off,
                                 id: getCode() + '_first_cpf',
@@ -232,7 +232,7 @@
                                 }"
                                 />
             </div>
-            <div id="card-cpf-msg" class="mage-error"></div>
+            <span id="card-cpf-msg"></span>
         </div>
         <!-- /ko -->
         <div class="field date required" data-bind="attr: {id: getCode() + '_first_cc_installments_div'}">

@@ -353,14 +353,12 @@ define(
             cpfvalidation: function(data, e) {
                 var datalen = $(e.currentTarget).val().length;
                 var charCode = (e.which) ? e.which : e.keyCode
-                var limit = $(e.currentTarget).attr('maxlength') ? $(e.currentTarget).attr('maxlength') : 11;
+                var limit = $(e.currentTarget).attr('maxlength') ? $(e.currentTarget).attr('maxlength') : 14;
 
-                if (charCode < 48 || charCode > 57 || datalen > limit) {
-                    $('#card-cpf-msg').html("Digite apenas números.");
+                if (charCode < 45 || charCode > 57 || datalen > limit) {
                     return false;
                 }
 
-                $('#card-cpf-msg').empty();
                 return true;
             },
 

@@ -186,7 +186,7 @@
             <span><!-- ko i18n: 'CPF '--><!-- /ko --></span>
         </label>
         <div class="control">
-            <input type="tel" name="payment[ps_cc_cpf]" class="input-text" value="" maxlength="11"
+            <input type="tel" name="payment[ps_cc_cpf]" class="input-text" value="" maxlength="14"
                    data-bind="attr: {
                                     autocomplete: off,
                                     id: getCode() + '_cpf',
@@ -200,7 +200,7 @@
                             valueUpdate: 'keyup'"
             />
         </div>
-        <div id="card-cpf-msg" class="mage-error"></div>
+        <span id="card-cpf-msg"></span>
     </div>
     <!-- /ko -->
     <div class="field date required" data-bind="attr: {id: getCode() + '_cc_installments_div'}">
