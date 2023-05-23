@@ -30,17 +30,17 @@ class UpdatePendingOrderStatus
      * @var OrderCollectionFactory
      */
     protected $orderCollectionFactory;
-    
+
     /**
      * @var LoggerInterface
      */
     private $logger;
-    
+
     /**
      * @var Notifications
      */
     private $notificationModel;
-    
+
     /**
      * @var PsHelper
      */
@@ -74,13 +74,13 @@ class UpdatePendingOrderStatus
         if (!$this->psHelper->isUpdaterEnabled()) {
             return;
         }
-        
+
         foreach ($this->_getOrderCollection() as $order) {
             // checks if its to update this order
             if (!$this->_canUpdate($order)) {
                 continue;
             }
-            
+
             foreach ($this->_getTransactionsIds($order) as $transactionId) {
                 try {
                     $responseXml = $this->psHelper->consultTransactionOnApi($transactionId);
@@ -95,7 +95,7 @@ class UpdatePendingOrderStatus
                     }
 
                     $this->notificationModel->proccessNotificatonResult($responseXml);
-                    
+
                     if ($order->getPayment()->getMethod() == \RicardoMartins\PagSeguro\Model\Method\Twocc::CODE) {
                         // if one transaction was cancelled, we doesnt want to process the other (2cc)
                         // because if the first transaction is cancelled, the processNotificationResult above would
@@ -103,12 +103,12 @@ class UpdatePendingOrderStatus
                         if (in_array((string) $responseXml->status, ['6', '7'])) {
                             break;
                         }
-                        
+
                         // reloads the order to get updated to avoid error loading old order data from memory in the
                         // next loop
                         $order->load($order->getId());
                     }
-                    
+
                 } catch (LocalizedException $e) {
                     $this->logger->warning(__(
                         "[PagSeguro Updater] Could not update order %1 | transaction %2: %3",
@@ -149,11 +149,23 @@ class UpdatePendingOrderStatus
      */
     protected function _getOrderCollection()
     {
-        $from = new \Zend_Date();
-        $from->subDay(self::FILTER_DAYS_BEFORE);
+        $formatter = new \IntlDateFormatter(
+            \Locale::getDefault(),
+            \IntlDateFormatter::FULL,
+            \IntlDateFormatter::FULL,
+            null,
+            null,
+            'yyyy-MM-dd 00:00:00'
+        );
+
+        $formatter->setTimeZone(new \DateTimeZone('UTC'));
+
+        $now = new \DateTime();
+        $now->sub(new \DateInterval('P' . self::FILTER_DAYS_BEFORE . 'D'));
+        $formattedDate = $formatter->format($now);
 
         $collection = $this->orderCollectionFactory->create()
-            ->addAttributeToFilter("created_at", ["from" => $from->toString("YYYY-MM-dd 00:00:00")])
+            ->addAttributeToFilter("created_at", ["from" => $formattedDate])
             ->addAttributeToFilter("state", ["in" => self::FILTER_ORDER_STATUS])
             ->addAttributeToSort("created_at", "ASC");
 
@@ -182,9 +194,10 @@ class UpdatePendingOrderStatus
             return true;
         }
 
-        $nextUpdate = new \Zend_Date($nextUpdate, 'YYYY-MM-dd HH:mm:ss');
+        $nextUpdateDate = new \DateTime($nextUpdate);
+        $now = new \DateTime();
 
-        if ($nextUpdate->isEarlier(\Zend_Date::now())) {
+        if ($nextUpdateDate < $now) {
             $this->_refreshNextUpdateTime($order);
             return true;
         }
@@ -199,8 +212,23 @@ class UpdatePendingOrderStatus
     protected function _refreshNextUpdateTime($order)
     {
         $payment = $order->getPayment();
-        $nextUpdate = (new \Zend_Date())->addHour(self::NEXT_UPDATE_TIME);
-        $payment->setAdditionalInformation('ps_next_update', $nextUpdate->toString('YYYY-MM-dd HH:mm:ss'));
+
+        $formatter = new \IntlDateFormatter(
+            \Locale::getDefault(),
+            \IntlDateFormatter::FULL,
+            \IntlDateFormatter::FULL,
+            null,
+            null,
+            'yyyy-MM-dd HH:mm:ss'
+        );
+
+        $formatter->setTimeZone(new \DateTimeZone('UTC'));
+
+        $now = new \DateTime();
+        $now->sub(new \DateInterval('PT' . self::NEXT_UPDATE_TIME . 'H'));
+        $nextUpdate = $formatter->format($now);
+
+        $payment->setAdditionalInformation('ps_next_update', $nextUpdate);
         $payment->save();
     }
 }
