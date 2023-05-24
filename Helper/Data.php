@@ -90,6 +90,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @var ClientInterface
      */
     protected $httpClient;
+    private \Magento\Customer\Model\Customer $customerRepo;
+    private Logger $_logHelper;
+    private \Magento\Framework\App\ProductMetadataInterface $productMetadata;
+    private \Magento\Framework\Module\ModuleListInterface $moduleList;
 
     /**
      * @param \Magento\Store\Model\StoreManagerInterface        $storeManager
@@ -436,7 +440,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param $payment
      * @param $type
      *
-     * @return SimpleXMLElement
+     * @return \SimpleXMLElement
      */
     public function callApi($params, $payment, $type = 'transactions')
     {
@@ -467,7 +471,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $response = curl_exec($ch);
         } catch (\Exception $e) {
             throw new \Magento\Framework\Validator\Exception(
-                'Communication failure with Pagseguro (' . $e->getMessage() . ')'
+                new Phrase('Communication failure with Pagseguro (' . $e->getMessage() . ')')
             );
         }
 
@@ -475,7 +479,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if (curl_error($ch)) {
             //@TODO Remove curl
             $this->writeLog('-----Curl error response----: ' . var_export(curl_error($ch), true));
-            throw new \Magento\Framework\Validator\Exception(curl_error($ch));
+            throw new \Magento\Framework\Validator\Exception(new Phrase(curl_error($ch)));
         }
         //@TODO Remove curl
         curl_close($ch);
@@ -674,7 +678,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Calculates the "Extra" value that corresponds to Tax values minus Discount given
      * It makes the correct discount to be shown correctly on PagSeguro
-     * @param Mage_Sales_Model_Order $order
+     * @param \Magento\Sales\Model\Order $order
      *
      * @return float
      */
@@ -701,7 +705,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
      /**
       * Return items information, to be send to API
-      * @param Magento\Sales\Model\Order $order
+      * @param \Magento\Sales\Model\Order $order
       * @param float $percent
       * @return array
       */
@@ -742,7 +746,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Return an array with Sender(Customer) information to be used on API call
      *
-     * @param Magento\Sales\Model\Order $order
+     * @param \Magento\Sales\Model\Order $order
      * @param $payment
      * @param string $cc
      * @return array
@@ -780,7 +784,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * Returns an array with credit card's owner (Customer) to be used on API
-     * @param Magento\Sales\Model\Order $order
+     * @param \Magento\Sales\Model\Order $order
      * @param $payment
      * @param string $cc
      * @return array
@@ -808,8 +812,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * Return an array with installment information to be used with API
-     * @param Magento\Sales\Model\Order $order
-     * @param Magento\Sales\Model\Order\Payment $payment
+     * @param \Magento\Sales\Model\Order $order
+     * @param \Magento\Sales\Model\Order\Payment $payment
      * @param string $cc
      * @return array
      */
@@ -840,7 +844,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * Return an array with address (shipping/billing) information to be used on API
-     * @param Magento\Sales\Model\Order $order
+     * @param \Magento\Sales\Model\Order $order
      * @param string (billing|shipping) $type
      * @param float $percent
      * @return array
@@ -848,7 +852,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getAddressParams(\Magento\Sales\Model\Order $order, $type, $percent = 1.0)
     {
         //address attributes
-        /** @var Mage_Sales_Model_Order_Address $address */
+        /** @var \Magento\Sales\Model\Order\Address $address */
         $address = ($type=='shipping' && !$order->getIsVirtual()) ?
         $order->getShippingAddress() : $order->getBillingAddress();
         $addressStreetAttribute = $this->scopeConfig->getValue(
@@ -910,8 +914,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * Returns customer's CPF based on your module configuration
-     * @param Mage_Sales_Model_Order $order
-     * @param Mage_Payment_Model_Method_Abstract $payment
+     *
+     * @param \Magento\Sales\Model\Order $order
+     * @param \Magento\Payment\Model\Method\AbstractMethod $payment
      * @param string $cc
      *
      * @return mixed
@@ -1006,8 +1011,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'Ñ' => 'N', 'Ò' => 'O', 'Ö' => 'O', 'Ø' => 'O', 'Ù' => 'U', 'Û' => 'U', 'Ü' => 'U', 'Ý' => 'Y',
             'ä' => 'a', 'ã' => 'a', 'á' => 'a', 'à' => 'a', 'å' => 'a', 'æ' => 'ae', 'è' => 'e', 'ë' => 'e', 'ì' => 'i',
             'í' => 'i', 'î' => 'i', 'ï' => 'i', 'Ã' => 'A', 'Õ' => 'O',
-            'ñ' => 'n', 'ò' => 'o', 'ô' => 'o', 'ö' => 'o', 'ø' => 'o', 'ù' => 'ú', 'û' => 'u', 'ü' => 'ý', 'ÿ' => 'y',
-            'Œ' => 'OE', 'œ' => 'oe', 'Š' => 'š', 'Ÿ' => 'Y', 'ƒ' => 'f', 'Ğ'=>'G', 'ğ'=>'g', 'Š'=>'S',
+            'ñ' => 'n', 'ò' => 'o', 'ô' => 'o', 'ö' => 'o', 'ø' => 'o', 'ù' => 'ú', 'û' => 'u', 'ü' => 'ý',
+            'Œ' => 'OE', 'œ' => 'oe', 'Ÿ' => 'Y', 'ƒ' => 'f', 'Ğ'=>'G', 'ğ'=>'g', 'Š'=>'S',
             'š'=>'s', 'Ş'=>'S', 'ș'=>'s', 'Ș'=>'S', 'ş'=>'s', 'ț'=>'t', 'Ț'=>'T', 'ÿ'=>'y', 'Ž'=>'Z', 'ž'=>'z'
         ];
         return preg_replace('/[^0-9A-Za-zÃÁÀÂÇÉÊÍÕÓÔÚÜãáàâçéêíõóôúü.\-\/ ]/u', '', strtr($s, $replace));
@@ -1063,7 +1068,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         } elseif ($method &&  strstr($method, 'sedex') !== false) {
             return '2';
         }
-        
+
         return '3';
     }
 
@@ -1479,7 +1484,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * Retrieves visible products of the order, omitting its children (yes, this is different than Magento's method)
-     * @param Magento\Sales\Model\Order $order
+     * @param \Magento\Sales\Model\Order $order
      *
      * @return array
      */
