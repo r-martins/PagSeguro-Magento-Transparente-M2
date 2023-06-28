@@ -578,7 +578,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 $v = '';
             }
 
-            $params[$k] = utf8_decode($v);
+            $params[$k] = mb_convert_encoding($params[$k], 'ISO-8859-1');
         }
         return $params;
     }
