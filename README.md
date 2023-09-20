@@ -10,8 +10,8 @@
 * Economize pelo menos 0,84% + R$0,40 nas taxas oficiais do PagSeguro ([saiba mais](https://pagseguro.ricardomartins.net.br/compare.html)).
 
 ### Pré-requisitos
-* Magento 2.3 ou superior
-* PHP 7.x
+* Magento 2.3.7 ou superior
+* PHP 7.4+
 
 ### Site Oficial do Módulo
 [https://pagseguro.ricardomartins.net.br/](https://pagseguro.ricardomartins.net.br/?utm_source=github&utm_medium=readme&utm_campaign=readme.md)
