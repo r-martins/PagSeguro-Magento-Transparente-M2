@@ -34,14 +34,15 @@ function RMPagSeguro(config) {
             }, 3000 );
         }
 
-        var parcelsDrop = jQuery('#rm_pagseguro_cc_cc_installments');
-        var parcelsFirstDrop = jQuery('#rm_pagseguro_twocc_first_cc_installments');
-        var parcelsSecondDrop = jQuery('#rm_pagseguro_twocc_second_cc_installments');
+        // @OBSOLETE - We've added via template
+        // var parcelsDrop = jQuery('#rm_pagseguro_cc_cc_installments');
+        // var parcelsFirstDrop = jQuery('#rm_pagseguro_twocc_first_cc_installments');
+        // var parcelsSecondDrop = jQuery('#rm_pagseguro_twocc_second_cc_installments');
 
         //Please enter credit card data to calculate
-        parcelsDrop.append('<option value="">Informe os dados do cartão para calcular</option>');
-        parcelsFirstDrop.append('<option value="">Informe os dados do cartão para calcular</option>');
-        parcelsSecondDrop.append('<option value="">Informe os dados do cartão para calcular</option>');
+        // parcelsDrop.append('<option value="">Informe os dados do cartão para calcular</option>');
+        // parcelsFirstDrop.append('<option value="">Informe os dados do cartão para calcular</option>');
+        // parcelsSecondDrop.append('<option value="">Informe os dados do cartão para calcular</option>');
 
         localStorage.setItem('rm_pagseguro_twocc_installments', false);
 }
@@ -58,12 +59,12 @@ RMPagSeguro.prototype.updateSenderHash = function(){
 }
 
 RMPagSeguro.prototype.setupGrandTotalListener = function(obj){
-    // avoids concurrent listeners (object could be instantiated more 
+    // avoids concurrent listeners (object could be instantiated more
     // than one time in checkout)
     if(obj.grandTotalListener) {
         jQuery(document).unbind('ajaxComplete', obj.grandTotalListener);
     }
-    
+
     // observed endpoints
     var observedEndpoints = [
         /\/V1\/carts\/mine\/shipping-information/,
@@ -71,7 +72,7 @@ RMPagSeguro.prototype.setupGrandTotalListener = function(obj){
         /\/V1\/guest-carts\/(.)+\/shipping-information/,
         /\/V1\/guest-carts\/(.)+\/coupons/
     ];
-    
+
     // 'update installments' listener
     obj.grandTotalListener = function (event, xhr, settings) {
         if (settings.type.match(/post|put|delete/i)) {
@@ -233,7 +234,7 @@ RMPagSeguro.prototype.addCardFieldsObserver = function(obj){
         jQuery(ccSecondAmount).keyup(function( event ) {
             obj.updateAmount('second');
         });
-        jQuery(ccSecondAmount).blur(function(event){            
+        jQuery(ccSecondAmount).blur(function(event){
             obj.setTwoInstallments('first');
         });
         jQuery(ccSecondNumElm).keyup(function( event ) {
@@ -314,7 +315,7 @@ RMPagSeguro.prototype.updateCreditCardToken = function(){
         this.updateTwoCreditCardToken('first');
         this.updateTwoCreditCardToken('second');
     }
-    
+
     /* else {
         this.updateOneCreditCardToken();
     } */
@@ -327,11 +328,11 @@ RMPagSeguro.prototype.updateOneCreditCardToken = function(successCallback = null
     var ccCvv = jQuery('input[name="payment[ps_cc_cid]"]').val().replace(/[^0-9\.]+/g, '');
     var brandName = '';
     var self = this;
-    
+
     if(typeof this.brand != "undefined"){
         brandName = this.brand.name;
     }
-    
+
     if(ccNum.length > 6 && ccExpMo != "" && ccExpYr != "" && ccCvv.length >= 3)
     {
         PagSeguroDirectPayment.createCardToken({
@@ -385,7 +386,7 @@ RMPagSeguro.prototype.updateOneCreditCardToken = function(successCallback = null
                 }
             }
         });
-    }    
+    }
 }
 
 RMPagSeguro.prototype.updateAmount = function(cardLabel) {
@@ -413,7 +414,7 @@ RMPagSeguro.prototype.updateAmount = function(cardLabel) {
     remaining = (remaining / 100).toFixed(2);
     value = (value / 100).toFixed(2);
 
-    if (cardLabel == 'first') {        
+    if (cardLabel == 'first') {
         jQuery('input[name="payment[ps_second_cc_amount]"]').val(remaining.toString());
         jQuery('input[name="payment[pagseguropro_second_cc_amount]"]').val(remaining.toString());
     }
@@ -481,7 +482,7 @@ RMPagSeguro.prototype.updateTwoCreditCardToken = function(cardLabel){
                 typeof self.lastExpMoFirst != "undefined" &&
                 ccExpMo == self.lastExpMoFirst &&
                 self.lastExpYrFirst == ccExpYr &&
-                self.lastFirstCcNum == ccNum && 
+                self.lastFirstCcNum == ccNum &&
                 self.lastFirstCvv == ccCvv
             ) {
                 return;
@@ -492,7 +493,7 @@ RMPagSeguro.prototype.updateTwoCreditCardToken = function(cardLabel){
                 typeof self.lastExpMoSecond != "undefined" &&
                 ccExpMo == self.lastExpMoSecond &&
                 self.lastExpYrSecond == ccExpYr &&
-                self.lastSecondCcNum == ccNum && 
+                self.lastSecondCcNum == ccNum &&
                 self.lastSecondCvv == ccCvv
             ) {
                 return;
@@ -527,7 +528,7 @@ RMPagSeguro.prototype.updateTwoCreditCardToken = function(cardLabel){
                 }
                 jQuery('#'+cardLabel+'-card-msg').html('');
                 jQuery('#'+cardLabel+'-card-msg').removeAttr('generated');
-                self.updatePaymentHashes();                
+                self.updatePaymentHashes();
             },
             error: function(psresponse){
                 //TODO: get real message instead of trying to catch all errors in the universe
@@ -605,7 +606,7 @@ RMPagSeguro.prototype.updateOneBrand = function() {
     if(typeof this.lastCcNum != "undefined" && ccNum == this.lastCcNum){
         return;
     }
-    
+
     var currentBin = ccNum.substring(0, 6);
     var flag = window.rmconfig.flag;
     var debug = window.rmconfig.debug;
@@ -670,7 +671,7 @@ RMPagSeguro.prototype.updateTwoBrand = function(cardLabel){
             this.cardSecondBin = currentBin;
         }
         localStorage.removeItem('rm_pagseguro_twocc_'+cardLabel);
-        
+
         //PagSeguroDirectPayment.getBrand({
         self.requestToWs('getBrand', {
             cardBin: currentBin,
@@ -679,7 +680,7 @@ RMPagSeguro.prototype.updateTwoBrand = function(cardLabel){
                     self.firstBrand = psresponse.brand;
                 } else {
                     self.secondBrand = psresponse.brand;
-                }                
+                }
                 if(flag != ''){
                     jQuery('.'+cardLabel+'_cc_number_visible').attr('style','background-image:url("https://stc.pagseguro.uol.com.br/public/img/payment-methods-flags/' +flag + '/' + psresponse.brand.name + '.png") !important');
                 }
@@ -815,7 +816,7 @@ RMPagSeguro.prototype.getInstallments = function(grandTotal, selectedInstallment
                     parcelsDrop.append('<option value="'+optionVal+'">'+optionText+'</option>');
                 }
             }
-            
+
             // updating installment value in checkout session
             self.updateInstallments();
         },
@@ -844,7 +845,7 @@ RMPagSeguro.prototype.getTwoInstallments = function(grandTotal, selectedInstallm
     }
 
     const brandName = (cardLabel === 'first')?this.firstBrand.name:this.secondBrand.name;
-    
+
     if(typeof grandTotal == "undefined"){
        this.getGrandTotal();
     }
@@ -934,7 +935,7 @@ RMPagSeguro.prototype.updateInstallments = function(){
 }
 
 RMPagSeguro.prototype.updateTwoInstallments = function(cardLabel){
-    var url = this.storeUrl + 'pseguro/ajax/updateInstallments';    
+    var url = this.storeUrl + 'pseguro/ajax/updateInstallments';
     ccInstallment = document.querySelector('#rm_pagseguro_twocc_'+ cardLabel +'_cc_installments').selectedIndex;
     localStorage.setItem('rm_pagseguro_twocc_'+cardLabel, ccInstallment);
     document.querySelector('.'+ cardLabel +'_cc_installments').value = document.querySelector('#rm_pagseguro_twocc_'+ cardLabel +'_cc_installments').value;
@@ -996,7 +997,7 @@ class RMPagSeguro_RequestQueue {
     /**
      * Adds a new request on queue and calls the queue processing
      * for its type
-     * @param string type 
+     * @param string type
      * @param object params
      */
     pushRequest(type, params) {
@@ -1025,7 +1026,7 @@ class RMPagSeguro_RequestQueue {
 
         let self = this;
         let originalParams = this.queues[type].requests.shift();
-        
+
         var params = Object.assign({}, originalParams);
         var localCallbacks = {
             success : function() {},
@@ -1037,18 +1038,18 @@ class RMPagSeguro_RequestQueue {
         if(originalParams.success) {
             localCallbacks.success = originalParams.success;
         }
-        
+
         if(originalParams.error) {
             localCallbacks.error = originalParams.error;
         }
-        
+
         if(originalParams.always) {
             localCallbacks.always = originalParams.always;
         }
 
         params.success = function(response) {
             localCallbacks.success(response);
-            
+
             // if you trust in PagSeguro lib, move this to always callback
             self._resumeRequests(type);
         };
@@ -1089,7 +1090,7 @@ class RMPagSeguro_RequestQueue {
     /**
      * Releases the queue lock and resumes the queue processing,
      * of a given request type
-     * @param string type 
+     * @param string type
      */
     _resumeRequests(type) {
         this.queues[type].lock = false;
@@ -1100,7 +1101,7 @@ class RMPagSeguro_RequestQueue {
 /**
  * Function that uses the request queue stored on window's object
  * to made PagSeguro WS functions calling
- * @param string type 
+ * @param string type
  * @param object params
  */
 RMPagSeguro.prototype.requestToWs = function(type, params){
